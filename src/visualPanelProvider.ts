@@ -114,7 +114,7 @@ export class VisualPanelProvider {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        // 生成可视化工作流的HTML
+        // 生成可视化工作流的HTML，包含AI增强分析和性能评估
         const analysisData = this._codeAnalysis ? JSON.stringify(this._codeAnalysis) : 'null';
         
         return `<!DOCTYPE html>
@@ -122,7 +122,7 @@ export class VisualPanelProvider {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>代码可视化工作流</title>
+            <title>AI增强代码可视化分析平台</title>
             <style>
                 body {
                     margin: 0;
@@ -136,18 +136,264 @@ export class VisualPanelProvider {
                     width: 100%;
                     height: 100vh;
                     position: relative;
-                    overflow: hidden;
+                    overflow: auto;
                 }
                 
                 .toolbar {
-                    position: absolute;
+                    position: fixed;
                     top: 10px;
                     left: 10px;
                     z-index: 1000;
                     background: var(--vscode-panel-background);
-                    padding: 10px;
-                    border-radius: 5px;
+                    padding: 15px;
+                    border-radius: 8px;
                     border: 1px solid var(--vscode-panel-border);
+                    display: flex;
+                    gap: 10px;
+                    align-items: center;
+                }
+                
+                .toolbar button {
+                    background: var(--vscode-button-background);
+                    color: var(--vscode-button-foreground);
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    font-weight: 500;
+                }
+                
+                .toolbar button:hover {
+                    background: var(--vscode-button-hoverBackground);
+                }
+                
+                .toolbar .separator {
+                    width: 1px;
+                    height: 20px;
+                    background: var(--vscode-panel-border);
+                    margin: 0 5px;
+                }
+                
+                /* 分析面板布局 */
+                .analysis-dashboard {
+                    margin-top: 70px;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                    max-width: 1200px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                
+                /* 评分卡片样式 */
+                .score-card {
+                    background: var(--vscode-editor-background);
+                    border: 2px solid var(--vscode-panel-border);
+                    border-radius: 12px;
+                    padding: 20px;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    transition: all 0.3s ease;
+                }
+                
+                .score-card:hover {
+                    border-color: var(--vscode-focusBorder);
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+                }
+                
+                .score-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 15px;
+                }
+                
+                .score-icon {
+                    font-size: 24px;
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 8px;
+                    background: var(--vscode-button-background);
+                }
+                
+                .score-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: var(--vscode-editor-foreground);
+                }
+                
+                .score-value {
+                    font-size: 32px;
+                    font-weight: 700;
+                    text-align: center;
+                    margin: 15px 0;
+                }
+                
+                .score-excellent { color: #4caf50; }
+                .score-good { color: #ff9800; }
+                .score-warning { color: #f44336; }
+                
+                .score-details {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                    margin-top: 15px;
+                }
+                
+                .detail-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 12px;
+                    background: var(--vscode-panel-background);
+                    border-radius: 6px;
+                    font-size: 14px;
+                }
+                
+                .detail-score {
+                    font-weight: 600;
+                }
+                
+                /* 可视化图表区域 */
+                .visualization-panel {
+                    grid-column: 1 / -1;
+                    background: var(--vscode-editor-background);
+                    border: 2px solid var(--vscode-panel-border);
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin-top: 20px;
+                }
+                
+                .viz-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 20px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid var(--vscode-panel-border);
+                }
+                
+                .viz-title {
+                    font-size: 20px;
+                    font-weight: 600;
+                }
+                
+                /* 节点可视化区域 */
+                .node-canvas {
+                    width: 100%;
+                    height: 400px;
+                    background: var(--vscode-panel-background);
+                    border-radius: 8px;
+                    position: relative;
+                    overflow: hidden;
+                    border: 1px solid var(--vscode-panel-border);
+                }
+                
+                .analysis-node {
+                    position: absolute;
+                    width: 120px;
+                    height: 80px;
+                    background: var(--vscode-button-background);
+                    border: 2px solid var(--vscode-panel-border);
+                    border-radius: 8px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-size: 12px;
+                    text-align: center;
+                    padding: 8px;
+                }
+                
+                .analysis-node:hover {
+                    border-color: var(--vscode-focusBorder);
+                    transform: scale(1.05);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                }
+                
+                .node-icon {
+                    font-size: 20px;
+                    margin-bottom: 4px;
+                }
+                
+                .node-title {
+                    font-weight: 600;
+                    font-size: 11px;
+                    line-height: 1.2;
+                }
+                
+                /* 建议列表 */
+                .suggestions-panel {
+                    grid-column: 1 / -1;
+                    background: var(--vscode-editor-background);
+                    border: 2px solid var(--vscode-panel-border);
+                    border-radius: 12px;
+                    padding: 20px;
+                    margin-top: 20px;
+                }
+                
+                .suggestion-item {
+                    background: var(--vscode-panel-background);
+                    border: 1px solid var(--vscode-panel-border);
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-bottom: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                
+                .suggestion-item:hover {
+                    border-color: var(--vscode-focusBorder);
+                    background: var(--vscode-editor-background);
+                }
+                
+                .suggestion-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 10px;
+                }
+                
+                .priority-badge {
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+                
+                .priority-high { background: #f44336; color: white; }
+                .priority-medium { background: #ff9800; color: white; }
+                .priority-low { background: #4caf50; color: white; }
+                
+                .suggestion-title {
+                    font-weight: 600;
+                    font-size: 14px;
+                }
+                
+                .suggestion-description {
+                    color: var(--vscode-descriptionForeground);
+                    font-size: 13px;
+                    line-height: 1.4;
+                    margin-bottom: 10px;
+                }
+                
+                .suggestion-code {
+                    background: var(--vscode-textCodeBlock-background);
+                    border: 1px solid var(--vscode-panel-border);
+                    border-radius: 4px;
+                    padding: 10px;
+                    font-family: 'Cascadia Code', monospace;
+                    font-size: 12px;
+                    overflow-x: auto;
+                    margin-top: 10px;
+                }
                 }
                 
                 .canvas {
@@ -534,22 +780,174 @@ export class VisualPanelProvider {
         </head>
         <body>
             <div class="container">
+                <!-- 工具栏 -->
                 <div class="toolbar">
-                    <button onclick="resetView()">重置视图</button>
-                    <button onclick="autoLayout()">自动布局</button>
-                    <button onclick="exportImage()">导出图片</button>
+                    <button onclick="resetView()">🔄 重置视图</button>
+                    <button onclick="autoLayout()">🎯 自动布局</button>
+                    <div class="separator"></div>
+                    <button onclick="showAIAnalysis()">🧠 AI分析</button>
+                    <button onclick="showPerformanceReport()">⚡ 性能报告</button>
+                    <button onclick="showQualityReport()">📊 质量评估</button>
+                    <div class="separator"></div>
+                    <button onclick="exportReport()">📄 导出报告</button>
                 </div>
                 
-                <div class="info-panel">
-                    <div class="info-title">文件信息</div>
-                    <div id="fileInfo">请先分析代码文件</div>
+                <!-- AI增强分析仪表板 -->
+                <div class="analysis-dashboard">
+                    <!-- 综合质量评分卡 -->
+                    <div class="score-card" id="qualityScoreCard">
+                        <div class="score-header">
+                            <div class="score-icon">🎯</div>
+                            <div class="score-title">综合质量评分</div>
+                        </div>
+                        <div class="score-value" id="overallScore">--</div>
+                        <div class="score-details">
+                            <div class="detail-item">
+                                <span>代码质量</span>
+                                <span class="detail-score" id="codeQualityScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>性能表现</span>
+                                <span class="detail-score" id="performanceScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>可维护性</span>
+                                <span class="detail-score" id="maintainabilityScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>安全性</span>
+                                <span class="detail-score" id="securityScore">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI增强分析卡 -->
+                    <div class="score-card" id="aiAnalysisCard">
+                        <div class="score-header">
+                            <div class="score-icon">🧠</div>
+                            <div class="score-title">AI增强分析</div>
+                        </div>
+                        <div class="score-value" id="aiInsightCount">--</div>
+                        <div class="score-details">
+                            <div class="detail-item">
+                                <span>代码坏味道</span>
+                                <span class="detail-score" id="badSmellCount">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>架构模式</span>
+                                <span class="detail-score" id="patternCount">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>改进建议</span>
+                                <span class="detail-score" id="suggestionCount">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>最佳实践</span>
+                                <span class="detail-score" id="bestPracticeCount">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 性能分析卡 -->
+                    <div class="score-card" id="performanceCard">
+                        <div class="score-header">
+                            <div class="score-icon">⚡</div>
+                            <div class="score-title">性能分析</div>
+                        </div>
+                        <div class="score-value" id="performanceOverall">--</div>
+                        <div class="score-details">
+                            <div class="detail-item">
+                                <span>算法复杂度</span>
+                                <span class="detail-score" id="algorithmScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>内存效率</span>
+                                <span class="detail-score" id="memoryScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>I/O效率</span>
+                                <span class="detail-score" id="ioScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>并发安全</span>
+                                <span class="detail-score" id="concurrencyScore">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 专项优化卡 -->
+                    <div class="score-card" id="specializationCard">
+                        <div class="score-header">
+                            <div class="score-icon">🎨</div>
+                            <div class="score-title">专项优化</div>
+                        </div>
+                        <div class="score-value" id="specializationScore">--</div>
+                        <div class="score-details">
+                            <div class="detail-item">
+                                <span>React Hook</span>
+                                <span class="detail-score" id="reactHookScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>状态管理</span>
+                                <span class="detail-score" id="stateManagementScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Rust内存</span>
+                                <span class="detail-score" id="rustMemoryScore">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>代码生成</span>
+                                <span class="detail-score" id="codeGenScore">--</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="canvas" id="canvas">
-                    <div class="empty-state" id="emptyState">
-                        <div class="empty-icon">📊</div>
-                        <h3>代码可视化工作流</h3>
-                        <p>请使用 "分析代码结构" 命令来生成可视化视图</p>
+                <!-- 可视化面板 -->
+                <div class="visualization-panel">
+                    <div class="viz-header">
+                        <div class="score-icon">📊</div>
+                        <div class="viz-title">代码结构可视化</div>
+                        <div style="margin-left: auto; display: flex; gap: 10px;">
+                            <button onclick="toggleNodeDetails()" style="padding: 6px 12px; font-size: 12px;">📝 详细信息</button>
+                            <button onclick="focusOnIssues()" style="padding: 6px 12px; font-size: 12px;">🚨 问题聚焦</button>
+                        </div>
+                    </div>
+                    
+                    <div class="node-canvas" id="nodeCanvas">
+                        <div class="empty-state" id="emptyState" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">🧠</div>
+                            <h3>AI增强代码分析平台</h3>
+                            <p>使用 "分析代码结构" 命令开始智能分析</p>
+                            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="loadDemo('react')" style="padding: 8px 16px; font-size: 12px;">🎯 React演示</button>
+                                <button onclick="loadDemo('rust')" style="padding: 8px 16px; font-size: 12px;">🦀 Rust演示</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 优化建议面板 -->
+                <div class="suggestions-panel">
+                    <div class="viz-header">
+                        <div class="score-icon">💡</div>
+                        <div class="viz-title">AI优化建议</div>
+                        <div style="margin-left: auto;">
+                            <select id="priorityFilter" onchange="filterSuggestions()" style="padding: 4px 8px; font-size: 12px;">
+                                <option value="all">全部建议</option>
+                                <option value="high">高优先级</option>
+                                <option value="medium">中优先级</option>
+                                <option value="low">低优先级</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="suggestionsList">
+                        <div class="empty-state" style="text-align: center; padding: 40px;">
+                            <div style="font-size: 32px; margin-bottom: 15px;">💡</div>
+                            <h4>暂无优化建议</h4>
+                            <p>分析代码后将显示AI生成的优化建议</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -560,12 +958,246 @@ export class VisualPanelProvider {
                 let nodes = [];
                 let draggedNode = null;
                 let offset = { x: 0, y: 0 };
+                let showNodeDetails = false;
+                let currentFilter = 'all';
                 
+                // AI增强分析数据处理
                 function init() {
                     if (codeAnalysis) {
                         renderNodes();
-                        updateFileInfo();
+                        updateAnalysisDashboard();
+                        updateSuggestionsList();
                         document.getElementById('emptyState').style.display = 'none';
+                    }
+                }
+                
+                // 更新AI分析仪表板
+                function updateAnalysisDashboard() {
+                    if (!codeAnalysis) return;
+                    
+                    // 综合质量评分
+                    const qualityReport = codeAnalysis.comprehensiveQualityReport;
+                    if (qualityReport) {
+                        updateScoreElement('overallScore', qualityReport.overallScore, true);
+                        updateScoreElement('codeQualityScore', qualityReport.dimensions.codeQuality);
+                        updateScoreElement('performanceScore', qualityReport.dimensions.performance);
+                        updateScoreElement('maintainabilityScore', qualityReport.dimensions.maintainability);
+                        updateScoreElement('securityScore', qualityReport.dimensions.security);
+                    }
+                    
+                    // AI增强分析
+                    const aiAnalysis = codeAnalysis.aiEnhancedAnalysis;
+                    if (aiAnalysis) {
+                        updateScoreElement('aiInsightCount', aiAnalysis.insights?.length || 0);
+                        updateScoreElement('badSmellCount', aiAnalysis.codeSmells?.length || 0);
+                        updateScoreElement('patternCount', aiAnalysis.architecturePatterns?.length || 0);
+                        updateScoreElement('suggestionCount', aiAnalysis.suggestions?.length || 0);
+                        updateScoreElement('bestPracticeCount', aiAnalysis.bestPractices?.length || 0);
+                    }
+                    
+                    // 性能分析
+                    const performanceAnalysis = codeAnalysis.deepPerformanceAnalysis;
+                    if (performanceAnalysis) {
+                        updateScoreElement('performanceOverall', performanceAnalysis.overallScore || 0, true);
+                        updateScoreElement('algorithmScore', performanceAnalysis.metrics?.algorithm || 0);
+                        updateScoreElement('memoryScore', performanceAnalysis.metrics?.memory || 0);
+                        updateScoreElement('ioScore', performanceAnalysis.metrics?.io || 0);
+                        updateScoreElement('concurrencyScore', performanceAnalysis.metrics?.concurrency || 0);
+                    }
+                    
+                    // 专项优化
+                    const hookAnalysis = codeAnalysis.reactHookOptimization;
+                    const stateAnalysis = codeAnalysis.reactStateOptimization;
+                    const memoryAnalysis = codeAnalysis.rustMemorySafetyPerformance;
+                    
+                    if (hookAnalysis) updateScoreElement('reactHookScore', hookAnalysis.overallScore || 0);
+                    if (stateAnalysis) updateScoreElement('stateManagementScore', stateAnalysis.overallScore || 0);
+                    if (memoryAnalysis) updateScoreElement('rustMemoryScore', memoryAnalysis.overallScore || 0);
+                    
+                    const avgSpecScore = Math.round(
+                        ((hookAnalysis?.overallScore || 0) + 
+                         (stateAnalysis?.overallScore || 0) + 
+                         (memoryAnalysis?.overallScore || 0)) / 3
+                    );
+                    updateScoreElement('specializationScore', avgSpecScore, true);
+                    updateScoreElement('codeGenScore', 85); // 代码生成评分
+                }
+                
+                // 更新评分元素
+                function updateScoreElement(elementId, score, isMainScore = false) {
+                    const element = document.getElementById(elementId);
+                    if (!element) return;
+                    
+                    if (isMainScore && typeof score === 'number') {
+                        element.textContent = score + '/100';
+                        element.className = 'score-value ' + getScoreClass(score);
+                    } else if (typeof score === 'number') {
+                        element.textContent = score > 100 ? score : score + '/100';
+                        element.className = 'detail-score ' + getScoreClass(score);
+                    } else {
+                        element.textContent = score;
+                    }
+                }
+                
+                // 获取评分样式类
+                function getScoreClass(score) {
+                    if (score >= 80) return 'score-excellent';
+                    if (score >= 60) return 'score-good';
+                    return 'score-warning';
+                }
+                
+                // 更新建议列表
+                function updateSuggestionsList() {
+                    const container = document.getElementById('suggestionsList');
+                    if (!container || !codeAnalysis) return;
+                    
+                    let allSuggestions = [];
+                    
+                    // 收集所有建议
+                    if (codeAnalysis.aiEnhancedAnalysis?.suggestions) {
+                        allSuggestions.push(...codeAnalysis.aiEnhancedAnalysis.suggestions.map(s => ({...s, source: 'AI分析'})));
+                    }
+                    if (codeAnalysis.deepPerformanceAnalysis?.suggestions) {
+                        allSuggestions.push(...codeAnalysis.deepPerformanceAnalysis.suggestions.map(s => ({...s, source: '性能分析'})));
+                    }
+                    if (codeAnalysis.comprehensiveQualityReport?.suggestions) {
+                        allSuggestions.push(...codeAnalysis.comprehensiveQualityReport.suggestions.map(s => ({...s, source: '质量分析'})));
+                    }
+                    
+                    // 收集专项分析建议
+                    ['reactHookOptimization', 'reactStateOptimization', 'rustMemorySafetyPerformance'].forEach(key => {
+                        if (codeAnalysis[key]?.suggestions) {
+                            const sourceMap = {
+                                'reactHookOptimization': 'React Hook优化',
+                                'reactStateOptimization': '状态管理优化',
+                                'rustMemorySafetyPerformance': 'Rust内存优化'
+                            };
+                            allSuggestions.push(...codeAnalysis[key].suggestions.map(s => ({...s, source: sourceMap[key]})));
+                        }
+                    });
+                    
+                    if (allSuggestions.length === 0) {
+                        container.innerHTML = '<div class="empty-state" style="text-align: center; padding: 40px;"><div style="font-size: 32px; margin-bottom: 15px;">✅</div><h4>代码质量良好</h4><p>暂无优化建议</p></div>';
+                        return;
+                    }
+                    
+                    // 过滤建议
+                    let filteredSuggestions = allSuggestions;
+                    if (currentFilter !== 'all') {
+                        filteredSuggestions = allSuggestions.filter(s => s.priority === currentFilter);
+                    }
+                    
+                    // 按优先级排序
+                    const priorityOrder = { high: 3, medium: 2, low: 1 };
+                    filteredSuggestions.sort((a, b) => (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0));
+                    
+                    // 渲染建议
+                    container.innerHTML = filteredSuggestions.map(suggestion => createSuggestionHTML(suggestion)).join('');
+                }
+                
+                // 创建建议HTML
+                function createSuggestionHTML(suggestion) {
+                    const priorityClass = 'priority-' + (suggestion.priority || 'medium');
+                    const priorityText = (suggestion.priority || 'medium').toUpperCase();
+                    
+                    return \`
+                        <div class="suggestion-item" onclick="jumpToCode('\${suggestion.file}', \${suggestion.line})">
+                            <div class="suggestion-header">
+                                <span class="priority-badge \${priorityClass}">\${priorityText}</span>
+                                <span class="suggestion-title">\${suggestion.title || '优化建议'}</span>
+                                <span style="margin-left: auto; font-size: 12px; color: var(--vscode-descriptionForeground);">
+                                    \${suggestion.source} • 第\${suggestion.line || 0}行
+                                </span>
+                            </div>
+                            <div class="suggestion-description">
+                                \${suggestion.description || suggestion.message || '建议优化此处代码'}
+                            </div>
+                            \${suggestion.codeExample ? \`
+                                <div class="suggestion-code">\${suggestion.codeExample}</div>
+                            \` : ''}
+                            \${suggestion.estimatedImpact ? \`
+                                <div style="margin-top: 10px; font-size: 12px; color: var(--vscode-descriptionForeground);">
+                                    预期收益: \${suggestion.estimatedImpact}
+                                </div>
+                            \` : ''}
+                        </div>
+                    \`;
+                }
+                
+                // 工具栏按钮功能
+                function showAIAnalysis() {
+                    document.querySelector('.analysis-dashboard').scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                function showPerformanceReport() {
+                    const perfCard = document.getElementById('performanceCard');
+                    if (perfCard) {
+                        perfCard.scrollIntoView({ behavior: 'smooth' });
+                        perfCard.style.transform = 'scale(1.02)';
+                        setTimeout(() => { perfCard.style.transform = 'scale(1)'; }, 200);
+                    }
+                }
+                
+                function showQualityReport() {
+                    const qualityCard = document.getElementById('qualityScoreCard');
+                    if (qualityCard) {
+                        qualityCard.scrollIntoView({ behavior: 'smooth' });
+                        qualityCard.style.transform = 'scale(1.02)';
+                        setTimeout(() => { qualityCard.style.transform = 'scale(1)'; }, 200);
+                    }
+                }
+                
+                function toggleNodeDetails() {
+                    showNodeDetails = !showNodeDetails;
+                    renderNodes();
+                }
+                
+                function focusOnIssues() {
+                    // 聚焦到有问题的节点
+                    const canvas = document.getElementById('nodeCanvas');
+                    const problemNodes = canvas.querySelectorAll('.analysis-node[data-has-issues="true"]');
+                    if (problemNodes.length > 0) {
+                        problemNodes.forEach(node => {
+                            node.style.border = '3px solid #f44336';
+                            node.style.animation = 'pulse 1s infinite';
+                        });
+                    }
+                }
+                
+                function filterSuggestions() {
+                    const select = document.getElementById('priorityFilter');
+                    currentFilter = select.value;
+                    updateSuggestionsList();
+                }
+                
+                function loadDemo(type) {
+                    vscode.postMessage({
+                        type: 'onInfo',
+                        value: \`正在加载\${type === 'react' ? 'React' : 'Rust'}演示项目...\`
+                    });
+                }
+                
+                function exportReport() {
+                    if (!codeAnalysis) {
+                        vscode.postMessage({
+                            type: 'onError',
+                            value: '没有可导出的分析数据'
+                        });
+                        return;
+                    }
+                    
+                    vscode.postMessage({
+                        type: 'exportReport',
+                        value: codeAnalysis
+                    });
+                }
+                
+                function jumpToCode(file, line) {
+                    if (file && line) {
+                        vscode.postMessage({
+                            type: 'onNodeClick',
+                            value: { file, line }
+                        });
                     }
                 }
                 
@@ -679,6 +1311,72 @@ export class VisualPanelProvider {
                         positionNode(node, nodeIndex, nodeSpacing);
                         canvas.appendChild(node);
                         nodeIndex++;
+                    }
+
+                    // 渲染React高级组件分析结果
+                    if (codeAnalysis.reactAdvancedComponentAnalysis) {
+                        const advancedAnalysis = codeAnalysis.reactAdvancedComponentAnalysis;
+                        
+                        // 渲染组件依赖分析
+                        if (advancedAnalysis.componentDependencies && advancedAnalysis.componentDependencies.dependencies) {
+                            advancedAnalysis.componentDependencies.dependencies.forEach((dep, index) => {
+                                const node = createReactComponentDependencyNode(dep, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染Hook依赖分析
+                        if (advancedAnalysis.hookDependencies && advancedAnalysis.hookDependencies.issues) {
+                            advancedAnalysis.hookDependencies.issues.forEach((issue, index) => {
+                                const node = createReactHookIssueNode(issue, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染架构评分
+                        if (advancedAnalysis.architectureScore) {
+                            const node = createReactArchitectureScoreNode(advancedAnalysis.architectureScore, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
+                    }
+
+                    // 渲染Rust高级系统分析结果
+                    if (codeAnalysis.rustAdvancedSystemAnalysis) {
+                        const advancedAnalysis = codeAnalysis.rustAdvancedSystemAnalysis;
+                        
+                        // 渲染模块架构分析
+                        if (advancedAnalysis.moduleArchitecture && advancedAnalysis.moduleArchitecture.modules) {
+                            advancedAnalysis.moduleArchitecture.modules.forEach((module, index) => {
+                                const node = createRustModuleArchitectureNode(module, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染错误处理质量
+                        if (advancedAnalysis.errorHandling && advancedAnalysis.errorHandling.issues) {
+                            advancedAnalysis.errorHandling.issues.forEach((issue, index) => {
+                                const node = createRustErrorHandlingNode(issue, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染系统架构评分
+                        if (advancedAnalysis.systemArchitectureScore) {
+                            const node = createRustSystemScoreNode(advancedAnalysis.systemArchitectureScore, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
                     }
 
                     // 渲染Rust后端架构分析结果
@@ -993,6 +1691,130 @@ export class VisualPanelProvider {
                             canvas.appendChild(node);
                             nodeIndex++;
                         });
+                    }
+                    
+                    // 渲染React深度优化分析结果
+                    if (codeAnalysis.reactDeepOptimization) {
+                        const optimization = codeAnalysis.reactDeepOptimization;
+                        
+                        // 渲染代码分割优化节点
+                        if (optimization.codeSplitting && optimization.codeSplitting.opportunities) {
+                            optimization.codeSplitting.opportunities.forEach((opportunity, index) => {
+                                const node = createReactCodeSplittingOptimizationNode(opportunity, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染渲染性能优化节点
+                        if (optimization.renderPerformance && optimization.renderPerformance.expensiveOperations) {
+                            optimization.renderPerformance.expensiveOperations.forEach((operation, index) => {
+                                const node = createReactRenderPerformanceOptimizationNode(operation, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染Bundle优化节点
+                        if (optimization.bundleOptimization && optimization.bundleOptimization.treeshakingOpportunities) {
+                            optimization.bundleOptimization.treeshakingOpportunities.forEach((treeshaking, index) => {
+                                const node = createReactBundleOptimizationNode(treeshaking, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染状态管理优化节点
+                        if (optimization.stateManagement && optimization.stateManagement.overStateDetection) {
+                            optimization.stateManagement.overStateDetection.forEach((stateIssue, index) => {
+                                const node = createReactStateOptimizationNode(stateIssue, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染性能预测模型节点
+                        if (optimization.performancePrediction) {
+                            const node = createReactPerformancePredictionNode(optimization.performancePrediction, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
+                        
+                        // 渲染综合评分节点
+                        if (optimization.comprehensiveScore) {
+                            const node = createReactComprehensiveScoreNode(optimization.comprehensiveScore, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
+                    }
+                    
+                    // 渲染Rust深度优化分析结果
+                    if (codeAnalysis.rustDeepOptimization) {
+                        const optimization = codeAnalysis.rustDeepOptimization;
+                        
+                        // 渲染内存分配优化节点
+                        if (optimization.memoryAllocation && optimization.memoryAllocation.preallocationOpportunities) {
+                            optimization.memoryAllocation.preallocationOpportunities.forEach((opportunity, index) => {
+                                const node = createRustMemoryAllocationOptimizationNode(opportunity, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染并发性能优化节点
+                        if (optimization.concurrencyPerformance && optimization.concurrencyPerformance.asyncConversionOpportunities) {
+                            optimization.concurrencyPerformance.asyncConversionOpportunities.forEach((opportunity, index) => {
+                                const node = createRustConcurrencyPerformanceOptimizationNode(opportunity, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染计算优化节点
+                        if (optimization.computationalOptimization && optimization.computationalOptimization.algorithmComplexityIssues) {
+                            optimization.computationalOptimization.algorithmComplexityIssues.forEach((issue, index) => {
+                                const node = createRustComputationalOptimizationNode(issue, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染错误处理安全节点
+                        if (optimization.errorHandlingSafety && optimization.errorHandlingSafety.panicRisks) {
+                            optimization.errorHandlingSafety.panicRisks.forEach((risk, index) => {
+                                const node = createRustErrorHandlingSafetyNode(risk, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染I/O优化节点
+                        if (optimization.ioOptimization && optimization.ioOptimization.syncToAsyncOpportunities) {
+                            optimization.ioOptimization.syncToAsyncOpportunities.forEach((opportunity, index) => {
+                                const node = createRustIOOptimizationNode(opportunity, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+                        
+                        // 渲染架构质量评估节点
+                        if (optimization.architectureQuality) {
+                            const node = createRustArchitectureQualityNode(optimization.architectureQuality, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
                     }
                     
                     // 渲染TypeScript/JavaScript函数（原有逻辑）
@@ -2248,6 +3070,186 @@ export class VisualPanelProvider {
                     return node;
                 }
 
+                // React高级组件分析相关节点创建函数
+                function createReactComponentDependencyNode(dependency, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-component-dependency-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactComponentDependency';
+                    node.dataset.index = index;
+                    
+                    const typeColors = {
+                        'circular': '#dc3545',
+                        'deep': '#ffc107',
+                        'normal': '#28a745'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🔗 组件依赖</div>
+                        <div class="node-content">
+                            <div><strong>来源:</strong> \${dependency.from}</div>
+                            <div><strong>目标:</strong> \${dependency.to}</div>
+                            <div style="color: \${typeColors[dependency.type]}">
+                                <strong>类型:</strong> \${dependency.type === 'circular' ? '循环依赖' : 
+                                                      dependency.type === 'deep' ? '深度依赖' : '正常依赖'}
+                            </div>
+                            <div><strong>严重程度:</strong> \${dependency.severity}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
+                function createReactHookIssueNode(issue, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-hook-issue-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactHookIssue';
+                    node.dataset.index = index;
+                    
+                    const severityColors = {
+                        'high': '#dc3545',
+                        'medium': '#ffc107',
+                        'low': '#28a745'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🪝 Hook问题</div>
+                        <div class="node-content">
+                            <div><strong>Hook:</strong> \${issue.hook}</div>
+                            <div style="color: \${severityColors[issue.severity]}">
+                                <strong>严重程度:</strong> \${issue.severity}
+                            </div>
+                            <div><strong>问题:</strong> \${issue.issue}</div>
+                            <div><strong>建议:</strong> \${issue.suggestion}</div>
+                            <div><strong>行号:</strong> \${issue.line}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
+                function createReactArchitectureScoreNode(score, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-architecture-score-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactArchitectureScore';
+                    node.dataset.index = index;
+                    
+                    const scoreColor = score.total >= 80 ? '#28a745' : 
+                                      score.total >= 60 ? '#ffc107' : '#dc3545';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">📊 架构评分</div>
+                        <div class="node-content">
+                            <div style="color: \${scoreColor}; font-size: 18px;">
+                                <strong>总分: \${score.total}/100</strong>
+                            </div>
+                            <div><strong>组件设计:</strong> \${score.componentDesign}/100</div>
+                            <div><strong>性能优化:</strong> \${score.performanceOptimization}/100</div>
+                            <div><strong>可维护性:</strong> \${score.maintainability}/100</div>
+                            <div><strong>可扩展性:</strong> \${score.scalability}/100</div>
+                            <div><strong>建议数:</strong> \${score.suggestions.length}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
+                // Rust高级系统分析相关节点创建函数
+                function createRustModuleArchitectureNode(module, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-module-architecture-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustModuleArchitecture';
+                    node.dataset.index = index;
+                    
+                    const cohesionColors = {
+                        'high': '#28a745',
+                        'medium': '#ffc107',
+                        'low': '#dc3545'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">📦 模块架构</div>
+                        <div class="node-content">
+                            <div><strong>模块:</strong> \${module.name}</div>
+                            <div style="color: \${cohesionColors[module.cohesion]}">
+                                <strong>内聚性:</strong> \${module.cohesion}
+                            </div>
+                            <div><strong>耦合度:</strong> \${module.coupling}</div>
+                            <div><strong>可见性:</strong> \${module.visibility}</div>
+                            <div><strong>函数数:</strong> \${module.functions}</div>
+                            <div><strong>结构体数:</strong> \${module.structs}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
+                function createRustErrorHandlingNode(errorIssue, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-error-handling-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustErrorHandling';
+                    node.dataset.index = index;
+                    
+                    const severityColors = {
+                        'high': '#dc3545',
+                        'medium': '#ffc107',
+                        'low': '#28a745'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">❌ 错误处理</div>
+                        <div class="node-content">
+                            <div><strong>类型:</strong> \${errorIssue.type}</div>
+                            <div style="color: \${severityColors[errorIssue.severity]}">
+                                <strong>严重程度:</strong> \${errorIssue.severity}
+                            </div>
+                            <div><strong>问题:</strong> \${errorIssue.issue}</div>
+                            <div><strong>建议:</strong> \${errorIssue.suggestion}</div>
+                            <div><strong>行号:</strong> \${errorIssue.line}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
+                function createRustSystemScoreNode(score, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-system-score-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustSystemScore';
+                    node.dataset.index = index;
+                    
+                    const scoreColor = score.total >= 80 ? '#28a745' : 
+                                      score.total >= 60 ? '#ffc107' : '#dc3545';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🏗️ 系统评分</div>
+                        <div class="node-content">
+                            <div style="color: \${scoreColor}; font-size: 18px;">
+                                <strong>总分: \${score.total}/100</strong>
+                            </div>
+                            <div><strong>架构质量:</strong> \${score.architectureQuality}/100</div>
+                            <div><strong>错误处理:</strong> \${score.errorHandling}/100</div>
+                            <div><strong>并发安全:</strong> \${score.concurrencySafety}/100</div>
+                            <div><strong>内存效率:</strong> \${score.memoryEfficiency}/100</div>
+                            <div><strong>测试质量:</strong> \${score.testQuality}/100</div>
+                            <div><strong>建议数:</strong> \${score.recommendations.length}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
                 function createRustUnsafeBlockNode(block, index) {
                     const node = document.createElement('div');
                     node.className = 'node rust-unsafe-node';
@@ -2287,6 +3289,326 @@ export class VisualPanelProvider {
                 }
                 
                 // 初始化
+                // React深度优化节点创建函数
+                function createReactCodeSplittingOptimizationNode(opportunity, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-code-splitting-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactCodeSplittingOptimization';
+                    node.dataset.index = index;
+                    
+                    const performanceColor = opportunity.estimatedSaving >= 30 ? '#28a745' : 
+                                            opportunity.estimatedSaving >= 20 ? '#ffc107' : '#17a2b8';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🚀 代码分割优化</div>
+                        <div class="node-content">
+                            <div><strong>组件:</strong> \${opportunity.component || 'Unknown'}</div>
+                            <div><strong>大小:</strong> \${opportunity.size}KB</div>
+                            <div style="color: \${performanceColor};">
+                                <strong>预期节省:</strong> \${opportunity.estimatedSaving}%
+                            </div>
+                            <div><strong>优先级:</strong> \${opportunity.priority}</div>
+                            <div class="node-description">\${opportunity.suggestion}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createReactRenderPerformanceOptimizationNode(operation, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-render-performance-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactRenderPerformanceOptimization';
+                    node.dataset.index = index;
+                    
+                    const severityColor = operation.severity === 'high' ? '#dc3545' : 
+                                         operation.severity === 'medium' ? '#ffc107' : '#28a745';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">⚡ 渲染性能优化</div>
+                        <div class="node-content">
+                            <div><strong>组件:</strong> \${operation.component || 'Unknown'}</div>
+                            <div><strong>操作:</strong> \${operation.operation}</div>
+                            <div style="color: \${severityColor};">
+                                <strong>严重级别:</strong> \${operation.severity}
+                            </div>
+                            <div><strong>建议:</strong> \${operation.memoizationSuggestion}</div>
+                            <div class="node-description">\${operation.description}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createReactBundleOptimizationNode(treeshaking, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-bundle-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactBundleOptimization';
+                    node.dataset.index = index;
+                    
+                    const impactColor = treeshaking.estimatedSaving >= 50 ? '#28a745' : 
+                                       treeshaking.estimatedSaving >= 20 ? '#ffc107' : '#17a2b8';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">📦 Bundle优化</div>
+                        <div class="node-content">
+                            <div><strong>模块:</strong> \${treeshaking.module}</div>
+                            <div><strong>未使用导出:</strong> \${treeshaking.unusedExports ? treeshaking.unusedExports.length : 0}</div>
+                            <div style="color: \${impactColor};">
+                                <strong>预期节省:</strong> \${treeshaking.estimatedSaving}KB
+                            </div>
+                            <div><strong>建议:</strong> \${treeshaking.suggestion}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createReactStateOptimizationNode(stateIssue, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-state-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactStateOptimization';
+                    node.dataset.index = index;
+                    
+                    const impactColor = stateIssue.impact === 'high' ? '#dc3545' : 
+                                       stateIssue.impact === 'medium' ? '#ffc107' : '#28a745';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🏗️ 状态管理优化</div>
+                        <div class="node-content">
+                            <div><strong>组件:</strong> \${stateIssue.component || 'Unknown'}</div>
+                            <div><strong>问题:</strong> \${stateIssue.issue}</div>
+                            <div style="color: \${impactColor};">
+                                <strong>影响:</strong> \${stateIssue.impact}
+                            </div>
+                            <div><strong>建议:</strong> \${stateIssue.normalizationSuggestion}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createReactPerformancePredictionNode(prediction, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-performance-prediction-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactPerformancePrediction';
+                    node.dataset.index = index;
+                    
+                    const loadTimeColor = prediction.loadTime <= 2 ? '#28a745' : 
+                                         prediction.loadTime <= 5 ? '#ffc107' : '#dc3545';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">📈 性能预测</div>
+                        <div class="node-content">
+                            <div style="color: \${loadTimeColor};">
+                                <strong>预测加载时间:</strong> \${prediction.loadTime}s
+                            </div>
+                            <div><strong>交互性评分:</strong> \${prediction.interactivityScore}/100</div>
+                            <div><strong>内存使用:</strong> \${prediction.memoryUsage}MB</div>
+                            <div><strong>复杂度:</strong> \${prediction.complexityScore}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createReactComprehensiveScoreNode(score, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-comprehensive-score-node';
+                    node.draggable = true;
+                    node.dataset.type = 'reactComprehensiveScore';
+                    node.dataset.index = index;
+                    
+                    const overallColor = score.overall >= 80 ? '#28a745' : 
+                                        score.overall >= 60 ? '#ffc107' : '#dc3545';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">📊 React综合评分</div>
+                        <div class="node-content">
+                            <div style="color: \${overallColor}; font-size: 18px;">
+                                <strong>总分: \${score.overall}/100</strong>
+                            </div>
+                            <div><strong>性能:</strong> \${score.performance}/100</div>
+                            <div><strong>可维护性:</strong> \${score.maintainability}/100</div>
+                            <div><strong>可扩展性:</strong> \${score.scalability}/100</div>
+                            <div><strong>用户体验:</strong> \${score.userExperience}/100</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                // Rust深度优化节点创建函数
+                function createRustMemoryAllocationOptimizationNode(opportunity, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-memory-allocation-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustMemoryAllocationOptimization';
+                    node.dataset.index = index;
+                    
+                    const impactColor = opportunity.impact === 'high' ? '#dc3545' : 
+                                       opportunity.impact === 'medium' ? '#ffc107' : '#28a745';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">💾 内存分配优化</div>
+                        <div class="node-content">
+                            <div><strong>函数:</strong> \${opportunity.function}</div>
+                            <div><strong>类型:</strong> \${opportunity.type}</div>
+                            <div style="color: \${impactColor};">
+                                <strong>影响:</strong> \${opportunity.impact}
+                            </div>
+                            <div><strong>建议:</strong> \${opportunity.suggestion}</div>
+                            <div class="node-description">\${opportunity.reasoning}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createRustConcurrencyPerformanceOptimizationNode(opportunity, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-concurrency-performance-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustConcurrencyPerformanceOptimization';
+                    node.dataset.index = index;
+                    
+                    const performanceColor = opportunity.performanceGain >= 100 ? '#28a745' : 
+                                            opportunity.performanceGain >= 50 ? '#ffc107' : '#17a2b8';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🚀 并发性能优化</div>
+                        <div class="node-content">
+                            <div><strong>函数:</strong> \${opportunity.function}</div>
+                            <div><strong>转换类型:</strong> \${opportunity.conversionType}</div>
+                            <div style="color: \${performanceColor};">
+                                <strong>性能提升:</strong> \${opportunity.performanceGain}%
+                            </div>
+                            <div><strong>建议:</strong> \${opportunity.suggestion}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createRustComputationalOptimizationNode(issue, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-computational-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustComputationalOptimization';
+                    node.dataset.index = index;
+                    
+                    const complexityColor = issue.currentComplexity && issue.currentComplexity.includes('O(n²)') ? '#dc3545' : 
+                                           issue.currentComplexity && issue.currentComplexity.includes('O(n)') ? '#ffc107' : '#28a745';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🧮 计算优化</div>
+                        <div class="node-content">
+                            <div><strong>函数:</strong> \${issue.function}</div>
+                            <div style="color: \${complexityColor};">
+                                <strong>当前复杂度:</strong> \${issue.currentComplexity}
+                            </div>
+                            <div><strong>建议复杂度:</strong> \${issue.suggestedComplexity}</div>
+                            <div><strong>优化建议:</strong> \${issue.inliningSuggestion}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createRustErrorHandlingSafetyNode(risk, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-error-handling-safety-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustErrorHandlingSafety';
+                    node.dataset.index = index;
+                    
+                    const riskColor = risk.riskLevel === 'high' ? '#dc3545' : 
+                                     risk.riskLevel === 'medium' ? '#ffc107' : '#28a745';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🛡️ 错误处理安全</div>
+                        <div class="node-content">
+                            <div><strong>函数:</strong> \${risk.function}</div>
+                            <div><strong>风险类型:</strong> \${risk.riskType}</div>
+                            <div style="color: \${riskColor};">
+                                <strong>风险级别:</strong> \${risk.riskLevel}
+                            </div>
+                            <div><strong>安全替代:</strong> \${risk.safeAlternative}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createRustIOOptimizationNode(opportunity, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-io-optimization-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustIOOptimization';
+                    node.dataset.index = index;
+                    
+                    const performanceColor = opportunity.expectedImprovement >= 50 ? '#28a745' : 
+                                            opportunity.expectedImprovement >= 20 ? '#ffc107' : '#17a2b8';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">📊 I/O优化</div>
+                        <div class="node-content">
+                            <div><strong>函数:</strong> \${opportunity.function}</div>
+                            <div><strong>操作类型:</strong> \${opportunity.operationType}</div>
+                            <div style="color: \${performanceColor};">
+                                <strong>预期改进:</strong> \${opportunity.expectedImprovement}%
+                            </div>
+                            <div><strong>建议:</strong> \${opportunity.suggestion}</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
+                function createRustArchitectureQualityNode(quality, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-architecture-quality-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustArchitectureQuality';
+                    node.dataset.index = index;
+                    
+                    const overallColor = quality.overall >= 80 ? '#28a745' : 
+                                        quality.overall >= 60 ? '#ffc107' : '#dc3545';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🏆 Rust架构质量</div>
+                        <div class="node-content">
+                            <div style="color: \${overallColor}; font-size: 18px;">
+                                <strong>总分: \${quality.overall}/100</strong>
+                            </div>
+                            <div><strong>性能:</strong> \${quality.performance}/100</div>
+                            <div><strong>内存效率:</strong> \${quality.memoryEfficiency}/100</div>
+                            <div><strong>并发安全:</strong> \${quality.concurrencySafety}/100</div>
+                            <div><strong>代码质量:</strong> \${quality.codeQuality}/100</div>
+                            <div><strong>可维护性:</strong> \${quality.maintainability}/100</div>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+                
                 init();
             </script>
         </body>

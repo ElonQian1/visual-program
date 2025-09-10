@@ -74,6 +74,56 @@
         "command": "visualProgramming.generateQualityReport",
         "title": "📊 生成质量报告",
         "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.runProjectDiagnostics",
+        "title": "🏥 项目功能诊断",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.openBlueprintEditor",
+        "title": "🎨 蓝图可视化编辑器",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.startRealTimeSync",
+        "title": "🔄 启动实时代码同步",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.createFromEnhancedTemplate",
+        "title": "📋 增强模板生成",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.configureInteraction",
+        "title": "🎨 交互设置",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.enhancedCodeGeneration",
+        "title": "🚀 增强代码生成",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.aiEnhancedAnalysis",
+        "title": "🧠 AI增强分析",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.performanceAnalysis",
+        "title": "⚡ 性能分析",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.switchTheme",
+        "title": "🎨 切换主题",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.intelligentRefactor",
+        "title": "🔧 智能重构",
+        "category": "代码可视化"
       }
     ],
     "viewsContainers": {
@@ -118,18 +168,30 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "test-backend": "npm run compile && echo 'Testing Rust backend architecture analysis...' && code --extensionDevelopmentPath=. ./demo"
+    "test-backend": "npm run compile && echo 'Testing Rust backend architecture analysis...' && code --extensionDevelopmentPath=. ./demo",
+    "test-advanced": "npm run compile && echo 'Testing advanced analysis features...' && code --extensionDevelopmentPath=. ./demo",
+    "test-deep-optimization": "npm run compile && echo 'Testing deep optimization analysis...' && code --extensionDevelopmentPath=. ./demo"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
+    "@types/diff": "^7.0.2",
+    "@types/lodash": "^4.17.20",
     "@types/node": "16.x",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@types/uuid": "^10.0.0",
+    "@types/vscode": "^1.74.0",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "esbuild": "^0.17.11",
     "eslint": "^8.28.0",
-    "typescript": "^4.9.4",
-    "esbuild": "^0.17.11"
+    "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@typescript-eslint/typescript-estree": "^5.45.0"
+    "@typescript-eslint/typescript-estree": "^5.45.0",
+    "diff": "^8.0.2",
+    "lodash": "^4.17.21",
+    "uuid": "^13.0.0",
+    "ws": "^8.18.3"
   }
 }

@@ -149,6 +149,43 @@ export class StructureItem extends vscode.TreeItem {
             case 'rustMemoryAnalysis':
                 this.iconPath = new vscode.ThemeIcon('symbol-array', new vscode.ThemeColor('charts.orange'));
                 break;
+            // 新增的高级分析节点类型
+            case 'reactAdvancedComponent':
+                this.iconPath = new vscode.ThemeIcon('extensions', new vscode.ThemeColor('charts.blue'));
+                break;
+            case 'reactComponentDependency':
+                this.iconPath = new vscode.ThemeIcon('references', new vscode.ThemeColor('charts.cyan'));
+                break;
+            case 'reactHookDependency':
+                this.iconPath = new vscode.ThemeIcon('link-external', new vscode.ThemeColor('charts.green'));
+                break;
+            case 'reactRenderOptimization':
+                this.iconPath = new vscode.ThemeIcon('zap', new vscode.ThemeColor('charts.yellow'));
+                break;
+            case 'reactBundleAnalysis':
+                this.iconPath = new vscode.ThemeIcon('package', new vscode.ThemeColor('charts.purple'));
+                break;
+            case 'rustAdvancedSystem':
+                this.iconPath = new vscode.ThemeIcon('server-process', new vscode.ThemeColor('charts.red'));
+                break;
+            case 'rustModuleArchitecture':
+                this.iconPath = new vscode.ThemeIcon('symbol-module', new vscode.ThemeColor('charts.orange'));
+                break;
+            case 'rustErrorHandling':
+                this.iconPath = new vscode.ThemeIcon('error', new vscode.ThemeColor('charts.red'));
+                break;
+            case 'rustConcurrencyAnalysis':
+                this.iconPath = new vscode.ThemeIcon('sync', new vscode.ThemeColor('charts.cyan'));
+                break;
+            case 'rustMemoryManagement':
+                this.iconPath = new vscode.ThemeIcon('symbol-ruler', new vscode.ThemeColor('charts.green'));
+                break;
+            case 'rustTestingAnalysis':
+                this.iconPath = new vscode.ThemeIcon('beaker', new vscode.ThemeColor('charts.blue'));
+                break;
+            case 'rustDependencyAnalysis':
+                this.iconPath = new vscode.ThemeIcon('package-dependencies', new vscode.ThemeColor('charts.purple'));
+                break;
             case 'reactPerformanceIssue':
                 this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('charts.red'));
                 break;
@@ -348,6 +385,16 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
                 ));
             }
 
+            // React高级组件分析 🔥
+            if (this.codeAnalysis.reactAdvancedComponent) {
+                rootItems.push(new StructureItem(
+                    `🔬 React 高级组件分析 (评分: ${this.codeAnalysis.reactAdvancedComponent.architectureScore}/100)`,
+                    vscode.TreeItemCollapsibleState.Collapsed,
+                    'reactAdvancedComponent',
+                    new vscode.ThemeIcon('extensions', new vscode.ThemeColor('charts.blue'))
+                ));
+            }
+
             // Rust相关分析
             if (this.codeAnalysis.rustStructs && this.codeAnalysis.rustStructs.length > 0) {
                 rootItems.push(new StructureItem(
@@ -423,6 +470,16 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
                 ));
             }
 
+            // Rust高级系统分析 🔥
+            if (this.codeAnalysis.rustAdvancedSystemNew) {
+                rootItems.push(new StructureItem(
+                    `🔬 Rust 高级系统分析 (评分: ${this.codeAnalysis.rustAdvancedSystemNew.overallArchitectureScore}/100)`,
+                    vscode.TreeItemCollapsibleState.Collapsed,
+                    'rustAdvancedSystemNew',
+                    new vscode.ThemeIcon('server-process', new vscode.ThemeColor('charts.red'))
+                ));
+            }
+
             return Promise.resolve(rootItems);
         } else {
             // 子节点
@@ -482,6 +539,10 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
                 return this.getReactPerformanceIssueItems();
             case 'reactArchitecturePattern':
                 return this.getReactArchitecturePatternItems();
+            case 'reactAdvancedComponent':
+                return this.getReactAdvancedComponentItems();
+            case 'rustAdvancedSystemNew':
+                return this.getRustAdvancedSystemItems();
             default:
                 return [];
         }
@@ -853,6 +914,183 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
             '组件统计',
             `当前架构包含 ${pattern.components.length} 个组件`
         ));
+        
+        return items;
+    }
+
+    // React高级组件分析项
+    private getReactAdvancedComponentItems(): StructureItem[] {
+        if (!this.codeAnalysis?.reactAdvancedComponent) { return []; }
+        
+        const analysis = this.codeAnalysis.reactAdvancedComponent;
+        const items: StructureItem[] = [];
+        
+        // 组件依赖分析
+        if (analysis.componentDependencies.length > 0) {
+            items.push(new StructureItem(
+                `组件依赖分析 (${analysis.componentDependencies.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactComponentDependency',
+                new vscode.ThemeIcon('references', new vscode.ThemeColor('charts.cyan'))
+            ));
+        }
+        
+        // Hook依赖分析
+        if (analysis.hookDependencies.length > 0) {
+            items.push(new StructureItem(
+                `Hook依赖分析 (${analysis.hookDependencies.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactHookDependency',
+                new vscode.ThemeIcon('link-external', new vscode.ThemeColor('charts.green'))
+            ));
+        }
+        
+        // 渲染优化建议
+        if (analysis.renderOptimizations.length > 0) {
+            const highPriorityCount = analysis.renderOptimizations.filter(opt => opt.priority === 'high').length;
+            items.push(new StructureItem(
+                `渲染优化建议 (${analysis.renderOptimizations.length}) ${highPriorityCount > 0 ? '⚠️' : ''}`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactRenderOptimization',
+                new vscode.ThemeIcon('zap', highPriorityCount > 0 ? new vscode.ThemeColor('problemsWarningIcon.foreground') : new vscode.ThemeColor('charts.yellow'))
+            ));
+        }
+        
+        // 状态流分析
+        items.push(new StructureItem(
+            `状态流分析 (复杂度: ${analysis.stateFlow.stateComplexity})`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'reactStateFlow',
+            new vscode.ThemeIcon('arrow-both', new vscode.ThemeColor('charts.blue'))
+        ));
+        
+        // 打包分析
+        items.push(new StructureItem(
+            `打包优化分析 (${analysis.bundleAnalysis.optimizationPotential})`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'reactBundleAnalysis',
+            new vscode.ThemeIcon('package', new vscode.ThemeColor('charts.purple'))
+        ));
+        
+        // 架构评分
+        const scoreColor = analysis.architectureScore >= 80 ? new vscode.ThemeColor('charts.green') :
+                          analysis.architectureScore >= 60 ? new vscode.ThemeColor('charts.yellow') :
+                          new vscode.ThemeColor('charts.red');
+        
+        items.push(new StructureItem(
+            `架构评分: ${analysis.architectureScore}/100`,
+            vscode.TreeItemCollapsibleState.None,
+            'reactAdvancedComponent',
+            new vscode.ThemeIcon('star', scoreColor),
+            '架构评分',
+            `当前React架构评分: ${analysis.architectureScore}/100`
+        ));
+        
+        // 优化建议
+        if (analysis.recommendations.length > 0) {
+            analysis.recommendations.forEach((rec, index) => {
+                items.push(new StructureItem(
+                    rec,
+                    vscode.TreeItemCollapsibleState.None,
+                    'reactAdvancedComponent',
+                    new vscode.ThemeIcon('lightbulb', new vscode.ThemeColor('charts.yellow')),
+                    '优化建议',
+                    `建议: ${rec}`
+                ));
+            });
+        }
+        
+        return items;
+    }
+
+    // Rust高级系统分析项
+    private getRustAdvancedSystemItems(): StructureItem[] {
+        if (!this.codeAnalysis?.rustAdvancedSystemNew) { return []; }
+        
+        const analysis = this.codeAnalysis.rustAdvancedSystemNew;
+        const items: StructureItem[] = [];
+        
+        // 模块架构分析
+        if (analysis.moduleArchitecture.length > 0) {
+            items.push(new StructureItem(
+                `模块架构 (${analysis.moduleArchitecture.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustModuleArchitecture',
+                new vscode.ThemeIcon('symbol-module', new vscode.ThemeColor('charts.orange'))
+            ));
+        }
+        
+        // 错误处理分析
+        items.push(new StructureItem(
+            `错误处理分析 (评分: ${analysis.errorHandling.errorHandlingScore}/100)`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustErrorHandling',
+            new vscode.ThemeIcon('error', analysis.errorHandling.errorHandlingScore >= 70 ? 
+                new vscode.ThemeColor('charts.green') : new vscode.ThemeColor('charts.red'))
+        ));
+        
+        // 并发安全分析
+        items.push(new StructureItem(
+            `并发安全分析 (评分: ${analysis.concurrency.safetyScore}/100)`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustConcurrencyAnalysis',
+            new vscode.ThemeIcon('sync', analysis.concurrency.safetyScore >= 70 ?
+                new vscode.ThemeColor('charts.green') : new vscode.ThemeColor('charts.orange'))
+        ));
+        
+        // 内存管理分析
+        items.push(new StructureItem(
+            `内存管理分析 (效率: ${analysis.memoryManagement.memoryEfficiencyScore}/100)`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustMemoryManagement',
+            new vscode.ThemeIcon('symbol-ruler', analysis.memoryManagement.memoryEfficiencyScore >= 70 ?
+                new vscode.ThemeColor('charts.green') : new vscode.ThemeColor('charts.yellow'))
+        ));
+        
+        // 测试分析
+        items.push(new StructureItem(
+            `测试质量分析 (评分: ${analysis.testing.testQualityScore}/100)`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustTestingAnalysis',
+            new vscode.ThemeIcon('beaker', analysis.testing.testQualityScore >= 50 ?
+                new vscode.ThemeColor('charts.blue') : new vscode.ThemeColor('charts.red'))
+        ));
+        
+        // 依赖分析
+        items.push(new StructureItem(
+            `依赖分析 (${analysis.dependencies.externalCrates.length} 个外部crate)`,
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustDependencyAnalysis',
+            new vscode.ThemeIcon('package-dependencies', new vscode.ThemeColor('charts.purple'))
+        ));
+        
+        // 总体架构评分
+        const overallScoreColor = analysis.overallArchitectureScore >= 80 ? new vscode.ThemeColor('charts.green') :
+                                 analysis.overallArchitectureScore >= 60 ? new vscode.ThemeColor('charts.yellow') :
+                                 new vscode.ThemeColor('charts.red');
+        
+        items.push(new StructureItem(
+            `总体架构评分: ${analysis.overallArchitectureScore}/100`,
+            vscode.TreeItemCollapsibleState.None,
+            'rustAdvancedSystem',
+            new vscode.ThemeIcon('star-full', overallScoreColor),
+            '架构评分',
+            `Rust系统架构总体评分: ${analysis.overallArchitectureScore}/100`
+        ));
+        
+        // 系统建议
+        if (analysis.systemRecommendations.length > 0) {
+            analysis.systemRecommendations.forEach((rec, index) => {
+                items.push(new StructureItem(
+                    rec,
+                    vscode.TreeItemCollapsibleState.None,
+                    'rustAdvancedSystem',
+                    new vscode.ThemeIcon('lightbulb', new vscode.ThemeColor('charts.yellow')),
+                    '系统建议',
+                    `建议: ${rec}`
+                ));
+            });
+        }
         
         return items;
     }

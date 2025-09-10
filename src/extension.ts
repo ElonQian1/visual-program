@@ -9,6 +9,147 @@ import { AIEnhancedAnalysisEngine } from './aiEnhancedAnalysisEngine';
 import { IntelligentTemplateSystem } from './intelligentTemplateSystem';
 import { createOrShowUnifiedVisualizationPanel } from './unifiedVisualizationProvider';
 import { IntelligentCodeOptimizer } from './intelligentCodeOptimizer';
+import { runProjectDiagnostics, FeatureDiagnosticResult } from './projectFeatureDiagnostics';
+// 🚀 新增增强功能
+import { codeGenerationEngine } from './enhancedCodeGenerationEngine';
+import { aiEnhancedAnalyzer } from './aiEnhancedAnalyzer';
+import { createBlueprintEditor } from './blueprintVisualEditor';
+import { RealTimeCodeSyncEngine } from './realTimeCodeSyncEngine';
+import { createEnhancedTemplateSystem } from './enhancedTemplateSystem';
+import { createInteractionOptimizer } from './interactionOptimizer';
+import { performanceOptimizer } from './performanceOptimizer';
+import { advancedUISystem } from './advancedUISystem';
+import { intelligentRefactoringEngine } from './intelligentRefactoringEngine';
+import { aiEnhancedAnalysisSystem } from './aiEnhancedAnalysisSystem';
+import { EnhancedInteractiveFeatures } from './enhancedInteractiveFeaturesSimplified';
+
+// 🔥 生成诊断报告
+function generateDiagnosticReport(result: FeatureDiagnosticResult): string {
+    const { projectName, overallHealth, featureCompleteness, gaps, recommendations, roadmap } = result;
+    
+    return `# 📊 ${projectName} - 项目功能诊断报告
+
+## 🏥 项目健康度概览
+- **整体健康度**: ${overallHealth}/100 ${getHealthIcon(overallHealth)}
+- **功能完整性**: ${featureCompleteness.completenessScore}%
+- **功能缺口数量**: ${gaps.length}
+- **诊断时间**: ${new Date().toLocaleString()}
+
+## 📈 功能完整性分析
+
+### 🎯 核心功能 (${featureCompleteness.coreFeatures.length})
+${featureCompleteness.coreFeatures.map(f => 
+    `- ${getStatusIcon(f.status)} **${f.name}**: ${f.status} (${f.priority})`
+).join('\n')}
+
+### ⚡ 高级功能 (${featureCompleteness.advancedFeatures.length})
+${featureCompleteness.advancedFeatures.map(f => 
+    `- ${getStatusIcon(f.status)} **${f.name}**: ${f.status} (${f.priority})`
+).join('\n')}
+
+### 🔗 集成功能 (${featureCompleteness.integrationFeatures.length})
+${featureCompleteness.integrationFeatures.map(f => 
+    `- ${getStatusIcon(f.status)} **${f.name}**: ${f.status} (${f.priority})`
+).join('\n')}
+
+### 🎨 用户界面 (${featureCompleteness.uiExperience.length})
+${featureCompleteness.uiExperience.map(f => 
+    `- ${getStatusIcon(f.status)} **${f.name}**: ${f.status} (${f.priority})`
+).join('\n')}
+
+## 🚨 功能缺口分析
+
+${gaps.length === 0 ? '🎉 恭喜！没有发现功能缺口。' : gaps.map(gap => 
+    `### ${getImpactIcon(gap.impact)} ${gap.feature}
+- **影响程度**: ${gap.impact}
+- **问题描述**: ${gap.description}
+- **建议方案**: ${gap.suggestedSolution}
+- **预估时间**: ${gap.estimatedTime}
+- **相关文件**: ${gap.requiredFiles.join(', ') || '待创建'}
+`
+).join('\n')}
+
+## 💡 优化建议
+
+${recommendations.map((rec, index) => 
+    `### ${index + 1}. ${getTypeIcon(rec.type)} ${rec.title}
+- **类型**: ${rec.type}
+- **优先级**: ${rec.priority}
+- **描述**: ${rec.description}
+- **预期收益**:
+${rec.benefits.map(b => `  - ${b}`).join('\n')}
+- **实施方案**:
+${rec.implementation.map(i => `  - ${i}`).join('\n')}
+`
+).join('\n')}
+
+## 🗺️ 发展路线图
+
+### ${roadmap.phase1.name} (${roadmap.phase1.duration})
+**目标**:
+${roadmap.phase1.goals.map(g => `- ${g}`).join('\n')}
+
+**功能**:
+${roadmap.phase1.features.map(f => `- ${f}`).join('\n')}
+
+### ${roadmap.phase2.name} (${roadmap.phase2.duration})
+**目标**:
+${roadmap.phase2.goals.map(g => `- ${g}`).join('\n')}
+
+**功能**:
+${roadmap.phase2.features.map(f => `- ${f}`).join('\n')}
+
+### ${roadmap.phase3.name} (${roadmap.phase3.duration})
+**目标**:
+${roadmap.phase3.goals.map(g => `- ${g}`).join('\n')}
+
+**功能**:
+${roadmap.phase3.features.map(f => `- ${f}`).join('\n')}
+
+---
+*报告生成时间: ${new Date().toLocaleString()}*
+*由 Visual Programming VSCode Extension 自动生成*
+`;
+}
+
+// 辅助函数
+function getHealthIcon(health: number): string {
+    if (health >= 80) return '🟢';
+    if (health >= 60) return '🟡';
+    if (health >= 40) return '🟠';
+    return '🔴';
+}
+
+function getStatusIcon(status: string): string {
+    switch (status) {
+        case 'complete': return '✅';
+        case 'partial': return '🟡';
+        case 'missing': return '❌';
+        case 'planned': return '📅';
+        default: return '❓';
+    }
+}
+
+function getImpactIcon(impact: string): string {
+    switch (impact) {
+        case 'critical': return '🔴';
+        case 'high': return '🟠';
+        case 'medium': return '🟡';
+        case 'low': return '🟢';
+        default: return '❓';
+    }
+}
+
+function getTypeIcon(type: string): string {
+    switch (type) {
+        case 'feature': return '🚀';
+        case 'architecture': return '🏗️';
+        case 'performance': return '⚡';
+        case 'ux': return '🎨';
+        case 'security': return '🔒';
+        default: return '💡';
+    }
+}
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('代码可视化编程插件已激活');
@@ -22,6 +163,22 @@ export function activate(context: vscode.ExtensionContext) {
     const aiAnalysisEngine = new AIEnhancedAnalysisEngine();
     const templateSystem = new IntelligentTemplateSystem();
     const codeOptimizer = new IntelligentCodeOptimizer();
+
+    // 🆕 初始化新功能组件
+    const blueprintEditor = createBlueprintEditor(context);
+    const syncOutputChannel = vscode.window.createOutputChannel('Real-Time Code Sync');
+    const realTimeSync = new RealTimeCodeSyncEngine(syncOutputChannel);
+    const enhancedTemplateSystem = createEnhancedTemplateSystem(context);
+    const interactionOptimizer = createInteractionOptimizer(context);
+    const { ErrorHandler } = require('./errorHandler');
+    const { PerformanceMonitor } = require('./performanceMonitor');
+    const { UserGuidanceSystem, showWelcomeWizard, showTutorialList } = require('./userGuidanceSystem');
+    const { FileBasedCollaborationSystem, createCollaborationSession, joinCollaborationSession } = require('./fileBasedCollaborationSystem');
+    
+    const errorHandler = ErrorHandler.getInstance();
+    const performanceMonitor = PerformanceMonitor.getInstance();
+    const userGuidance = UserGuidanceSystem.getInstance();
+    const collaborationSystem = FileBasedCollaborationSystem.getInstance();
 
     // 注册命令
     const openVisualViewCommand = vscode.commands.registerCommand(
@@ -144,6 +301,265 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
+    // 🎨 蓝图可视化编辑器命令
+    const blueprintEditorCommand = vscode.commands.registerCommand(
+        'visualProgramming.openBlueprintEditor',
+        () => {
+            blueprintEditor.createOrShow(context.extensionUri);
+            vscode.window.showInformationMessage('🎨 蓝图可视化编辑器已打开');
+        }
+    );
+
+    // 🔄 实时代码同步命令
+    const startRealTimeSyncCommand = vscode.commands.registerCommand(
+        'visualProgramming.startRealTimeSync',
+        () => {
+            realTimeSync.refreshAnalysis();
+            vscode.window.showInformationMessage('🔄 实时代码同步已启动');
+        }
+    );
+
+    // 📋 增强模板系统命令
+    const createFromEnhancedTemplateCommand = vscode.commands.registerCommand(
+        'visualProgramming.createFromEnhancedTemplate',
+        async () => {
+            const templates = enhancedTemplateSystem.getAllTemplates();
+            
+            const selectedTemplate = await vscode.window.showQuickPick(
+                templates.map(t => ({
+                    label: `${t.name}`,
+                    description: t.description,
+                    detail: `${t.category} | ${t.tags.join(', ')}`,
+                    template: t
+                })),
+                {
+                    placeHolder: '选择代码模板',
+                    matchOnDescription: true,
+                    matchOnDetail: true
+                }
+            );
+            
+            if (selectedTemplate) {
+                // 收集模板变量
+                const variables: Record<string, any> = {};
+                
+                for (const variable of selectedTemplate.template.variables) {
+                    if (variable.type === 'string') {
+                        const value = await vscode.window.showInputBox({
+                            prompt: variable.description,
+                            value: String(variable.defaultValue || ''),
+                            validateInput: (value) => {
+                                if (variable.required && !value.trim()) {
+                                    return `${variable.name} 是必填项`;
+                                }
+                                return undefined;
+                            }
+                        });
+                        if (value !== undefined) variables[variable.name] = value;
+                    } else if (variable.type === 'boolean') {
+                        const choice = await vscode.window.showQuickPick(['是', '否'], {
+                            placeHolder: variable.description
+                        });
+                        variables[variable.name] = choice === '是';
+                    } else if (variable.type === 'choice' && variable.choices) {
+                        const choice = await vscode.window.showQuickPick(variable.choices, {
+                            placeHolder: variable.description
+                        });
+                        if (choice) variables[variable.name] = choice;
+                    }
+                }
+                
+                try {
+                    const result = await enhancedTemplateSystem.generateCode(
+                        selectedTemplate.template.id,
+                        {
+                            projectPath: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '',
+                            language: selectedTemplate.template.language,
+                            framework: selectedTemplate.template.framework,
+                            userPreferences: {},
+                            variables: variables
+                        }
+                    );
+                    
+                    // 创建新文档
+                    const document = await vscode.workspace.openTextDocument({
+                        content: result.content,
+                        language: selectedTemplate.template.language
+                    });
+                    
+                    await vscode.window.showTextDocument(document);
+                    
+                    vscode.window.showInformationMessage('✨ 增强模板代码生成完成！');
+                } catch (error) {
+                    vscode.window.showErrorMessage(`模板生成失败: ${error}`);
+                }
+            }
+        }
+    );
+
+    // 🎨 交互优化设置命令
+    const configureInteractionCommand = vscode.commands.registerCommand(
+        'visualProgramming.configureInteraction',
+        async () => {
+            const currentSettings = interactionOptimizer.getSettings();
+            
+            const options = [
+                {
+                    label: `🎯 网格吸附: ${currentSettings.enableGridSnap ? '开启' : '关闭'}`,
+                    description: '拖拽时自动吸附到网格',
+                    setting: 'gridSnap'
+                },
+                {
+                    label: `📏 智能对齐: ${currentSettings.enableSmartAlign ? '开启' : '关闭'}`,
+                    description: '自动对齐到其他元素',
+                    setting: 'smartAlign'
+                },
+                {
+                    label: `🎨 主题: ${currentSettings.theme}`,
+                    description: '界面主题设置',
+                    setting: 'theme'
+                },
+                {
+                    label: `⚡ 动画速度: ${currentSettings.animationSpeed}`,
+                    description: '界面动画播放速度',
+                    setting: 'animationSpeed'
+                },
+                {
+                    label: '🔄 重置所有设置',
+                    description: '恢复默认交互设置',
+                    setting: 'reset'
+                }
+            ];
+            
+            const selected = await vscode.window.showQuickPick(options, {
+                placeHolder: '选择要配置的交互设置'
+            });
+            
+            if (selected) {
+                switch (selected.setting) {
+                    case 'gridSnap':
+                        await interactionOptimizer.saveSettings({
+                            enableGridSnap: !currentSettings.enableGridSnap
+                        });
+                        break;
+                    case 'smartAlign':
+                        await interactionOptimizer.saveSettings({
+                            enableSmartAlign: !currentSettings.enableSmartAlign
+                        });
+                        break;
+                    case 'theme':
+                        const theme = await vscode.window.showQuickPick(['auto', 'dark', 'light'], {
+                            placeHolder: '选择主题'
+                        });
+                        if (theme) {
+                            await interactionOptimizer.saveSettings({ theme: theme as any });
+                        }
+                        break;
+                    case 'animationSpeed':
+                        const speed = await vscode.window.showQuickPick(['fast', 'normal', 'slow'], {
+                            placeHolder: '选择动画速度'
+                        });
+                        if (speed) {
+                            await interactionOptimizer.saveSettings({ animationSpeed: speed as any });
+                        }
+                        break;
+                    case 'reset':
+                        await interactionOptimizer.resetSettings();
+                        break;
+                }
+            }
+        }
+    );
+
+    // ⚡ 性能优化器命令
+    const performanceAnalysisCommand = vscode.commands.registerCommand(
+        'visualProgramming.performanceAnalysis',
+        async () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            const metrics = await performanceOptimizer.measureAnalysisTime(async () => {
+                return await codeAnalyzer.analyzeFile(activeEditor.document);
+            });
+
+            vscode.window.showInformationMessage(`⚡ 性能分析完成`);
+        }
+    );
+
+    // 🎨 主题切换命令
+    const switchThemeCommand = vscode.commands.registerCommand(
+        'visualProgramming.switchTheme',
+        async () => {
+            const themes = advancedUISystem.getAllThemes();
+            const themeItems = themes.map(t => ({
+                label: t.config.name,
+                description: `Theme: ${t.name}`,
+                detail: t.name
+            }));
+
+            const selected = await vscode.window.showQuickPick(themeItems, {
+                placeHolder: '选择一个主题'
+            });
+
+            if (selected) {
+                await advancedUISystem.applyTheme(selected.detail);
+            }
+        }
+    );
+
+    // 🔧 智能重构命令
+    const intelligentRefactorCommand = vscode.commands.registerCommand(
+        'visualProgramming.intelligentRefactor',
+        async () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            try {
+                // 分析代码异味
+                const smells = await intelligentRefactoringEngine.analyzeCodeSmells(activeEditor.document);
+                
+                if (smells.length === 0) {
+                    vscode.window.showInformationMessage('🎉 代码质量良好，没有发现异味！');
+                    return;
+                }
+
+                // 显示代码异味和重构建议
+                const items = smells.map(smell => ({
+                    label: `${smell.type}: ${smell.message}`,
+                    description: `Severity: ${smell.severity}`,
+                    detail: `Line: ${smell.location.start.line + 1}`,
+                    smell
+                }));
+
+                const selected = await vscode.window.showQuickPick(items, {
+                    placeHolder: '选择要重构的代码异味'
+                });
+
+                if (selected && selected.smell.refactoringOptions.length > 0) {
+                    const option = selected.smell.refactoringOptions[0];
+                    const result = await intelligentRefactoringEngine.executeRefactoring(
+                        activeEditor.document,
+                        option
+                    );
+
+                    if (result.success) {
+                        vscode.window.showInformationMessage('✨ 重构完成！');
+                    } else {
+                        vscode.window.showWarningMessage(`重构失败: ${result.warnings.join(', ')}`);
+                    }
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`重构分析失败: ${error}`);
+            }
+        }
+    );
+
     const aiAnalysisCommand = vscode.commands.registerCommand(
         'visualProgramming.aiAnalysis',
         async () => {
@@ -252,12 +668,200 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
-    // 🔧 智能代码优化命令
+    // � 增强代码生成命令
+    const enhancedCodeGenerationCommand = vscode.commands.registerCommand(
+        'visualProgramming.enhancedCodeGeneration',
+        async () => {
+            const options = await vscode.window.showQuickPick([
+                { label: '🔧 生成React组件', value: 'react-component' },
+                { label: '🦀 生成Rust结构体', value: 'rust-struct' },
+                { label: '🌐 生成Rust Web服务', value: 'rust-service' },
+                { label: '📦 生成完整项目', value: 'full-project' }
+            ], { placeHolder: '选择代码生成类型' });
+
+            if (!options) return;
+
+            try {
+                switch (options.value) {
+                    case 'react-component':
+                        const componentName = await vscode.window.showInputBox({
+                            prompt: '输入组件名称',
+                            value: 'MyComponent'
+                        });
+                        if (componentName) {
+                            const props = [
+                                { name: 'title', type: 'string' },
+                                { name: 'onClick', type: '() => void' }
+                            ];
+                            const component = codeGenerationEngine.generateReactComponent(componentName, props);
+                            const test = codeGenerationEngine.generateComponentTest(componentName, props);
+                            await codeGenerationEngine.saveGeneratedFiles([component, test]);
+                        }
+                        break;
+
+                    case 'rust-struct':
+                        const structName = await vscode.window.showInputBox({
+                            prompt: '输入结构体名称',
+                            value: 'MyStruct'
+                        });
+                        if (structName) {
+                            const fields = [
+                                { name: 'id', type: 'u32' },
+                                { name: 'name', type: 'String' }
+                            ];
+                            const rustStruct = codeGenerationEngine.generateRustStruct(structName, fields);
+                            await codeGenerationEngine.saveGeneratedFiles([rustStruct]);
+                        }
+                        break;
+
+                    case 'rust-service':
+                        const serviceName = await vscode.window.showInputBox({
+                            prompt: '输入服务名称',
+                            value: 'MyService'
+                        });
+                        if (serviceName) {
+                            const endpoints = [
+                                { name: 'get_health', path: '/health', method: 'GET' },
+                                { name: 'get_users', path: '/users', method: 'GET' }
+                            ];
+                            const service = codeGenerationEngine.generateRustWebService(serviceName, endpoints);
+                            const cargoToml = codeGenerationEngine.generateCargoToml(serviceName, ['axum', 'tokio', 'serde']);
+                            await codeGenerationEngine.saveGeneratedFiles([service, cargoToml]);
+                        }
+                        break;
+
+                    case 'full-project':
+                        const projectName = await vscode.window.showInputBox({
+                            prompt: '输入项目名称',
+                            value: 'my-project'
+                        });
+                        
+                        const language = await vscode.window.showQuickPick([
+                            { label: 'TypeScript/React', value: 'typescript' },
+                            { label: 'Rust', value: 'rust' }
+                        ], { placeHolder: '选择项目语言' });
+
+                        if (projectName && language) {
+                            const projectConfig = {
+                                projectName,
+                                components: language.value === 'typescript' ? [
+                                    { name: 'App', props: [] },
+                                    { name: 'Header', props: [{ name: 'title', type: 'string' }] }
+                                ] : [],
+                                services: language.value === 'rust' ? [
+                                    { name: 'api', endpoints: [{ name: 'health', path: '/health', method: 'GET' }] }
+                                ] : [],
+                                language: language.value as 'typescript' | 'rust'
+                            };
+                            
+                            const files = await codeGenerationEngine.generateFullProject(projectConfig);
+                            await codeGenerationEngine.saveGeneratedFiles(files);
+                        }
+                        break;
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`代码生成失败: ${error}`);
+            }
+        }
+    );
+
+    // 🧠 AI增强分析命令
+    const aiEnhancedAnalysisCommand = vscode.commands.registerCommand(
+        'visualProgramming.aiEnhancedAnalysis',
+        async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            const document = editor.document;
+            
+            try {
+                vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Notification,
+                    title: '🧠 AI正在分析代码...',
+                    cancellable: false
+                }, async (progress) => {
+                    progress.report({ increment: 0, message: '开始分析...' });
+                    
+                    const result = await aiEnhancedAnalyzer.analyzeCodeIntelligence(document);
+                    
+                    progress.report({ increment: 50, message: '生成报告...' });
+                    
+                    const report = aiEnhancedAnalyzer.generateAnalysisReport(result, document.fileName);
+                    
+                    progress.report({ increment: 100, message: '分析完成!' });
+                    
+                    // 创建新的不可编辑文档显示报告
+                    const reportDoc = await vscode.workspace.openTextDocument({
+                        content: report,
+                        language: 'markdown'
+                    });
+                    
+                    await vscode.window.showTextDocument(reportDoc);
+                    
+                    // 提供代码修复建议
+                    if (result.codeSmells.length > 0) {
+                        const shouldFix = await vscode.window.showInformationMessage(
+                            `发现 ${result.codeSmells.length} 个代码问题，是否查看修复建议？`,
+                            '查看修复', '稍后'
+                        );
+                        
+                        if (shouldFix === '查看修复') {
+                            const fixes = await aiEnhancedAnalyzer.suggestCodeFixes(document, result.codeSmells);
+                            // 这里可以集成到VS Code的Quick Fix功能
+                            vscode.window.showInformationMessage(`生成了 ${fixes.length} 个修复建议`);
+                        }
+                    }
+                });
+            } catch (error) {
+                vscode.window.showErrorMessage(`AI分析失败: ${error}`);
+            }
+        }
+    );
+
+    // �🔧 智能代码优化命令
     const openCodeOptimizerCommand = vscode.commands.registerCommand(
         'visualProgramming.openCodeOptimizer',
         () => {
             codeOptimizer.createOptimizationPanel(context);
             vscode.window.showInformationMessage('🔧 智能代码优化面板已打开');
+        }
+    );
+
+    // 🏥 项目功能诊断命令
+    const runProjectDiagnosticsCommand = vscode.commands.registerCommand(
+        'visualProgramming.runProjectDiagnostics',
+        async () => {
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (!workspaceFolder) {
+                vscode.window.showWarningMessage('请先打开一个工作区');
+                return;
+            }
+
+            try {
+                vscode.window.showInformationMessage('🔍 开始项目功能诊断...');
+                
+                const diagnosticResult = await runProjectDiagnostics(workspaceFolder.uri.fsPath);
+                
+                // 生成诊断报告
+                const report = generateDiagnosticReport(diagnosticResult);
+                
+                // 显示诊断结果
+                const doc = await vscode.workspace.openTextDocument({
+                    content: report,
+                    language: 'markdown'
+                });
+                await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
+                
+                // 显示摘要信息
+                const summary = `项目健康度: ${diagnosticResult.overallHealth}/100 | 功能完整性: ${diagnosticResult.featureCompleteness.completenessScore}% | 发现 ${diagnosticResult.gaps.length} 个功能缺口`;
+                vscode.window.showInformationMessage(`📊 ${summary}`);
+                
+            } catch (error) {
+                vscode.window.showErrorMessage(`项目诊断失败: ${error}`);
+            }
         }
     );
 
@@ -309,6 +913,330 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
 
+    // 🎓 用户引导相关命令
+    const showWelcomeCommand = vscode.commands.registerCommand(
+        'visualProgramming.showWelcome',
+        () => showWelcomeWizard()
+    );
+
+    const showTutorialsCommand = vscode.commands.registerCommand(
+        'visualProgramming.showTutorials',
+        () => showTutorialList()
+    );
+
+    const resetTutorialProgressCommand = vscode.commands.registerCommand(
+        'visualProgramming.resetTutorialProgress',
+        () => userGuidance.resetProgress()
+    );
+
+    // 🤝 协作相关命令
+    const createCollaborationCommand = vscode.commands.registerCommand(
+        'visualProgramming.createCollaboration',
+        async () => {
+            const sessionName = await vscode.window.showInputBox({
+                prompt: '请输入协作会话名称',
+                placeHolder: '例如: 项目开发协作'
+            });
+            
+            if (sessionName) {
+                try {
+                    const sessionId = await createCollaborationSession(sessionName);
+                    vscode.window.showInformationMessage(`🎉 协作会话创建成功！ID: ${sessionId}`);
+                } catch (error) {
+                    errorHandler.handleError(error as Error, { context: 'collaboration-create' });
+                }
+            }
+        }
+    );
+
+    const joinCollaborationCommand = vscode.commands.registerCommand(
+        'visualProgramming.joinCollaboration',
+        async () => {
+            const sessionId = await vscode.window.showInputBox({
+                prompt: '请输入要加入的协作会话ID',
+                placeHolder: '例如: COLLAB-ABCD1234'
+            });
+            
+            if (sessionId) {
+                try {
+                    await joinCollaborationSession(sessionId);
+                    vscode.window.showInformationMessage('🤝 成功加入协作会话！');
+                } catch (error) {
+                    errorHandler.handleError(error as Error, { context: 'collaboration-join' });
+                }
+            }
+        }
+    );
+
+    const leaveCollaborationCommand = vscode.commands.registerCommand(
+        'visualProgramming.leaveCollaboration',
+        async () => {
+            if (collaborationSystem.isInSession()) {
+                await collaborationSystem.leaveSession();
+                vscode.window.showInformationMessage('👋 已离开协作会话');
+            } else {
+                vscode.window.showWarningMessage('您当前不在任何协作会话中');
+            }
+        }
+    );
+
+    const sendChatMessageCommand = vscode.commands.registerCommand(
+        'visualProgramming.sendChatMessage',
+        async () => {
+            if (!collaborationSystem.isInSession()) {
+                vscode.window.showWarningMessage('请先加入协作会话');
+                return;
+            }
+
+            const message = await vscode.window.showInputBox({
+                prompt: '输入聊天消息',
+                placeHolder: '与协作者交流...'
+            });
+
+            if (message) {
+                await collaborationSystem.sendChatMessage(message);
+            }
+        }
+    );
+
+    // 📊 性能监控命令
+    const showPerformanceCommand = vscode.commands.registerCommand(
+        'visualProgramming.showPerformance',
+        async () => {
+            try {
+                const report = await performanceMonitor.generatePerformanceReport();
+                const doc = await vscode.workspace.openTextDocument({
+                    content: report,
+                    language: 'markdown'
+                });
+                await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
+                vscode.window.showInformationMessage('📊 性能报告已生成！');
+            } catch (error) {
+                errorHandler.handleError(error as Error, { context: 'performance-report' });
+            }
+        }
+    );
+
+    const optimizePerformanceCommand = vscode.commands.registerCommand(
+        'visualProgramming.optimizePerformance',
+        async () => {
+            try {
+                const insights = await performanceMonitor.generatePerformanceInsights();
+                if (insights.optimizations.length === 0) {
+                    vscode.window.showInformationMessage('✨ 性能表现良好，没有发现可优化项！');
+                    return;
+                }
+
+                const items = insights.optimizations.map((opt: any) => ({
+                    label: `${opt.priority === 'high' ? '🔴' : opt.priority === 'medium' ? '🟡' : '🟢'} ${opt.title}`,
+                    description: opt.description,
+                    detail: `预期提升: ${opt.expectedImprovement}`,
+                    optimization: opt
+                }));
+
+                const selected = await vscode.window.showQuickPick(items, {
+                    placeHolder: `发现 ${insights.optimizations.length} 个优化建议`,
+                    canPickMany: true
+                });
+
+                if (selected && selected.length > 0) {
+                    vscode.window.showInformationMessage(`📈 已记录 ${selected.length} 个性能优化建议！`);
+                }
+            } catch (error) {
+                errorHandler.handleError(error as Error, { context: 'performance-optimize' });
+            }
+        }
+    );
+
+    // 🆘 帮助和支持命令
+    const showHelpCommand = vscode.commands.registerCommand(
+        'visualProgramming.showHelp',
+        async () => {
+            const helpOptions = [
+                { label: '📚 查看教程', action: 'tutorials' },
+                { label: '🎯 快速入门', action: 'quickstart' },
+                { label: '🔧 常见问题', action: 'faq' },
+                { label: '📖 功能文档', action: 'docs' },
+                { label: '🐛 报告问题', action: 'report' }
+            ];
+
+            const selected = await vscode.window.showQuickPick(helpOptions, {
+                placeHolder: '选择帮助类型'
+            });
+
+            if (selected) {
+                switch (selected.action) {
+                    case 'tutorials':
+                        await showTutorialList();
+                        break;
+                    case 'quickstart':
+                        await userGuidance.startTutorial('getting-started');
+                        break;
+                    case 'faq':
+                    case 'docs':
+                        await userGuidance.showContextualHelp('general');
+                        break;
+                    case 'report':
+                        vscode.env.openExternal(vscode.Uri.parse('https://github.com/your-repo/issues'));
+                        break;
+                }
+            }
+        }
+    );
+
+    // 🔄 系统维护命令
+    const cleanupCacheCommand = vscode.commands.registerCommand(
+        'visualProgramming.cleanupCache',
+        async () => {
+            try {
+                // 清理性能监控缓存
+                performanceMonitor.clearMetrics();
+                
+                // 重置用户引导进度（可选）
+                const shouldResetTutorials = await vscode.window.showWarningMessage(
+                    '是否同时重置教程进度？',
+                    '是',
+                    '否'
+                );
+                
+                if (shouldResetTutorials === '是') {
+                    userGuidance.resetProgress();
+                }
+                
+                vscode.window.showInformationMessage('🧹 缓存清理完成！');
+            } catch (error) {
+                errorHandler.handleError(error as Error, { context: 'cleanup-cache' });
+            }
+        }
+    );
+
+    // 🎯 增强交互功能命令
+    const enableEnhancedInteractionCommand = vscode.commands.registerCommand(
+        'visualProgramming.enableEnhancedInteraction',
+        async () => {
+            try {
+                const activeEditor = vscode.window.activeTextEditor;
+                if (!activeEditor) {
+                    vscode.window.showWarningMessage('请先打开一个代码文件');
+                    return;
+                }
+
+                // 创建交互式画布实例
+                const canvasProvider = new InteractiveCanvasProvider();
+                
+                // 创建增强交互功能实例
+                const enhancedFeatures = new EnhancedInteractiveFeatures(canvasProvider);
+                
+                // 启用增强功能
+                enhancedFeatures.enableMultiSelection();
+                
+                // 显示功能面板
+                const panel = vscode.window.createWebviewPanel(
+                    'enhancedInteraction',
+                    '🎯 增强交互画布',
+                    vscode.ViewColumn.Beside,
+                    {
+                        enableScripts: true,
+                        retainContextWhenHidden: true
+                    }
+                );
+
+                panel.webview.html = getEnhancedInteractionHTML(panel.webview);
+                
+                // 设置消息处理
+                panel.webview.onDidReceiveMessage(message => {
+                    switch (message.command) {
+                        case 'doubleClick':
+                            enhancedFeatures.handleDoubleClick(message.target, message.id);
+                            break;
+                        case 'contextMenu':
+                            enhancedFeatures.showContextMenu(message.x, message.y, message.targetType, message.nodeId);
+                            break;
+                        case 'search':
+                            const results = enhancedFeatures.globalSearch(message.query);
+                            panel.webview.postMessage({
+                                command: 'searchResults',
+                                results: results
+                            });
+                            break;
+                        case 'shortcut':
+                            enhancedFeatures.handleShortcut(message.action);
+                            break;
+                    }
+                });
+
+                vscode.window.showInformationMessage('🎯 增强交互功能已启用！双击节点编辑，Ctrl+A全选，右键菜单等功能已激活。');
+
+            } catch (error) {
+                vscode.window.showErrorMessage(`启用增强交互功能失败: ${error}`);
+            }
+        }
+    );
+
+    // 🎯 智能建议命令
+    const getSmartSuggestionsCommand = vscode.commands.registerCommand(
+        'visualProgramming.getSmartSuggestions',
+        async () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            try {
+                const operationId = performanceMonitor.startOperation('analysis');
+                
+                // 并行运行多种分析
+                const [
+                    codeAnalysis,
+                    qualityReport,
+                    aiInsights
+                ] = await Promise.all([
+                    codeAnalyzer.analyzeFile(activeEditor.document),
+                    codeOptimizer.generateCodeQualityReport(activeEditor.document),
+                    aiAnalysisEngine.analyzeCodeWithAI(activeEditor.document)
+                ]);
+
+                performanceMonitor.endOperation(operationId);
+
+                // 汇总建议
+                const suggestions = [
+                    `📊 发现 ${codeAnalysis.functions.length} 个函数，${codeAnalysis.classes?.length || 0} 个类`,
+                    `🎯 AI分析发现 ${aiInsights.length} 个优化建议`,
+                    `📈 代码质量报告已生成`
+                ];
+
+                const action = await vscode.window.showInformationMessage(
+                    '🎯 智能分析完成！',
+                    '查看详细报告',
+                    '应用优化建议'
+                );
+
+                if (action === '查看详细报告') {
+                    const doc = await vscode.workspace.openTextDocument({
+                        content: qualityReport,
+                        language: 'markdown'
+                    });
+                    await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
+                } else if (action === '应用优化建议') {
+                    await codeOptimizer.applyAllHighPriorityOptimizations(activeEditor.document);
+                    vscode.window.showInformationMessage('✨ 优化建议已应用！');
+                }
+
+            } catch (error) {
+                errorHandler.handleError(error as Error, { context: 'smart-suggestions' });
+            }
+        }
+    );
+
+    // 首次使用时显示欢迎向导
+    if (context.globalState.get('firstRun') !== false) {
+        setTimeout(() => {
+            showWelcomeWizard();
+            context.globalState.update('firstRun', false);
+        }, 2000); // 延迟2秒显示
+    }
+
     // 添加到上下文
     context.subscriptions.push(
         openVisualViewCommand,
@@ -320,9 +1248,37 @@ export function activate(context: vscode.ExtensionContext) {
         createFromTemplateCommand,
         openUnifiedVisualizationCommand,
         openCodeOptimizerCommand,
+        runProjectDiagnosticsCommand,
         quickOptimizeCommand,
         generateQualityReportCommand,
-        codeStructureView
+        // 🚀 增强功能命令
+        enhancedCodeGenerationCommand,
+        aiEnhancedAnalysisCommand,
+        // 🆕 新功能命令
+        showWelcomeCommand,
+        showTutorialsCommand,
+        resetTutorialProgressCommand,
+        createCollaborationCommand,
+        joinCollaborationCommand,
+        leaveCollaborationCommand,
+        // 🎯 增强交互功能命令
+        enableEnhancedInteractionCommand,
+        sendChatMessageCommand,
+        showPerformanceCommand,
+        optimizePerformanceCommand,
+        showHelpCommand,
+        cleanupCacheCommand,
+        getSmartSuggestionsCommand,
+        codeStructureView,
+        // 🎨 蓝图编辑器和实时同步
+        blueprintEditorCommand,
+        startRealTimeSyncCommand,
+        createFromEnhancedTemplateCommand,
+        configureInteractionCommand,
+        // 🆕 新增高级功能命令
+        performanceAnalysisCommand,
+        switchThemeCommand,
+        intelligentRefactorCommand
     );
 
     // 监听文件变化
@@ -343,4 +1299,172 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
     console.log('代码可视化编程插件已停用');
+}
+
+// 🎯 增强交互HTML生成函数
+function getEnhancedInteractionHTML(webview: vscode.Webview): string {
+    return `
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>增强交互画布</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                min-height: 100vh;
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+                margin: 0;
+                background: linear-gradient(45deg, #fff, #e0e0e0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-bottom: 30px;
+            }
+            
+            .feature-card {
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 15px;
+                padding: 25px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                background: rgba(255, 255, 255, 0.2);
+            }
+            
+            .feature-icon {
+                font-size: 2rem;
+                margin-bottom: 15px;
+                display: block;
+            }
+            
+            .feature-title {
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            
+            .btn {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                margin: 5px;
+            }
+            
+            .btn:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎯 增强交互画布</h1>
+                <p>双击编辑、多选操作、智能搜索、快捷键支持</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🖱️</span>
+                    <div class="feature-title">多选功能</div>
+                    <div>Ctrl+点击多选节点，框选批量操作</div>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">✏️</span>
+                    <div class="feature-title">双击编辑</div>
+                    <div>双击节点编辑名称，双击连线编辑标签</div>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">📋</span>
+                    <div class="feature-title">右键菜单</div>
+                    <div>右键显示上下文菜单，快速操作</div>
+                </div>
+                
+                <div class="feature-card">
+                    <span class="feature-icon">🔍</span>
+                    <div class="feature-title">智能搜索</div>
+                    <div>全局搜索节点和连接，快速定位</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="showDemo()">🚀 开始体验</button>
+            </div>
+            
+            <div style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">
+                <h3>🎮 快捷键指南</h3>
+                <p><strong>Ctrl+A</strong> - 全选节点</p>
+                <p><strong>Ctrl+C/V</strong> - 复制/粘贴</p>
+                <p><strong>Delete</strong> - 删除选中节点</p>
+                <p><strong>Ctrl+F</strong> - 搜索</p>
+                <p><strong>双击</strong> - 编辑节点</p>
+                <p><strong>右键</strong> - 上下文菜单</p>
+            </div>
+        </div>
+        
+        <script>
+            const vscode = acquireVsCodeApi();
+            
+            function showDemo() {
+                vscode.postMessage({
+                    command: 'shortcut',
+                    action: 'demo'
+                });
+            }
+            
+            // 键盘快捷键处理
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'a') {
+                    e.preventDefault();
+                    vscode.postMessage({
+                        command: 'shortcut',
+                        action: 'selectAll'
+                    });
+                }
+            });
+        </script>
+    </body>
+    </html>
+    `;
 }

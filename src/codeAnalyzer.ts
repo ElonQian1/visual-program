@@ -17,6 +17,18 @@ import { ReactStateManagementAnalyzer, ReactStateManagementAnalysis } from './re
 import { RustPerformanceAnalyzer, RustPerformanceAnalysis as RustDetailedPerformanceAnalysis } from './rustPerformanceAnalyzer';
 import { ReactAdvancedAnalyzer, ReactPerformanceIssue, ReactArchitecturePattern } from './reactPerformanceAnalyzer';
 import { RustBackendArchitectureAnalyzer } from './rustBackendArchitectureAnalyzer';
+import { ReactAdvancedComponentAnalyzer, ReactAdvancedComponentAnalysis } from './reactAdvancedComponentAnalyzer';
+import { RustAdvancedSystemAnalyzer, RustAdvancedSystemAnalysis as RustAdvancedSystemAnalysisNew } from './rustAdvancedSystemAnalyzer';
+import { ReactDeepOptimizationAnalyzer, ReactDeepOptimizationAnalysis } from './reactDeepOptimizationAnalyzer';
+import { RustDeepOptimizationAnalyzer, RustDeepOptimizationAnalysis } from './rustDeepOptimizationAnalyzer';
+import { ReactHookOptimizationAnalyzer, ReactHookOptimizationAnalysis } from './reactHookOptimizationAnalyzer';
+import { RustMemorySafetyPerformanceAnalyzer, RustMemorySafetyPerformanceAnalysis } from './rustMemorySafetyPerformanceAnalyzer';
+import { ReactStateOptimizationAnalyzer, ReactStateOptimizationAnalysis } from './reactStateOptimizationAnalyzer';
+import { ReactAdvancedArchitectureAnalyzer as ReactAdvancedArch, ReactArchitectureAnalysisResult } from './reactAdvancedArchitectureAnalyzer';
+import { RustAdvancedArchitectureAnalyzer as RustAdvancedArch, RustArchitectureAnalysisResult } from './rustAdvancedArchitectureAnalyzer';
+import { ReactStateFlowAnalyzer, StateFlowReport } from './reactStateFlowAnalyzer';
+import { RustConcurrencySafetyAnalyzer, ConcurrencySafetyReport } from './rustConcurrencySafetyAnalyzer';
+import { RustErrorHandlingAnalyzer, ErrorHandlingAnalysis } from './rustErrorHandlingAnalyzer';
 
 // 代码分析结果接口
 export interface CodeAnalysis {
@@ -87,6 +99,30 @@ export interface CodeAnalysis {
     reactArchitecturePattern?: ReactArchitecturePattern;
     // Rust后端架构分析
     rustBackendArchitecture?: any; // RustBackendArchitectureAnalysis;
+    // 新增的高级分析
+    reactAdvancedComponent?: ReactAdvancedComponentAnalysis;
+    // 实时性能监控分析
+    reactRealtimePerformance?: import('./reactRealTimePerformanceAnalyzer').ReactRealTimeMonitoringResult;
+    // Rust系统性能分析
+    rustSystemMonitoring?: import('./rustSystemPerformanceAnalyzer').RustSystemMonitoringResult;
+    // 高级代码质量分析
+    advancedCodeQuality?: import('./advancedCodeQualityAnalyzer').QualityReport;
+    rustAdvancedSystemNew?: RustAdvancedSystemAnalysisNew;
+    // 深度优化分析
+    reactDeepOptimization?: ReactDeepOptimizationAnalysis;
+    rustDeepOptimization?: RustDeepOptimizationAnalysis;
+    // 专项优化分析
+    reactHookOptimization?: ReactHookOptimizationAnalysis;
+    rustMemorySafetyPerformance?: RustMemorySafetyPerformanceAnalysis;
+    reactStateOptimization?: ReactStateOptimizationAnalysis;
+    // 高级架构分析 (新增)
+    reactAdvancedArchitectureAnalysis?: ReactArchitectureAnalysisResult;
+    rustAdvancedArchitectureAnalysis?: RustArchitectureAnalysisResult;
+    // 状态流和并发安全分析
+    reactStateFlow?: StateFlowReport;
+    rustConcurrencySafety?: ConcurrencySafetyReport;
+    // Rust错误处理分析
+    rustErrorHandling?: import('./rustErrorHandlingAnalyzer').ErrorHandlingAnalysis;
 }
 
 export interface FunctionInfo {
@@ -148,6 +184,27 @@ export class CodeAnalyzer {
     private rustPerformanceAnalyzer: RustPerformanceAnalyzer;
     private reactAdvancedAnalyzer: ReactAdvancedAnalyzer;
     private rustBackendArchitectureAnalyzer: RustBackendArchitectureAnalyzer;
+    private reactAdvancedComponentAnalyzer: ReactAdvancedComponentAnalyzer;
+    private rustAdvancedSystemAnalyzerNew: RustAdvancedSystemAnalyzer;
+    // 深度优化分析器
+    private reactDeepOptimizationAnalyzer: ReactDeepOptimizationAnalyzer;
+    private rustDeepOptimizationAnalyzer: RustDeepOptimizationAnalyzer;
+    // 专项优化分析器
+    private reactHookOptimizationAnalyzer: ReactHookOptimizationAnalyzer;
+    private rustMemorySafetyPerformanceAnalyzer: RustMemorySafetyPerformanceAnalyzer;
+    private reactStateOptimizationAnalyzer: ReactStateOptimizationAnalyzer;
+    // 高级架构分析器 (新增)
+    private reactAdvancedArchitectureAnalyzer: ReactAdvancedArch;
+    private rustAdvancedArchitectureAnalyzer: RustAdvancedArch;
+    // 最新的分析器
+    private reactRealTimePerformanceAnalyzer: any;
+    private rustSystemPerformanceAnalyzer: any;
+    private advancedCodeQualityAnalyzer: any;
+    // 状态流和并发安全分析器
+    private reactStateFlowAnalyzer: ReactStateFlowAnalyzer;
+    private rustConcurrencySafetyAnalyzer: RustConcurrencySafetyAnalyzer;
+    // Rust错误处理分析器
+    private rustErrorHandlingAnalyzer: RustErrorHandlingAnalyzer;
 
     constructor() {
         this.reactAnalyzer = new ReactAnalyzer();
@@ -169,6 +226,27 @@ export class CodeAnalyzer {
         this.rustPerformanceAnalyzer = new RustPerformanceAnalyzer();
         this.reactAdvancedAnalyzer = new ReactAdvancedAnalyzer();
         this.rustBackendArchitectureAnalyzer = new RustBackendArchitectureAnalyzer();
+        this.reactAdvancedComponentAnalyzer = new ReactAdvancedComponentAnalyzer();
+        this.rustAdvancedSystemAnalyzerNew = new RustAdvancedSystemAnalyzer();
+        // 初始化深度优化分析器
+        this.reactDeepOptimizationAnalyzer = new ReactDeepOptimizationAnalyzer();
+        this.rustDeepOptimizationAnalyzer = new RustDeepOptimizationAnalyzer();
+        // 初始化专项优化分析器
+        this.reactHookOptimizationAnalyzer = new ReactHookOptimizationAnalyzer();
+        this.rustMemorySafetyPerformanceAnalyzer = new RustMemorySafetyPerformanceAnalyzer();
+        this.reactStateOptimizationAnalyzer = new ReactStateOptimizationAnalyzer();
+        // 初始化高级架构分析器 (新增)
+        this.reactAdvancedArchitectureAnalyzer = new ReactAdvancedArch();
+        this.rustAdvancedArchitectureAnalyzer = new RustAdvancedArch();
+        // 最新的分析器将在需要时懒加载
+        this.reactRealTimePerformanceAnalyzer = null;
+        this.rustSystemPerformanceAnalyzer = null;
+        this.advancedCodeQualityAnalyzer = null;
+        // 初始化状态流和并发安全分析器
+        this.reactStateFlowAnalyzer = new ReactStateFlowAnalyzer();
+        this.rustConcurrencySafetyAnalyzer = new RustConcurrencySafetyAnalyzer();
+        // 初始化Rust错误处理分析器
+        this.rustErrorHandlingAnalyzer = new RustErrorHandlingAnalyzer();
         this.translationMap = new Map([
             // React/TypeScript 翻译
             ['useState', '使用状态'],
@@ -271,6 +349,30 @@ export class CodeAnalyzer {
                         analysis.reactContexts || [], analysis.reduxStores || []);
                     analysis.reactPerformanceIssues = reactPerformanceIssues;
                     analysis.reactArchitecturePattern = reactArchPattern;
+                    
+                    // 添加React高级组件分析
+                    const reactAdvancedComponentAnalysis = this.reactAdvancedComponentAnalyzer.analyzeAdvancedComponents(text, fileName);
+                    analysis.reactAdvancedComponent = reactAdvancedComponentAnalysis;
+                    
+                    // 添加React深度优化分析
+                    const reactDeepOptimizationAnalysis = await this.reactDeepOptimizationAnalyzer.analyzeReactOptimization(text, fileName);
+                    analysis.reactDeepOptimization = reactDeepOptimizationAnalysis;
+                    
+                    // 添加React Hook优化分析
+                    const reactHookOptimizationAnalysis = await this.reactHookOptimizationAnalyzer.analyzeHookOptimization(text, fileName);
+                    analysis.reactHookOptimization = reactHookOptimizationAnalysis;
+                    
+                    // 添加React状态优化分析
+                    const reactStateOptimizationAnalysis = await this.reactStateOptimizationAnalyzer.analyzeStateOptimization(text, fileName);
+                    analysis.reactStateOptimization = reactStateOptimizationAnalysis;
+                    
+                    // 添加React高级架构分析 (新增)
+                    const reactAdvancedArchitectureAnalysis = await this.reactAdvancedArchitectureAnalyzer.analyzeReactArchitecture(text, fileName);
+                    analysis.reactAdvancedArchitectureAnalysis = reactAdvancedArchitectureAnalysis;
+                    
+                    // 添加React状态流分析
+                    const reactStateFlowAnalysis = await this.reactStateFlowAnalyzer.analyzeStateFlow(text, fileName);
+                    analysis.reactStateFlow = reactStateFlowAnalysis;
                 }
             } else if (language === 'rust') {
                 analysis = await this.analyzeRust(text, fileName, language);
@@ -324,7 +426,67 @@ export class CodeAnalyzer {
                 // 添加Rust后端架构分析
                 const rustBackendAnalysis = this.rustBackendArchitectureAnalyzer.analyze(text, fileName);
                 analysis.rustBackendArchitecture = rustBackendAnalysis;
+                
+                // 添加Rust高级系统分析
+                const rustAdvancedSystemAnalysisNew = this.rustAdvancedSystemAnalyzerNew.analyzeAdvancedSystem(text, fileName);
+                analysis.rustAdvancedSystemNew = rustAdvancedSystemAnalysisNew;
+                
+                // 添加Rust深度优化分析
+                const rustDeepOptimizationAnalysis = await this.rustDeepOptimizationAnalyzer.analyzeRustOptimization(text, fileName);
+                analysis.rustDeepOptimization = rustDeepOptimizationAnalysis;
+                
+                // 添加Rust内存安全性能分析
+                const rustMemorySafetyPerformanceAnalysis = await this.rustMemorySafetyPerformanceAnalyzer.analyzeMemorySafetyPerformance(text, fileName);
+                analysis.rustMemorySafetyPerformance = rustMemorySafetyPerformanceAnalysis;
+                
+                // 添加Rust高级架构分析 (新增)
+                const rustAdvancedArchitectureAnalysis = await this.rustAdvancedArchitectureAnalyzer.analyzeRustArchitecture(text, fileName);
+                analysis.rustAdvancedArchitectureAnalysis = rustAdvancedArchitectureAnalysis;
+                
+                // 添加Rust并发安全分析
+                const rustConcurrencySafetyAnalysis = await this.rustConcurrencySafetyAnalyzer.analyzeConcurrency(text, fileName);
+                analysis.rustConcurrencySafety = rustConcurrencySafetyAnalysis;
+                
+                // 添加Rust错误处理分析
+                const rustErrorHandlingAnalysis = await this.rustErrorHandlingAnalyzer.analyzeErrorHandling(text, fileName);
+                analysis.rustErrorHandling = rustErrorHandlingAnalysis;
             }
+            
+            // 添加通用的高级分析器 (适用于React和Rust)
+            try {
+                // 懒加载并调用实时性能分析器 (仅React)
+                if (language === 'typescript' || language === 'typescriptreact') {
+                    if (!this.reactRealTimePerformanceAnalyzer) {
+                        const { ReactRealTimePerformanceAnalyzer } = await import('./reactRealTimePerformanceAnalyzer');
+                        this.reactRealTimePerformanceAnalyzer = new ReactRealTimePerformanceAnalyzer();
+                    }
+                    const reactRealtimeAnalysis = await this.reactRealTimePerformanceAnalyzer.startRealTimeMonitoring(text, fileName);
+                    analysis.reactRealtimePerformance = reactRealtimeAnalysis;
+                }
+                
+                // 懒加载并调用系统性能分析器 (仅Rust)
+                if (language === 'rust') {
+                    if (!this.rustSystemPerformanceAnalyzer) {
+                        const { RustSystemPerformanceAnalyzer } = await import('./rustSystemPerformanceAnalyzer');
+                        this.rustSystemPerformanceAnalyzer = new RustSystemPerformanceAnalyzer();
+                    }
+                    const rustSystemAnalysis = await this.rustSystemPerformanceAnalyzer.analyzeSystemPerformance(text, fileName);
+                    analysis.rustSystemMonitoring = rustSystemAnalysis;
+                }
+                
+                // 懒加载并调用高级代码质量分析器 (通用)
+                if (!this.advancedCodeQualityAnalyzer) {
+                    const { AdvancedCodeQualityAnalyzer } = await import('./advancedCodeQualityAnalyzer');
+                    this.advancedCodeQualityAnalyzer = new AdvancedCodeQualityAnalyzer();
+                }
+                const qualityAnalysis = await this.advancedCodeQualityAnalyzer.analyzeCodeQuality(text, fileName);
+                analysis.advancedCodeQuality = qualityAnalysis;
+                
+            } catch (advancedError) {
+                console.warn('高级分析器错误:', advancedError);
+                // 不中断主要分析流程
+            }
+            
         } catch (error) {
             // 使用VSCode的输出通道而不是console
             vscode.window.showErrorMessage('代码分析错误: ' + error);
