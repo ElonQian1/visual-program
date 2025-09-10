@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { CodeAnalyzer } from './codeAnalyzer';
 import { VisualPanelProvider, createOrShowVisualPanel } from './visualPanelProvider';
-import { CodeStructureProvider } from './codeStructureProvider';
+import { CodeStructureProvider } from './codeStructureProviderSimplified';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('代码可视化编程插件已激活');
@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
                 vscode.window.showInformationMessage(`分析完成：发现 ${analysis.functions.length} 个函数`);
                 
                 // 更新结构视图
-                codeStructureProvider.updateStructure(analysis);
+                codeStructureProvider.refresh(analysis);
             } catch (error) {
                 vscode.window.showErrorMessage(`代码分析失败: ${error}`);
             }
@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
             // 延迟分析，避免频繁更新
             setTimeout(() => {
                 codeAnalyzer.analyzeFile(event.document).then(analysis => {
-                    codeStructureProvider.updateStructure(analysis);
+                    codeStructureProvider.refresh(analysis);
                 });
             }, 1000);
         }

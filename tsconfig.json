@@ -9,5 +9,14 @@
         "sourceMap": true,
         "rootDir": "src",
         "strict": true
-    }
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "demo/**/*",
+        "demo-files/**/*",
+        "out",
+        "node_modules"
+    ]
 }
