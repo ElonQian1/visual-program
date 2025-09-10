@@ -15,6 +15,7 @@ import { ReactHookAnalyzer, ReactHookAnalysis } from './reactHookAnalyzer';
 import { RustAsyncNetworkAnalyzer, RustAsyncNetworkAnalysis } from './rustAsyncNetworkAnalyzer';
 import { ReactStateManagementAnalyzer, ReactStateManagementAnalysis } from './reactStateManagementAnalyzer';
 import { RustPerformanceAnalyzer, RustPerformanceAnalysis as RustDetailedPerformanceAnalysis } from './rustPerformanceAnalyzer';
+import { ReactAdvancedAnalyzer, ReactPerformanceIssue, ReactArchitecturePattern } from './reactPerformanceAnalyzer';
 
 // 代码分析结果接口
 export interface CodeAnalysis {

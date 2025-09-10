@@ -115,7 +115,7 @@ export interface ModuleInterface {
     type: 'public' | 'internal' | 'external';
     exports: string[];
     imports: string[];
-    api_surface: number;
+    apiSurface: number;
 }
 
 export interface ModularityRecommendation {
@@ -179,7 +179,7 @@ export interface RefactoringOpportunity {
 export interface RefactoringStep {
     step: number;
     action: string;
-    code_example?: string;
+    codeExample?: string;
     validation: string;
 }
 
@@ -214,8 +214,8 @@ export class ReactDependencyAnalyzer {
                 if (namedImports) {
                     imports.push(...namedImports.split(',').map(imp => imp.trim()));
                 }
-                if (namespaceImport) imports.push(namespaceImport);
-                if (defaultImport) imports.push(defaultImport);
+                if (namespaceImport) {imports.push(namespaceImport);}
+                if (defaultImport) {imports.push(defaultImport);}
                 
                 if (modulePath.startsWith('./') || modulePath.startsWith('../')) {
                     importMap.set(modulePath, imports);
@@ -487,8 +487,8 @@ export class ReactDependencyAnalyzer {
     }
 
     private calculateCoupling(depCount: number): 'loose' | 'tight' | 'high' {
-        if (depCount <= 2) return 'loose';
-        if (depCount <= 5) return 'tight';
+        if (depCount <= 2) {return 'loose';}
+        if (depCount <= 5) {return 'tight';}
         return 'high';
     }
 
@@ -502,7 +502,7 @@ export class ReactDependencyAnalyzer {
             braceCount += (line.match(/{/g) || []).length;
             braceCount -= (line.match(/}/g) || []).length;
             
-            if (braceCount < 0) break;
+            if (braceCount < 0) {break;}
             
             // 计算循环复杂度
             if (line.includes('if') || line.includes('while') || line.includes('for')) {
@@ -514,16 +514,16 @@ export class ReactDependencyAnalyzer {
     }
 
     private determineNodeType(component: string, lines: string[]): 'component' | 'hook' | 'context' | 'service' {
-        if (component.startsWith('use')) return 'hook';
-        if (component.includes('Context')) return 'context';
-        if (component.includes('Service') || component.includes('API')) return 'service';
+        if (component.startsWith('use')) {return 'hook';}
+        if (component.includes('Context')) {return 'context';}
+        if (component.includes('Service') || component.includes('API')) {return 'service';}
         return 'component';
     }
 
     private calculateImportance(complexity: number): 'critical' | 'important' | 'normal' | 'low' {
-        if (complexity > 20) return 'critical';
-        if (complexity > 10) return 'important';
-        if (complexity > 5) return 'normal';
+        if (complexity > 20) {return 'critical';}
+        if (complexity > 10) {return 'important';}
+        if (complexity > 5) {return 'normal';}
         return 'low';
     }
 
@@ -555,9 +555,9 @@ export class ReactDependencyAnalyzer {
     }
 
     private calculateCircularDependencySeverity(cycle: string[]): 'low' | 'medium' | 'high' | 'critical' {
-        if (cycle.length > 5) return 'critical';
-        if (cycle.length > 3) return 'high';
-        if (cycle.length > 2) return 'medium';
+        if (cycle.length > 5) {return 'critical';}
+        if (cycle.length > 3) {return 'high';}
+        if (cycle.length > 2) {return 'medium';}
         return 'low';
     }
 
