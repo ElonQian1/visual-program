@@ -442,8 +442,8 @@ export class AdvancedReactPerformanceAnalyzer {
                         importedNames.add(cleanName);
                     });
                 }
-                if (namespaceImport) importedNames.add(namespaceImport);
-                if (defaultImport) importedNames.add(defaultImport);
+                if (namespaceImport) {importedNames.add(namespaceImport);}
+                if (defaultImport) {importedNames.add(defaultImport);}
             }
         }
 
@@ -1049,11 +1049,11 @@ export class AdvancedReactPerformanceAnalyzer {
     private isAriaUsageCorrect(attribute: string, line: string): boolean {
         // 简化的验证逻辑
         const validUsage: { [key: string]: boolean } = {
-            'aria-label': true,
-            'aria-labelledby': line.includes('id='),
-            'aria-describedby': line.includes('id='),
-            'aria-expanded': line.includes('button') || line.includes('details'),
-            'aria-hidden': true
+            ariaLabel: true,
+            ariaLabelledby: line.includes('id='),
+            ariaDescribedby: line.includes('id='),
+            ariaExpanded: line.includes('button') || line.includes('details'),
+            ariaHidden: true
         };
 
         return validUsage[attribute] !== false;

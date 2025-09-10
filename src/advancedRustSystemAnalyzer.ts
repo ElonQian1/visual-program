@@ -144,7 +144,7 @@ export interface StoragePattern {
     pattern: 'sql' | 'nosql' | 'key-value' | 'graph' | 'time-series' | 'blob';
     consistency: 'strong' | 'eventual' | 'weak';
     availability: 'high' | 'medium' | 'low';
-    partition_tolerance: boolean;
+    partitionTolerance: boolean;
     line: number;
 }
 
@@ -876,18 +876,18 @@ export class AdvancedRustSystemAnalyzer {
 
     // Helper methods
     private extractAlgorithmName(line: string): string {
-        if (line.includes('sort')) return 'sorting_algorithm';
-        if (line.includes('search')) return 'search_algorithm';
-        if (line.includes('hash')) return 'hashing_algorithm';
-        if (line.includes('crypto')) return 'cryptographic_algorithm';
+        if (line.includes('sort')) {return 'sorting_algorithm';}
+        if (line.includes('search')) {return 'search_algorithm';}
+        if (line.includes('hash')) {return 'hashing_algorithm';}
+        if (line.includes('crypto')) {return 'cryptographic_algorithm';}
         return 'unknown_algorithm';
     }
 
     private estimateParallelSpeedup(line: string): number {
         // Simplified speedup estimation based on algorithm type
-        if (line.includes('map')) return 3.5;
-        if (line.includes('reduce')) return 2.5;
-        if (line.includes('filter')) return 4.0;
+        if (line.includes('map')) {return 3.5;}
+        if (line.includes('reduce')) {return 2.5;}
+        if (line.includes('filter')) {return 4.0;}
         return 3.0;
     }
 
@@ -896,20 +896,20 @@ export class AdvancedRustSystemAnalyzer {
     }
 
     private determineIOType(line: string): 'file-io' | 'network-io' | 'database-io' | 'serial-io' {
-        if (line.includes('file') || line.includes('File') || line.includes('fs::')) return 'file-io';
-        if (line.includes('tcp') || line.includes('udp') || line.includes('http')) return 'network-io';
-        if (line.includes('sql') || line.includes('database') || line.includes('pg') || line.includes('mysql')) return 'database-io';
+        if (line.includes('file') || line.includes('File') || line.includes('fs::')) {return 'file-io';}
+        if (line.includes('tcp') || line.includes('udp') || line.includes('http')) {return 'network-io';}
+        if (line.includes('sql') || line.includes('database') || line.includes('pg') || line.includes('mysql')) {return 'database-io';}
         return 'file-io';
     }
 
     private extractFunctionName(line: string, lines: string[], index: number): string {
         const fnMatch = line.match(/fn\s+(\w+)/);
-        if (fnMatch) return fnMatch[1];
+        if (fnMatch) {return fnMatch[1];}
 
         // Look in surrounding lines
         for (let i = Math.max(0, index - 2); i <= Math.min(lines.length - 1, index + 2); i++) {
             const fnMatch = lines[i].match(/fn\s+(\w+)/);
-            if (fnMatch) return fnMatch[1];
+            if (fnMatch) {return fnMatch[1];}
         }
 
         return 'unknown_function';
@@ -917,13 +917,13 @@ export class AdvancedRustSystemAnalyzer {
 
     private extractComponentName(line: string): string {
         const structMatch = line.match(/struct\s+(\w+)/);
-        if (structMatch) return structMatch[1];
+        if (structMatch) {return structMatch[1];}
 
         const implMatch = line.match(/impl\s+(\w+)/);
-        if (implMatch) return implMatch[1];
+        if (implMatch) {return implMatch[1];}
 
         const modMatch = line.match(/mod\s+(\w+)/);
-        if (modMatch) return modMatch[1];
+        if (modMatch) {return modMatch[1];}
 
         return 'unknown_component';
     }
@@ -939,10 +939,10 @@ export class AdvancedRustSystemAnalyzer {
 
     private extractServiceName(line: string): string {
         const serviceMatch = line.match(/(\w+Service|\w+Handler|\w+Controller|\w+Worker)/);
-        if (serviceMatch) return serviceMatch[1];
+        if (serviceMatch) {return serviceMatch[1];}
 
         const structMatch = line.match(/struct\s+(\w+)/);
-        if (structMatch) return structMatch[1];
+        if (structMatch) {return structMatch[1];}
 
         return 'unknown_service';
     }
@@ -970,17 +970,17 @@ export class AdvancedRustSystemAnalyzer {
         // Count methods, handlers, and branches
         for (let i = index; i < Math.min(lines.length, index + 50); i++) {
             const line = lines[i];
-            if (line.includes('fn ')) complexity++;
-            if (line.includes('if ') || line.includes('match ')) complexity++;
-            if (line.includes('for ') || line.includes('while ')) complexity++;
+            if (line.includes('fn ')) {complexity++;}
+            if (line.includes('if ') || line.includes('match ')) {complexity++;}
+            if (line.includes('for ') || line.includes('while ')) {complexity++;}
         }
 
         return complexity;
     }
 
     private extractGrpcPattern(line: string): 'request-response' | 'streaming' | 'fire-and-forget' {
-        if (line.includes('stream')) return 'streaming';
-        if (line.includes('oneway')) return 'fire-and-forget';
+        if (line.includes('stream')) {return 'streaming';}
+        if (line.includes('oneway')) {return 'fire-and-forget';}
         return 'request-response';
     }
 

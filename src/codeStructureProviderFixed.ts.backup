@@ -1,0 +1,568 @@
+import * as vscode from 'vscode';
+import { CodeAnalysis } from './codeAnalyzer';
+
+// 代码结构树项
+export class StructureItem extends vscode.TreeItem {
+    constructor(
+        public readonly label: string,
+        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public readonly contextValue?: string,
+        iconPath?: vscode.ThemeIcon,
+        public readonly description?: string,
+        public readonly tooltip?: string,
+        public readonly command?: vscode.Command
+    ) {
+        super(label, collapsibleState);
+        this.contextValue = contextValue;
+        this.description = description;
+        this.tooltip = tooltip;
+        this.command = command;
+        
+        // 设置图标颜色
+        this.iconPath = iconPath || this.getIconForContextValue(contextValue);
+    }
+    
+    private getIconForContextValue(contextValue?: string): vscode.ThemeIcon {
+        if (!contextValue) return new vscode.ThemeIcon('circle-filled');
+        
+        switch (contextValue) {
+            case 'function':
+                return new vscode.ThemeIcon('symbol-function', new vscode.ThemeColor('symbolIcon.functionForeground'));
+            case 'class':
+                return new vscode.ThemeIcon('symbol-class', new vscode.ThemeColor('symbolIcon.classForeground'));
+            case 'import':
+                return new vscode.ThemeIcon('symbol-namespace', new vscode.ThemeColor('symbolIcon.namespaceForeground'));
+            case 'variable':
+                return new vscode.ThemeIcon('symbol-variable', new vscode.ThemeColor('symbolIcon.variableForeground'));
+            case 'reactComponent':
+                return new vscode.ThemeIcon('symbol-class', new vscode.ThemeColor('charts.blue'));
+            case 'reactRoute':
+                return new vscode.ThemeIcon('symbol-misc', new vscode.ThemeColor('charts.green'));
+            case 'reactContext':
+                return new vscode.ThemeIcon('symbol-interface', new vscode.ThemeColor('charts.purple'));
+            case 'reduxStore':
+                return new vscode.ThemeIcon('database', new vscode.ThemeColor('charts.orange'));
+            case 'reactForm':
+                return new vscode.ThemeIcon('symbol-field', new vscode.ThemeColor('charts.yellow'));
+            case 'apiCall':
+                return new vscode.ThemeIcon('cloud', new vscode.ThemeColor('charts.red'));
+            case 'rustStruct':
+                return new vscode.ThemeIcon('symbol-struct', new vscode.ThemeColor('charts.orange'));
+            case 'rustEnum':
+                return new vscode.ThemeIcon('symbol-enum', new vscode.ThemeColor('charts.green'));
+            case 'rustTrait':
+                return new vscode.ThemeIcon('symbol-interface', new vscode.ThemeColor('charts.purple'));
+            case 'rustImpl':
+                return new vscode.ThemeIcon('symbol-method', new vscode.ThemeColor('charts.blue'));
+            case 'rustWebHandler':
+                return new vscode.ThemeIcon('globe', new vscode.ThemeColor('charts.red'));
+            case 'rustDbModel':
+                return new vscode.ThemeIcon('database', new vscode.ThemeColor('charts.green'));
+            case 'rustAsyncTask':
+                return new vscode.ThemeIcon('clock', new vscode.ThemeColor('charts.yellow'));
+            case 'rustErrorType':
+                return new vscode.ThemeIcon('error', new vscode.ThemeColor('charts.red'));
+            case 'rustConfig':
+                return new vscode.ThemeIcon('gear', new vscode.ThemeColor('charts.blue'));
+            case 'rustTest':
+                return new vscode.ThemeIcon('beaker', new vscode.ThemeColor('charts.green'));
+            case 'rustMacro':
+                return new vscode.ThemeIcon('symbol-operator', new vscode.ThemeColor('charts.purple'));
+            case 'rustLifetime':
+                return new vscode.ThemeIcon('clock', new vscode.ThemeColor('charts.orange'));
+            case 'reactState':
+                return new vscode.ThemeIcon('symbol-property', new vscode.ThemeColor('charts.blue'));
+            case 'reactCommunication':
+                return new vscode.ThemeIcon('radio-tower', new vscode.ThemeColor('charts.green'));
+            case 'reactDataBinding':
+                return new vscode.ThemeIcon('link', new vscode.ThemeColor('charts.orange'));
+            case 'reactPerformance':
+                return new vscode.ThemeIcon('dashboard', new vscode.ThemeColor('charts.red'));
+            case 'rustOptimization':
+                return new vscode.ThemeIcon('rocket', new vscode.ThemeColor('charts.yellow'));
+            case 'rustArchitecture':
+                return new vscode.ThemeIcon('organization', new vscode.ThemeColor('charts.purple'));
+            case 'rustResource':
+                return new vscode.ThemeIcon('database', new vscode.ThemeColor('charts.green'));
+            case 'reactHook':
+                return new vscode.ThemeIcon('symbol-method', new vscode.ThemeColor('charts.blue'));
+            case 'rustAsyncNetwork':
+                return new vscode.ThemeIcon('cloud', new vscode.ThemeColor('charts.cyan'));
+            case 'rustConcurrency':
+                return new vscode.ThemeIcon('symbol-thread', new vscode.ThemeColor('charts.orange'));
+            case 'rustAsync':
+                return new vscode.ThemeIcon('clock', new vscode.ThemeColor('charts.yellow'));
+            case 'reactStateManagement':
+                return new vscode.ThemeIcon('symbol-property', new vscode.ThemeColor('charts.purple'));
+            case 'reactRedux':
+                return new vscode.ThemeIcon('database', new vscode.ThemeColor('charts.red'));
+            case 'reactZustand':
+                return new vscode.ThemeIcon('symbol-object', new vscode.ThemeColor('charts.green'));
+            case 'reactRecoil':
+                return new vscode.ThemeIcon('atom', new vscode.ThemeColor('charts.blue'));
+            case 'rustPerformanceAnalysis':
+                return new vscode.ThemeIcon('pulse', new vscode.ThemeColor('charts.red'));
+            case 'rustMemoryAnalysis':
+                return new vscode.ThemeIcon('symbol-array', new vscode.ThemeColor('charts.orange'));
+            case 'rustCpuAnalysis':
+                return new vscode.ThemeIcon('cpu', new vscode.ThemeColor('charts.yellow'));
+            case 'rustIoAnalysis':
+                return new vscode.ThemeIcon('symbol-file', new vscode.ThemeColor('charts.green'));
+            case 'rustNetworkAnalysis':
+                return new vscode.ThemeIcon('globe', new vscode.ThemeColor('charts.blue'));
+            case 'rustAlgorithmicAnalysis':
+                return new vscode.ThemeIcon('symbol-ruler', new vscode.ThemeColor('charts.purple'));
+            case 'optimizationStrategy':
+                return new vscode.ThemeIcon('lightbulb', new vscode.ThemeColor('charts.yellow'));
+            default:
+                return new vscode.ThemeIcon('circle-filled');
+        }
+    }
+}
+
+// 代码结构提供器
+export class CodeStructureProvider implements vscode.TreeDataProvider<StructureItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<StructureItem | undefined | null | void> = new vscode.EventEmitter<StructureItem | undefined | null | void>();
+    readonly onDidChangeTreeData: vscode.Event<StructureItem | undefined | null | void> = this._onDidChangeTreeData.event;
+
+    private codeAnalysis: CodeAnalysis | undefined;
+
+    constructor() {}
+
+    refresh(codeAnalysis?: CodeAnalysis): void {
+        this.codeAnalysis = codeAnalysis;
+        this._onDidChangeTreeData.fire();
+    }
+
+    getTreeItem(element: StructureItem): vscode.TreeItem {
+        return element;
+    }
+
+    getChildren(element?: StructureItem): Thenable<StructureItem[]> {
+        if (!this.codeAnalysis) {
+            return Promise.resolve([]);
+        }
+
+        if (!element) {
+            // 根级别项
+            return Promise.resolve(this.getRootItems());
+        } else {
+            // 子级项
+            return Promise.resolve(this.getChildItems(element));
+        }
+    }
+
+    private getRootItems(): StructureItem[] {
+        const items: StructureItem[] = [];
+
+        if (!this.codeAnalysis) {
+            return items;
+        }
+
+        // 基础代码结构
+        if (this.codeAnalysis.functions.length > 0) {
+            items.push(new StructureItem(
+                `函数 (${this.codeAnalysis.functions.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'functionGroup'
+            ));
+        }
+
+        if (this.codeAnalysis.classes.length > 0) {
+            items.push(new StructureItem(
+                `类 (${this.codeAnalysis.classes.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'classGroup'
+            ));
+        }
+
+        if (this.codeAnalysis.imports.length > 0) {
+            items.push(new StructureItem(
+                `导入 (${this.codeAnalysis.imports.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'importGroup'
+            ));
+        }
+
+        // React组件分析
+        if (this.codeAnalysis.reactComponents?.length) {
+            items.push(new StructureItem(
+                `React组件 (${this.codeAnalysis.reactComponents.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactComponentGroup'
+            ));
+        }
+
+        // React路由
+        if (this.codeAnalysis.reactRoutes?.length) {
+            items.push(new StructureItem(
+                `React路由 (${this.codeAnalysis.reactRoutes.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactRouteGroup'
+            ));
+        }
+
+        // React状态管理
+        if (this.codeAnalysis.reactStateManagement) {
+            items.push(new StructureItem(
+                'React状态管理分析',
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactStateManagementGroup'
+            ));
+        }
+
+        // React Hooks
+        if (this.codeAnalysis.reactHooks) {
+            const totalHooks = this.codeAnalysis.reactHooks.stateHooks.length + 
+                              this.codeAnalysis.reactHooks.effectHooks.length + 
+                              this.codeAnalysis.reactHooks.customHooks.length;
+            items.push(new StructureItem(
+                `React Hooks (${totalHooks})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactHookGroup'
+            ));
+        }
+
+        // Rust结构体
+        if (this.codeAnalysis.rustStructs?.length) {
+            items.push(new StructureItem(
+                `Rust结构体 (${this.codeAnalysis.rustStructs.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustStructGroup'
+            ));
+        }
+
+        // Rust枚举
+        if (this.codeAnalysis.rustEnums?.length) {
+            items.push(new StructureItem(
+                `Rust枚举 (${this.codeAnalysis.rustEnums.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustEnumGroup'
+            ));
+        }
+
+        // Rust性能分析
+        if (this.codeAnalysis.rustDetailedPerformance) {
+            items.push(new StructureItem(
+                'Rust性能分析',
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustPerformanceGroup'
+            ));
+        }
+
+        // Rust异步网络
+        if (this.codeAnalysis.rustAsyncNetwork) {
+            items.push(new StructureItem(
+                'Rust异步网络分析',
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustAsyncNetworkGroup'
+            ));
+        }
+
+        return items;
+    }
+
+    private getChildItems(element: StructureItem): StructureItem[] {
+        const items: StructureItem[] = [];
+
+        if (!this.codeAnalysis) {
+            return items;
+        }
+
+        switch (element.contextValue) {
+            case 'functionGroup':
+                return this.codeAnalysis.functions.map(func => new StructureItem(
+                    `${func.displayName || func.name}`,
+                    vscode.TreeItemCollapsibleState.None,
+                    'function',
+                    undefined,
+                    `行 ${func.line}`,
+                    func.description
+                ));
+
+            case 'classGroup':
+                return this.codeAnalysis.classes.map(cls => new StructureItem(
+                    `${cls.displayName || cls.name}`,
+                    vscode.TreeItemCollapsibleState.None,
+                    'class',
+                    undefined,
+                    `行 ${cls.line}`,
+                    `类: ${cls.name}`
+                ));
+
+            case 'importGroup':
+                return this.codeAnalysis.imports.map(imp => new StructureItem(
+                    `来自 ${imp.moduleName}`,
+                    vscode.TreeItemCollapsibleState.None,
+                    'import',
+                    undefined,
+                    `${imp.importedItems.join(', ')}`,
+                    `导入: ${imp.importedItems.join(', ')}`
+                ));
+
+            case 'reactComponentGroup':
+                return this.codeAnalysis.reactComponents?.map(comp => new StructureItem(
+                    comp.name,
+                    vscode.TreeItemCollapsibleState.None,
+                    'reactComponent',
+                    undefined,
+                    `${comp.type} - 行 ${comp.line}`,
+                    `React组件: ${comp.name}`
+                )) || [];
+
+            case 'reactStateManagementGroup':
+                return this.getReactStateManagementItems();
+
+            case 'reactHookGroup':
+                const hookItems: StructureItem[] = [];
+                const hooks = this.codeAnalysis.reactHooks;
+                if (hooks) {
+                    hooks.stateHooks.forEach(hook => {
+                        hookItems.push(new StructureItem(
+                            `${hook.stateName} (${hook.hookType})`,
+                            vscode.TreeItemCollapsibleState.None,
+                            'reactHook',
+                            undefined,
+                            `行 ${hook.line}`,
+                            `状态Hook: ${hook.stateName}`
+                        ));
+                    });
+                    hooks.effectHooks.forEach(hook => {
+                        hookItems.push(new StructureItem(
+                            `Effect (${hook.effectType})`,
+                            vscode.TreeItemCollapsibleState.None,
+                            'reactHook',
+                            undefined,
+                            `行 ${hook.line}`,
+                            `副作用Hook: ${hook.effectType}`
+                        ));
+                    });
+                    hooks.customHooks.forEach(hook => {
+                        hookItems.push(new StructureItem(
+                            `${hook.hookName} (自定义)`,
+                            vscode.TreeItemCollapsibleState.None,
+                            'reactHook',
+                            undefined,
+                            `行 ${hook.line}`,
+                            `自定义Hook: ${hook.hookName}`
+                        ));
+                    });
+                }
+                return hookItems;
+
+            case 'rustStructGroup':
+                return this.codeAnalysis.rustStructs?.map(struct => new StructureItem(
+                    struct.name,
+                    vscode.TreeItemCollapsibleState.None,
+                    'rustStruct',
+                    undefined,
+                    `行 ${struct.line}`,
+                    `Rust结构体: ${struct.name}`
+                )) || [];
+
+            case 'rustEnumGroup':
+                return this.codeAnalysis.rustEnums?.map(enumItem => new StructureItem(
+                    enumItem.name,
+                    vscode.TreeItemCollapsibleState.None,
+                    'rustEnum',
+                    undefined,
+                    `行 ${enumItem.line}`,
+                    `Rust枚举: ${enumItem.name}`
+                )) || [];
+
+            case 'rustPerformanceGroup':
+                return this.getRustPerformanceItems();
+
+            case 'rustAsyncNetworkGroup':
+                return this.getRustAsyncNetworkItems();
+
+            default:
+                return [];
+        }
+    }
+
+    private getReactStateManagementItems(): StructureItem[] {
+        const items: StructureItem[] = [];
+        const analysis = this.codeAnalysis?.reactStateManagement;
+
+        if (!analysis) return items;
+
+        // Redux分析
+        if (analysis.reduxAnalysis && analysis.reduxAnalysis.stores.length > 0) {
+            items.push(new StructureItem(
+                `Redux Stores (${analysis.reduxAnalysis.stores.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactRedux',
+                undefined,
+                `${analysis.reduxAnalysis.stores.length}个存储`,
+                'Redux状态管理分析'
+            ));
+        }
+
+        // Context分析
+        if (analysis.contextAnalysis && analysis.contextAnalysis.contexts.length > 0) {
+            items.push(new StructureItem(
+                `React Context (${analysis.contextAnalysis.contexts.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactContext',
+                undefined,
+                `${analysis.contextAnalysis.contexts.length}个上下文`,
+                'React Context分析'
+            ));
+        }
+
+        // Zustand分析
+        if (analysis.zustandAnalysis && analysis.zustandAnalysis.stores.length > 0) {
+            items.push(new StructureItem(
+                `Zustand Stores (${analysis.zustandAnalysis.stores.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactZustand',
+                undefined,
+                `${analysis.zustandAnalysis.stores.length}个存储`,
+                'Zustand状态管理分析'
+            ));
+        }
+
+        // Recoil分析
+        if (analysis.recoilAnalysis && analysis.recoilAnalysis.atoms.length > 0) {
+            items.push(new StructureItem(
+                `Recoil Atoms (${analysis.recoilAnalysis.atoms.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactRecoil',
+                undefined,
+                `${analysis.recoilAnalysis.atoms.length}个原子`,
+                'Recoil状态管理分析'
+            ));
+        }
+
+        // 优化建议
+        if (analysis.optimizationSuggestions.length > 0) {
+            items.push(new StructureItem(
+                `优化建议 (${analysis.optimizationSuggestions.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'optimizationStrategy',
+                undefined,
+                `${analysis.optimizationSuggestions.length}个建议`,
+                '状态管理优化建议'
+            ));
+        }
+
+        return items;
+    }
+
+    private getRustPerformanceItems(): StructureItem[] {
+        const items: StructureItem[] = [];
+        const analysis = this.codeAnalysis?.rustDetailedPerformance;
+
+        if (!analysis) return items;
+
+        // 内存分析
+        items.push(new StructureItem(
+            '内存性能分析',
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustMemoryAnalysis',
+            undefined,
+            `堆使用: ${analysis.memoryAnalysis.heapUsage.totalAllocations}次分配`,
+            '内存使用和分配模式分析'
+        ));
+
+        // CPU分析
+        items.push(new StructureItem(
+            'CPU性能分析',
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustCpuAnalysis',  
+            undefined,
+            `热点: ${analysis.cpuAnalysis.hotspots.length}个`,
+            'CPU使用和性能瓶颈分析'
+        ));
+
+        // I/O分析
+        items.push(new StructureItem(
+            'I/O性能分析',
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustIoAnalysis',
+            undefined,
+            `文件操作: ${analysis.ioAnalysis.fileIo.operations.length}个`,
+            'I/O操作性能分析'
+        ));
+
+        // 网络分析
+        items.push(new StructureItem(
+            '网络性能分析',
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustNetworkAnalysis',
+            undefined,
+            `连接管理: ${analysis.networkAnalysis.connectionManagement.pooling.enabled ? '已启用池化' : '未启用池化'}`,
+            '网络通信性能分析'
+        ));
+
+        // 算法分析
+        items.push(new StructureItem(
+            '算法性能分析',
+            vscode.TreeItemCollapsibleState.Collapsed,
+            'rustAlgorithmicAnalysis',
+            undefined,
+            `复杂度分析: ${analysis.algorithmicAnalysis.complexityAnalysis.length}个函数`,
+            '算法复杂度和数据结构分析'
+        ));
+
+        // 优化策略
+        if (analysis.optimizationStrategies.length > 0) {
+            items.push(new StructureItem(
+                `优化策略 (${analysis.optimizationStrategies.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'optimizationStrategy',
+                undefined,
+                `${analysis.optimizationStrategies.length}个优化建议`,
+                '性能优化策略和建议'
+            ));
+        }
+
+        return items;
+    }
+
+    private getRustAsyncNetworkItems(): StructureItem[] {
+        const items: StructureItem[] = [];
+        const analysis = this.codeAnalysis?.rustAsyncNetwork;
+
+        if (!analysis) return items;
+
+        // 异步任务
+        if (analysis.asyncTasks.length > 0) {
+            items.push(new StructureItem(
+                `异步任务 (${analysis.asyncTasks.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustAsync',
+                undefined,
+                `${analysis.asyncTasks.length}个任务`,
+                '异步任务执行分析'
+            ));
+        }
+
+        // 网络服务
+        if (analysis.networkServices.length > 0) {
+            items.push(new StructureItem(
+                `网络服务 (${analysis.networkServices.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustAsyncNetwork',
+                undefined,
+                `${analysis.networkServices.length}个服务`,
+                '网络服务和通信分析'
+            ));
+        }
+
+        // 并发模式
+        if (analysis.concurrencyPatterns.length > 0) {
+            items.push(new StructureItem(
+                `并发模式 (${analysis.concurrencyPatterns.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'rustConcurrency',
+                undefined,
+                `${analysis.concurrencyPatterns.length}个模式`,
+                '并发处理模式分析'
+            ));
+        }
+
+        return items;
+    }
+}

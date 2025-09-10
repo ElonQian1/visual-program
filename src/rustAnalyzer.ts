@@ -556,8 +556,8 @@ export class RustAnalyzer {
 
     private translateVisibility(visibility: string): string {
         if (visibility.startsWith('pub')) {
-            if (visibility.includes('(crate)')) return '包内公共';
-            if (visibility.includes('(super)')) return '父模块公共';
+            if (visibility.includes('(crate)')) {return '包内公共';}
+            if (visibility.includes('(super)')) {return '父模块公共';}
             return '公共';
         }
         return '私有';
@@ -642,8 +642,8 @@ export class RustAnalyzer {
             // RustFunction
             const paramCount = item.parameters.length;
             const modifiers = [];
-            if (item.isAsync) modifiers.push('异步');
-            if (item.isUnsafe) modifiers.push('不安全');
+            if (item.isAsync) {modifiers.push('异步');}
+            if (item.isUnsafe) {modifiers.push('不安全');}
             const modifierText = modifiers.length > 0 ? modifiers.join('') + '' : '';
             return `${modifierText}函数 • ${paramCount}个参数`;
         }

@@ -798,15 +798,15 @@ export class ReactRuntimeAnalyzer {
     }
 
     private determineRenderPhase(line: string): 'mount' | 'update' | 'unmount' {
-        if (line.includes('mount')) return 'mount';
-        if (line.includes('unmount')) return 'unmount';
+        if (line.includes('mount')) {return 'mount';}
+        if (line.includes('unmount')) {return 'unmount';}
         return 'update';
     }
 
     private extractTriggerReason(line: string): string {
-        if (line.includes('props')) return 'props-change';
-        if (line.includes('state')) return 'state-change';
-        if (line.includes('context')) return 'context-change';
+        if (line.includes('props')) {return 'props-change';}
+        if (line.includes('state')) {return 'state-change';}
+        if (line.includes('context')) {return 'context-change';}
         return 'unknown';
     }
 
@@ -815,30 +815,30 @@ export class ReactRuntimeAnalyzer {
     }
 
     private determineRerenderReason(line: string, lines: string[], index: number): 'props-shallow-equal' | 'state-unchanged' | 'parent-rerender' | 'context-unchanged' {
-        if (line.includes('props')) return 'props-shallow-equal';
-        if (line.includes('state')) return 'state-unchanged';
-        if (line.includes('context')) return 'context-unchanged';
+        if (line.includes('props')) {return 'props-shallow-equal';}
+        if (line.includes('state')) {return 'state-unchanged';}
+        if (line.includes('context')) {return 'context-unchanged';}
         return 'parent-rerender';
     }
 
     private estimateRerenderFrequency(line: string): number {
         // Simple estimation based on component type
-        if (line.includes('useState')) return 10;
-        if (line.includes('useEffect')) return 5;
+        if (line.includes('useState')) {return 10;}
+        if (line.includes('useEffect')) {return 5;}
         return 3;
     }
 
     private assessRerenderImpact(line: string): 'high' | 'medium' | 'low' {
-        if (line.includes('map') && line.includes('1000')) return 'high';
-        if (line.includes('expensive')) return 'high';
-        if (line.includes('simple')) return 'low';
+        if (line.includes('map') && line.includes('1000')) {return 'high';}
+        if (line.includes('expensive')) {return 'high';}
+        if (line.includes('simple')) {return 'low';}
         return 'medium';
     }
 
     private suggestRerenderSolution(line: string): string {
-        if (line.includes('props')) return '使用React.memo并提供自定义比较函数';
-        if (line.includes('state')) return '检查state更新逻辑，避免不必要的更新';
-        if (line.includes('context')) return '拆分Context或使用useMemo优化value';
+        if (line.includes('props')) {return '使用React.memo并提供自定义比较函数';}
+        if (line.includes('state')) {return '检查state更新逻辑，避免不必要的更新';}
+        if (line.includes('context')) {return '拆分Context或使用useMemo优化value';}
         return '使用React.memo包装组件';
     }
 

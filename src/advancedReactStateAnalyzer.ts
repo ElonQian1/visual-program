@@ -39,7 +39,7 @@ export interface SideEffectPattern {
     trigger: string;
     cleanup: boolean;
     dependencies: string[];
-    potential_issues: string[];
+    potentialIssues: string[];
     line: number;
 }
 
@@ -376,7 +376,7 @@ export class AdvancedReactStateAnalyzer {
                     trigger: deps.length > 0 ? 'dependency-change' : 'mount',
                     cleanup,
                     dependencies: deps,
-                    potential_issues: this.findPotentialEffectIssues(line, deps),
+                    potentialIssues: this.findPotentialEffectIssues(line, deps),
                     line: index + 1
                 });
             }
@@ -681,8 +681,8 @@ export class AdvancedReactStateAnalyzer {
 
         for (let i = effectStart; i < lines.length; i++) {
             const line = lines[i];
-            if (line.includes('useEffect')) inEffect = true;
-            if (!inEffect) continue;
+            if (line.includes('useEffect')) {inEffect = true;}
+            if (!inEffect) {continue;}
 
             braceCount += (line.match(/\{/g) || []).length;
             braceCount -= (line.match(/\}/g) || []).length;
@@ -691,7 +691,7 @@ export class AdvancedReactStateAnalyzer {
                 return true;
             }
 
-            if (braceCount === 0 && inEffect) break;
+            if (braceCount === 0 && inEffect) {break;}
         }
 
         return false;
@@ -711,10 +711,10 @@ export class AdvancedReactStateAnalyzer {
     }
 
     private extractEffectPurpose(line: string): string {
-        if (line.includes('fetch') || line.includes('axios')) return 'data-fetching';
-        if (line.includes('addEventListener')) return 'event-listener';
-        if (line.includes('setInterval') || line.includes('setTimeout')) return 'timer';
-        if (line.includes('subscription') || line.includes('subscribe')) return 'subscription';
+        if (line.includes('fetch') || line.includes('axios')) {return 'data-fetching';}
+        if (line.includes('addEventListener')) {return 'event-listener';}
+        if (line.includes('setInterval') || line.includes('setTimeout')) {return 'timer';}
+        if (line.includes('subscription') || line.includes('subscribe')) {return 'subscription';}
         return 'unknown';
     }
 
@@ -740,9 +740,9 @@ export class AdvancedReactStateAnalyzer {
         const totalComplexity = patterns.reduce((sum, pattern) => sum + pattern.complexity, 0);
         const avgComplexity = totalComplexity / patterns.length;
         
-        if (avgComplexity < 2) return 'simple';
-        if (avgComplexity < 3) return 'moderate';
-        if (avgComplexity < 4) return 'complex';
+        if (avgComplexity < 2) {return 'simple';}
+        if (avgComplexity < 3) {return 'moderate';}
+        if (avgComplexity < 4) {return 'complex';}
         return 'very-complex';
     }
 
@@ -750,8 +750,8 @@ export class AdvancedReactStateAnalyzer {
         const unidirectional = patterns.filter(p => p.pattern === 'redux' || p.pattern === 'flux').length;
         const bidirectional = patterns.filter(p => p.pattern === 'two-way-binding').length;
         
-        if (bidirectional === 0) return 'unidirectional';
-        if (unidirectional === 0) return 'bidirectional';
+        if (bidirectional === 0) {return 'unidirectional';}
+        if (unidirectional === 0) {return 'bidirectional';}
         return 'mixed';
     }
 
@@ -787,8 +787,8 @@ export class AdvancedReactStateAnalyzer {
     }
 
     private evaluateBindingPerformance(line: string): 'excellent' | 'good' | 'poor' {
-        if (line.includes('useCallback') || line.includes('useMemo')) return 'excellent';
-        if (line.includes('onChange')) return 'good';
+        if (line.includes('useCallback') || line.includes('useMemo')) {return 'excellent';}
+        if (line.includes('onChange')) {return 'good';}
         return 'poor';
     }
 
@@ -832,33 +832,33 @@ export class AdvancedReactStateAnalyzer {
     }
 
     private extractValidationTiming(line: string): 'onChange' | 'onBlur' | 'onSubmit' | 'realTime' {
-        if (line.includes('onBlur')) return 'onBlur';
-        if (line.includes('onChange')) return 'onChange';
-        if (line.includes('onSubmit')) return 'onSubmit';
+        if (line.includes('onBlur')) {return 'onBlur';}
+        if (line.includes('onChange')) {return 'onChange';}
+        if (line.includes('onSubmit')) {return 'onSubmit';}
         return 'realTime';
     }
 
     private detectValidationLibrary(lines: string[]): string {
-        if (lines.some(line => line.includes('yup'))) return 'yup';
-        if (lines.some(line => line.includes('joi'))) return 'joi';
-        if (lines.some(line => line.includes('zod'))) return 'zod';
-        if (lines.some(line => line.includes('react-hook-form'))) return 'react-hook-form';
+        if (lines.some(line => line.includes('yup'))) {return 'yup';}
+        if (lines.some(line => line.includes('joi'))) {return 'joi';}
+        if (lines.some(line => line.includes('zod'))) {return 'zod';}
+        if (lines.some(line => line.includes('react-hook-form'))) {return 'react-hook-form';}
         return 'native';
     }
 
     private extractTransformationMethod(line: string): 'map' | 'reduce' | 'filter' | 'normalize' | 'denormalize' {
-        if (line.includes('.map(')) return 'map';
-        if (line.includes('.reduce(')) return 'reduce';
-        if (line.includes('.filter(')) return 'filter';
+        if (line.includes('.map(')) {return 'map';}
+        if (line.includes('.reduce(')) {return 'reduce';}
+        if (line.includes('.filter(')) {return 'filter';}
         return 'map';
     }
 
     private calculateTransformationComplexity(line: string): number {
         let complexity = 1;
-        if (line.includes('.map(')) complexity++;
-        if (line.includes('.filter(')) complexity++;
-        if (line.includes('.reduce(')) complexity += 2;
-        if (line.includes('=>') && line.includes('{')) complexity++;
+        if (line.includes('.map(')) {complexity++;}
+        if (line.includes('.filter(')) {complexity++;}
+        if (line.includes('.reduce(')) {complexity += 2;}
+        if (line.includes('=>') && line.includes('{')) {complexity++;}
         return complexity;
     }
 
@@ -867,15 +867,15 @@ export class AdvancedReactStateAnalyzer {
         const mediumFrequency = ['click', 'keydown', 'change'];
         const lowFrequency = ['submit', 'load', 'focus', 'blur'];
         
-        if (highFrequency.includes(eventType)) return 10;
-        if (mediumFrequency.includes(eventType)) return 5;
-        if (lowFrequency.includes(eventType)) return 1;
+        if (highFrequency.includes(eventType)) {return 10;}
+        if (mediumFrequency.includes(eventType)) {return 5;}
+        if (lowFrequency.includes(eventType)) {return 1;}
         return 3;
     }
 
     private evaluateEventPerformance(eventType: string): 'optimal' | 'good' | 'poor' {
         const heavyEvents = ['mousemove', 'scroll', 'resize'];
-        if (heavyEvents.includes(eventType)) return 'poor';
+        if (heavyEvents.includes(eventType)) {return 'poor';}
         return 'good';
     }
 
@@ -900,8 +900,8 @@ export class AdvancedReactStateAnalyzer {
     }
 
     private determineEventUsage(line: string): 'component-internal' | 'cross-component' | 'global' {
-        if (line.includes('window.') || line.includes('document.')) return 'global';
-        if (line.includes('parent') || line.includes('bubbles')) return 'cross-component';
+        if (line.includes('window.') || line.includes('document.')) {return 'global';}
+        if (line.includes('parent') || line.includes('bubbles')) {return 'cross-component';}
         return 'component-internal';
     }
 
@@ -932,25 +932,25 @@ export class AdvancedReactStateAnalyzer {
 
     private determineContextScope(line: string): 'global' | 'feature' | 'component' {
         const name = this.extractContextName(line).toLowerCase();
-        if (name.includes('global') || name.includes('app')) return 'global';
-        if (name.includes('theme') || name.includes('auth') || name.includes('user')) return 'feature';
+        if (name.includes('global') || name.includes('app')) {return 'global';}
+        if (name.includes('theme') || name.includes('auth') || name.includes('user')) {return 'feature';}
         return 'component';
     }
 
     private extractContextValueType(line: string): string {
         // Simple type extraction
-        if (line.includes('string')) return 'string';
-        if (line.includes('number')) return 'number';
-        if (line.includes('boolean')) return 'boolean';
-        if (line.includes('object') || line.includes('{')) return 'object';
+        if (line.includes('string')) {return 'string';}
+        if (line.includes('number')) {return 'number';}
+        if (line.includes('boolean')) {return 'boolean';}
+        if (line.includes('object') || line.includes('{')) {return 'object';}
         return 'unknown';
     }
 
     private estimateUpdateFrequency(line: string): 'never' | 'rare' | 'frequent' | 'constant' {
         const name = this.extractContextName(line).toLowerCase();
-        if (name.includes('theme') || name.includes('config')) return 'rare';
-        if (name.includes('user') || name.includes('auth')) return 'rare';
-        if (name.includes('state') || name.includes('data')) return 'frequent';
+        if (name.includes('theme') || name.includes('config')) {return 'rare';}
+        if (name.includes('user') || name.includes('auth')) {return 'rare';}
+        if (name.includes('state') || name.includes('data')) {return 'frequent';}
         return 'frequent';
     }
 
@@ -970,7 +970,7 @@ export class AdvancedReactStateAnalyzer {
     private calculateProviderLevel(lines: string[], index: number): number {
         let level = 0;
         for (let i = 0; i < index; i++) {
-            if (lines[i].includes('.Provider')) level++;
+            if (lines[i].includes('.Provider')) {level++;}
         }
         return level;
     }
@@ -979,22 +979,22 @@ export class AdvancedReactStateAnalyzer {
         // Simple approximation - count components after provider
         let children = 0;
         for (let i = index + 1; i < Math.min(index + 20, lines.length); i++) {
-            if (lines[i].match(/<[A-Z]\w+/)) children++;
+            if (lines[i].match(/<[A-Z]\w+/)) {children++;}
         }
         return children;
     }
 
     private analyzeValueStability(lines: string[], index: number): 'stable' | 'unstable' | 'optimized' {
         const line = lines[index];
-        if (line.includes('useMemo') || line.includes('useCallback')) return 'optimized';
-        if (line.includes('value={{')) return 'unstable';
+        if (line.includes('useMemo') || line.includes('useCallback')) {return 'optimized';}
+        if (line.includes('value={{')) {return 'unstable';}
         return 'stable';
     }
 
     private analyzeContextUsageType(lines: string[], index: number): 'full' | 'partial' | 'minimal' {
         const line = lines[index];
-        if (line.includes('...context') || line.includes('Object.keys')) return 'full';
-        if (line.includes('.') && line.split('.').length > 2) return 'partial';
+        if (line.includes('...context') || line.includes('Object.keys')) {return 'full';}
+        if (line.includes('.') && line.split('.').length > 2) {return 'partial';}
         return 'minimal';
     }
 

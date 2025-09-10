@@ -544,8 +544,8 @@ export class RustAsyncNetworkAnalyzer {
                 enableAll = true;
             }
 
-            if (line.includes('enable_io()')) features.push('io');
-            if (line.includes('enable_time()')) features.push('time');
+            if (line.includes('enable_io()')) {features.push('io');}
+            if (line.includes('enable_time()')) {features.push('time');}
         });
 
         return {
@@ -711,8 +711,8 @@ export class RustAsyncNetworkAnalyzer {
         const awaitCount = (functionBody.match(/\.await/g) || []).length;
         const branchCount = (functionBody.match(/if|match|for|while/g) || []).length;
         
-        if (awaitCount > 5 || branchCount > 3) return 'complex';
-        if (awaitCount > 2 || branchCount > 1) return 'moderate';
+        if (awaitCount > 5 || branchCount > 3) {return 'complex';}
+        if (awaitCount > 2 || branchCount > 1) {return 'moderate';}
         return 'simple';
     }
 
@@ -754,14 +754,14 @@ export class RustAsyncNetworkAnalyzer {
         
         for (let i = startIndex; i < lines.length; i++) {
             const line = lines[i];
-            if (line.includes('fn ') && line.includes('{')) started = true;
-            if (!started) continue;
+            if (line.includes('fn ') && line.includes('{')) {started = true;}
+            if (!started) {continue;}
             
             body += line + '\n';
             braceCount += (line.match(/{/g) || []).length;
             braceCount -= (line.match(/}/g) || []).length;
             
-            if (braceCount === 0 && started) break;
+            if (braceCount === 0 && started) {break;}
         }
         
         return body;
@@ -786,9 +786,9 @@ export class RustAsyncNetworkAnalyzer {
     }
 
     private extractChannelType(line: string): string {
-        if (line.includes('mpsc')) return 'mpsc';
-        if (line.includes('oneshot')) return 'oneshot';
-        if (line.includes('broadcast')) return 'broadcast';
+        if (line.includes('mpsc')) {return 'mpsc';}
+        if (line.includes('oneshot')) {return 'oneshot';}
+        if (line.includes('broadcast')) {return 'broadcast';}
         return 'unknown';
     }
 
@@ -823,16 +823,16 @@ export class RustAsyncNetworkAnalyzer {
 
     private determineTaskType(lines: string[], index: number): 'compute' | 'io' | 'network' | 'blocking' | 'hybrid' {
         const context = lines.slice(index, index + 10).join('\n');
-        if (context.includes('blocking')) return 'blocking';
-        if (context.includes('http') || context.includes('tcp')) return 'network';
-        if (context.includes('file') || context.includes('read') || context.includes('write')) return 'io';
+        if (context.includes('blocking')) {return 'blocking';}
+        if (context.includes('http') || context.includes('tcp')) {return 'network';}
+        if (context.includes('file') || context.includes('read') || context.includes('write')) {return 'io';}
         return 'compute';
     }
 
     private extractSpawningMethod(line: string): string {
-        if (line.includes('spawn_blocking')) return 'spawn_blocking';
-        if (line.includes('spawn_local')) return 'spawn_local';
-        if (line.includes('block_on')) return 'block_on';
+        if (line.includes('spawn_blocking')) {return 'spawn_blocking';}
+        if (line.includes('spawn_local')) {return 'spawn_local';}
+        if (line.includes('block_on')) {return 'block_on';}
         return 'spawn';
     }
 
@@ -842,8 +842,8 @@ export class RustAsyncNetworkAnalyzer {
 
     private assessTaskLifetime(lines: string[], index: number): 'short' | 'medium' | 'long' | 'infinite' {
         const context = lines.slice(index, index + 10).join('\n');
-        if (context.includes('loop') && !context.includes('break')) return 'infinite';
-        if (context.includes('server') || context.includes('listener')) return 'long';
+        if (context.includes('loop') && !context.includes('break')) {return 'infinite';}
+        if (context.includes('server') || context.includes('listener')) {return 'long';}
         return 'short';
     }
 
@@ -896,24 +896,24 @@ export class RustAsyncNetworkAnalyzer {
 
     // 网络分析相关方法
     private extractNetworkFramework(line: string): string {
-        if (line.includes('reqwest')) return 'reqwest';
-        if (line.includes('hyper')) return 'hyper';
-        if (line.includes('warp')) return 'warp';
-        if (line.includes('axum')) return 'axum';
+        if (line.includes('reqwest')) {return 'reqwest';}
+        if (line.includes('hyper')) {return 'hyper';}
+        if (line.includes('warp')) {return 'warp';}
+        if (line.includes('axum')) {return 'axum';}
         return 'custom';
     }
 
     private extractProtocol(line: string): string {
-        if (line.includes('http')) return 'http';
-        if (line.includes('tcp')) return 'tcp';
-        if (line.includes('udp')) return 'udp';
+        if (line.includes('http')) {return 'http';}
+        if (line.includes('tcp')) {return 'tcp';}
+        if (line.includes('udp')) {return 'udp';}
         return 'http';
     }
 
     private determineNetworkPattern(lines: string[], index: number): string {
         const context = lines.slice(index - 5, index + 5).join('\n');
-        if (context.includes('server') || context.includes('listen')) return 'server';
-        if (context.includes('client') || context.includes('request')) return 'client';
+        if (context.includes('server') || context.includes('listen')) {return 'server';}
+        if (context.includes('client') || context.includes('request')) {return 'client';}
         return 'client';
     }
 
@@ -956,16 +956,16 @@ export class RustAsyncNetworkAnalyzer {
 
     // 其他分析方法的简化实现
     private determineErrorType(line: string): any {
-        if (line.includes('anyhow')) return 'anyhow';
-        if (line.includes('thiserror')) return 'thiserror';
-        if (line.includes('Result')) return 'result';
+        if (line.includes('anyhow')) {return 'anyhow';}
+        if (line.includes('thiserror')) {return 'thiserror';}
+        if (line.includes('Result')) {return 'result';}
         return 'custom-error';
     }
 
     private analyzePropagation(lines: string[], index: number): any {
         const context = lines.slice(index, index + 5).join('\n');
-        if (context.includes('?')) return 'bubble-up';
-        if (context.includes('unwrap') || context.includes('expect')) return 'handled-locally';
+        if (context.includes('?')) {return 'bubble-up';}
+        if (context.includes('unwrap') || context.includes('expect')) {return 'handled-locally';}
         return 'bubble-up';
     }
 

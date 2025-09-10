@@ -180,7 +180,7 @@ export class AdvancedTypeScriptAnalyzer {
             
             if (line.includes('}')) {
                 braceCount -= (line.match(/}/g) || []).length;
-                if (braceCount === 0) break;
+                if (braceCount === 0) {break;}
             }
 
             if (inInterface && braceCount > 0) {
@@ -444,7 +444,7 @@ export class AdvancedTypeScriptAnalyzer {
                     ));
                 }
                 
-                if (braceCount === 0) break;
+                if (braceCount === 0) {break;}
             }
         }
 
@@ -458,23 +458,23 @@ export class AdvancedTypeScriptAnalyzer {
     }
 
     private determineTypeKind(definition: string): 'type' | 'union' | 'intersection' | 'literal' {
-        if (definition.includes('|')) return 'union';
-        if (definition.includes('&')) return 'intersection';
-        if (definition.includes('"') || definition.includes("'")) return 'literal';
+        if (definition.includes('|')) {return 'union';}
+        if (definition.includes('&')) {return 'intersection';}
+        if (definition.includes('"') || definition.includes("'")) {return 'literal';}
         return 'type';
     }
 
     private detectTestFramework(text: string): 'jest' | 'react-testing-library' | 'enzyme' | 'cypress' {
-        if (text.includes('@testing-library/react')) return 'react-testing-library';
-        if (text.includes('enzyme')) return 'enzyme';
-        if (text.includes('cypress')) return 'cypress';
+        if (text.includes('@testing-library/react')) {return 'react-testing-library';}
+        if (text.includes('enzyme')) {return 'enzyme';}
+        if (text.includes('cypress')) {return 'cypress';}
         return 'jest';
     }
 
     private determineTestType(testName: string): 'unit' | 'integration' | 'e2e' {
         const lowerName = testName.toLowerCase();
-        if (lowerName.includes('e2e') || lowerName.includes('end-to-end')) return 'e2e';
-        if (lowerName.includes('integration')) return 'integration';
+        if (lowerName.includes('e2e') || lowerName.includes('end-to-end')) {return 'e2e';}
+        if (lowerName.includes('integration')) {return 'integration';}
         return 'unit';
     }
 

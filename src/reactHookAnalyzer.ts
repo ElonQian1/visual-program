@@ -348,7 +348,7 @@ export class ReactHookAnalyzer {
     }
 
     private parseDependencyArray(depArray?: string): string[] {
-        if (!depArray || depArray === '[]') return [];
+        if (!depArray || depArray === '[]') {return [];}
         return depArray.slice(1, -1).split(',').map(dep => dep.trim());
     }
 
@@ -358,8 +358,8 @@ export class ReactHookAnalyzer {
     }
 
     private determineRunCondition(dependencies: string[]): 'mount' | 'update' | 'conditional' | 'every-render' {
-        if (dependencies.length === 0) return 'mount';
-        if (dependencies.length > 0) return 'conditional';
+        if (dependencies.length === 0) {return 'mount';}
+        if (dependencies.length > 0) {return 'conditional';}
         return 'every-render';
     }
 
@@ -384,8 +384,8 @@ export class ReactHookAnalyzer {
     }
 
     private assessEffectPerformance(dependencies: string[], lines: string[], index: number): 'optimal' | 'warning' | 'critical' {
-        if (dependencies.length > 5) return 'warning';
-        if (this.hasExpensiveOperationInEffect(lines, index)) return 'critical';
+        if (dependencies.length > 5) {return 'warning';}
+        if (this.hasExpensiveOperationInEffect(lines, index)) {return 'critical';}
         return 'optimal';
     }
 
@@ -416,14 +416,14 @@ export class ReactHookAnalyzer {
         
         for (let i = startIndex; i < lines.length; i++) {
             const line = lines[i];
-            if (line.includes('useEffect')) started = true;
-            if (!started) continue;
+            if (line.includes('useEffect')) {started = true;}
+            if (!started) {continue;}
             
             body += line + '\n';
             braceCount += (line.match(/{/g) || []).length;
             braceCount -= (line.match(/}/g) || []).length;
             
-            if (braceCount === 0 && started) break;
+            if (braceCount === 0 && started) {break;}
         }
         
         return body;
@@ -468,7 +468,7 @@ export class ReactHookAnalyzer {
     }
 
     private parseHookParameters(params: string): HookParameter[] {
-        if (!params.trim()) return [];
+        if (!params.trim()) {return [];}
         
         return params.split(',').map(param => {
             const trimmed = param.trim();
@@ -502,8 +502,8 @@ export class ReactHookAnalyzer {
 
     private assessReusability(lines: string[], index: number, hookName: string): 'low' | 'medium' | 'high' {
         const usages = lines.filter(line => line.includes(hookName)).length;
-        if (usages > 3) return 'high';
-        if (usages > 1) return 'medium';
+        if (usages > 3) {return 'high';}
+        if (usages > 1) {return 'medium';}
         return 'low';
     }
 
@@ -518,14 +518,14 @@ export class ReactHookAnalyzer {
     }
 
     private assessComputationCost(computation: string): 'low' | 'medium' | 'high' {
-        if (computation.includes('map') || computation.includes('filter')) return 'medium';
-        if (computation.includes('sort') || computation.includes('reduce')) return 'high';
+        if (computation.includes('map') || computation.includes('filter')) {return 'medium';}
+        if (computation.includes('sort') || computation.includes('reduce')) {return 'high';}
         return 'low';
     }
 
     private assessMemoEffectiveness(lines: string[], index: number, dependencies: string[]): 'beneficial' | 'neutral' | 'harmful' {
-        if (dependencies.length === 0) return 'harmful';
-        if (dependencies.length > 5) return 'neutral';
+        if (dependencies.length === 0) {return 'harmful';}
+        if (dependencies.length > 5) {return 'neutral';}
         return 'beneficial';
     }
 

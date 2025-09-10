@@ -368,10 +368,10 @@ export class AdvancedReactArchitectureAnalyzer {
 
     private extractMiddleware(line: string): string[] {
         const middleware: string[] = [];
-        if (line.includes('thunk')) middleware.push('redux-thunk');
-        if (line.includes('saga')) middleware.push('redux-saga');
-        if (line.includes('logger')) middleware.push('redux-logger');
-        if (line.includes('persist')) middleware.push('redux-persist');
+        if (line.includes('thunk')) {middleware.push('redux-thunk');}
+        if (line.includes('saga')) {middleware.push('redux-saga');}
+        if (line.includes('logger')) {middleware.push('redux-logger');}
+        if (line.includes('persist')) {middleware.push('redux-persist');}
         return middleware;
     }
 

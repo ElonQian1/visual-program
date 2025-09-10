@@ -116,7 +116,7 @@ export interface RustSafety {
 export interface RustUnsafeBlock {
     reason: string;
     operations: string[];
-    safety_comment?: string;
+    safetyComment?: string;
     line: number;
 }
 
@@ -628,7 +628,7 @@ export class AdvancedRustEcosystemAnalyzer {
                 blocks.push({
                     reason: this.determineUnsafeReason(operations),
                     operations,
-                    safety_comment: safetyComment,
+                    safetyComment: safetyComment,
                     line: i + 1
                 });
             }
@@ -708,7 +708,7 @@ export class AdvancedRustEcosystemAnalyzer {
                 // 查找外部函数
                 for (let j = i + 1; j < lines.length; j++) {
                     const fnLine = lines[j];
-                    if (fnLine.includes('}')) break;
+                    if (fnLine.includes('}')) {break;}
                     
                     const fnMatch = fnLine.match(/fn\s+(\w+)/);
                     if (fnMatch) {
@@ -764,9 +764,9 @@ export class AdvancedRustEcosystemAnalyzer {
     }
 
     private determineLifetimeScope(text: string, lifetimeName: string): string {
-        if (text.includes(`impl<'${lifetimeName}>`)) return '实现块';
-        if (text.includes(`fn `) && text.includes(`'${lifetimeName}`)) return '函数';
-        if (text.includes(`struct `) && text.includes(`'${lifetimeName}`)) return '结构体';
+        if (text.includes(`impl<'${lifetimeName}>`)) {return '实现块';}
+        if (text.includes(`fn `) && text.includes(`'${lifetimeName}`)) {return '函数';}
+        if (text.includes(`struct `) && text.includes(`'${lifetimeName}`)) {return '结构体';}
         return '未知';
     }
 
@@ -818,8 +818,8 @@ export class AdvancedRustEcosystemAnalyzer {
     }
 
     private determineMutexType(line: string): 'std::sync::Mutex' | 'tokio::sync::Mutex' | 'parking_lot::Mutex' {
-        if (line.includes('tokio::sync::Mutex')) return 'tokio::sync::Mutex';
-        if (line.includes('parking_lot::Mutex')) return 'parking_lot::Mutex';
+        if (line.includes('tokio::sync::Mutex')) {return 'tokio::sync::Mutex';}
+        if (line.includes('parking_lot::Mutex')) {return 'parking_lot::Mutex';}
         return 'std::sync::Mutex';
     }
 
@@ -905,11 +905,11 @@ export class AdvancedRustEcosystemAnalyzer {
             braceCount += (line.match(/{/g) || []).length;
             braceCount -= (line.match(/}/g) || []).length;
             
-            if (line.includes('*')) operations.push('指针解引用');
-            if (line.includes('transmute')) operations.push('类型转换');
-            if (line.includes('from_raw')) operations.push('原始指针转换');
+            if (line.includes('*')) {operations.push('指针解引用');}
+            if (line.includes('transmute')) {operations.push('类型转换');}
+            if (line.includes('from_raw')) {operations.push('原始指针转换');}
             
-            if (braceCount === 0) break;
+            if (braceCount === 0) {break;}
         }
         
         return operations;
@@ -930,9 +930,9 @@ export class AdvancedRustEcosystemAnalyzer {
     }
 
     private determineUnsafeReason(operations: string[]): string {
-        if (operations.includes('指针解引用')) return '指针解引用操作';
-        if (operations.includes('类型转换')) return '类型转换操作';
-        if (operations.includes('原始指针转换')) return '原始指针操作';
+        if (operations.includes('指针解引用')) {return '指针解引用操作';}
+        if (operations.includes('类型转换')) {return '类型转换操作';}
+        if (operations.includes('原始指针转换')) {return '原始指针操作';}
         return '不安全操作';
     }
 

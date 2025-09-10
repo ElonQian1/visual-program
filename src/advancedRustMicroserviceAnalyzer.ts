@@ -880,17 +880,17 @@ export class AdvancedRustMicroserviceAnalyzer {
     }
 
     private detectFramework(line: string): string {
-        if (line.includes('axum')) return 'Axum';
-        if (line.includes('actix_web')) return 'Actix-web';
-        if (line.includes('warp')) return 'Warp';
-        if (line.includes('rocket')) return 'Rocket';
+        if (line.includes('axum')) {return 'Axum';}
+        if (line.includes('actix_web')) {return 'Actix-web';}
+        if (line.includes('warp')) {return 'Warp';}
+        if (line.includes('rocket')) {return 'Rocket';}
         return 'Unknown';
     }
 
     private detectDatabaseFramework(line: string): string {
-        if (line.includes('diesel')) return 'Diesel';
-        if (line.includes('sqlx')) return 'SQLx';
-        if (line.includes('sea_orm')) return 'SeaORM';
+        if (line.includes('diesel')) {return 'Diesel';}
+        if (line.includes('sqlx')) {return 'SQLx';}
+        if (line.includes('sea_orm')) {return 'SeaORM';}
         return 'Unknown';
     }
 
@@ -931,16 +931,16 @@ export class AdvancedRustMicroserviceAnalyzer {
     }
 
     private detectLoggingTool(line: string): string {
-        if (line.includes('tracing::')) return 'tracing';
-        if (line.includes('log::')) return 'log';
-        if (line.includes('slog::')) return 'slog';
+        if (line.includes('tracing::')) {return 'tracing';}
+        if (line.includes('log::')) {return 'log';}
+        if (line.includes('slog::')) {return 'slog';}
         return 'unknown';
     }
 
     private extractLogLevel(line: string): 'debug' | 'info' | 'warn' | 'error' {
-        if (line.includes('debug')) return 'debug';
-        if (line.includes('warn')) return 'warn';
-        if (line.includes('error')) return 'error';
+        if (line.includes('debug')) {return 'debug';}
+        if (line.includes('warn')) {return 'warn';}
+        if (line.includes('error')) {return 'error';}
         return 'info';
     }
 

@@ -84,9 +84,6 @@
     "esbuild": "^0.17.11"
   },
   "dependencies": {
-    "@typescript-eslint/typescript-estree": "^5.45.0",
-    "tree-sitter": "^0.20.4",
-    "tree-sitter-rust": "^0.20.4",
-    "tree-sitter-typescript": "^0.20.3"
+    "@typescript-eslint/typescript-estree": "^5.45.0"
   }
 }

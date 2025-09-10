@@ -13,6 +13,8 @@ import { AdvancedRustSystemAnalyzer, RustAdvancedSystemAnalysis, RustPerformance
 import { ReactRuntimeAnalyzer, ReactRuntimeAnalysis, DebuggingAnalysis, TestingAnalysis } from './reactRuntimeAnalyzer';
 import { ReactHookAnalyzer, ReactHookAnalysis } from './reactHookAnalyzer';  
 import { RustAsyncNetworkAnalyzer, RustAsyncNetworkAnalysis } from './rustAsyncNetworkAnalyzer';
+import { ReactStateManagementAnalyzer, ReactStateManagementAnalysis } from './reactStateManagementAnalyzer';
+import { RustPerformanceAnalyzer, RustPerformanceAnalysis as RustDetailedPerformanceAnalysis } from './rustPerformanceAnalyzer';
 
 // 代码分析结果接口
 export interface CodeAnalysis {
@@ -74,6 +76,10 @@ export interface CodeAnalysis {
     reactHooks?: ReactHookAnalysis;
     // Rust异步网络分析
     rustAsyncNetwork?: RustAsyncNetworkAnalysis;
+    // React状态管理分析
+    reactStateManagement?: import('./reactStateManagementAnalyzer').ReactStateManagementAnalysis;
+    // Rust性能分析
+    rustDetailedPerformance?: RustDetailedPerformanceAnalysis;
 }
 
 export interface FunctionInfo {
@@ -131,6 +137,8 @@ export class CodeAnalyzer {
     private reactRuntimeAnalyzer: ReactRuntimeAnalyzer;
     private reactHookAnalyzer: ReactHookAnalyzer;
     private rustAsyncNetworkAnalyzer: RustAsyncNetworkAnalyzer;
+    private reactStateManagementAnalyzer: ReactStateManagementAnalyzer;
+    private rustPerformanceAnalyzer: RustPerformanceAnalyzer;
 
     constructor() {
         this.reactAnalyzer = new ReactAnalyzer();
@@ -148,6 +156,8 @@ export class CodeAnalyzer {
         this.reactRuntimeAnalyzer = new ReactRuntimeAnalyzer();
         this.reactHookAnalyzer = new ReactHookAnalyzer();
         this.rustAsyncNetworkAnalyzer = new RustAsyncNetworkAnalyzer();
+        this.reactStateManagementAnalyzer = new ReactStateManagementAnalyzer();
+        this.rustPerformanceAnalyzer = new RustPerformanceAnalyzer();
         this.translationMap = new Map([
             // React/TypeScript 翻译
             ['useState', '使用状态'],
@@ -238,6 +248,10 @@ export class CodeAnalyzer {
                     // 添加React Hook分析
                     const reactHookAnalysis = this.reactHookAnalyzer.analyzeReactHooks(text, fileName);
                     analysis.reactHooks = reactHookAnalysis;
+                    
+                    // 添加React状态管理分析
+                    const reactStateManagementAnalysis = this.reactStateManagementAnalyzer.analyzeReactStateManagement(text, fileName);
+                    analysis.reactStateManagement = reactStateManagementAnalysis;
                 }
             } else if (language === 'rust') {
                 analysis = await this.analyzeRust(text, fileName, language);
@@ -283,6 +297,10 @@ export class CodeAnalyzer {
                 // 添加Rust异步网络分析
                 const rustAsyncNetworkAnalysis = this.rustAsyncNetworkAnalyzer.analyzeRustAsyncNetwork(text, fileName);
                 analysis.rustAsyncNetwork = rustAsyncNetworkAnalysis;
+                
+                // 添加Rust详细性能分析
+                const rustDetailedPerformanceAnalysis = this.rustPerformanceAnalyzer.analyzeRustPerformance(text, fileName);
+                analysis.rustDetailedPerformance = rustDetailedPerformanceAnalysis;
             }
         } catch (error) {
             // 使用VSCode的输出通道而不是console
@@ -462,10 +480,10 @@ export class CodeAnalyzer {
 
     private extractParameters(line: string): Parameter[] {
         const paramMatch = line.match(/\(([^)]*)\)/);
-        if (!paramMatch) return [];
+        if (!paramMatch) {return [];}
 
         const paramStr = paramMatch[1];
-        if (!paramStr.trim()) return [];
+        if (!paramStr.trim()) {return [];}
 
         return paramStr.split(',').map(param => {
             const trimmed = param.trim();
@@ -480,10 +498,10 @@ export class CodeAnalyzer {
 
     private extractRustParameters(line: string): Parameter[] {
         const paramMatch = line.match(/\(([^)]*)\)/);
-        if (!paramMatch) return [];
+        if (!paramMatch) {return [];}
 
         const paramStr = paramMatch[1];
-        if (!paramStr.trim()) return [];
+        if (!paramStr.trim()) {return [];}
 
         return paramStr.split(',').map(param => {
             const trimmed = param.trim();

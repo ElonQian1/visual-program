@@ -27,7 +27,7 @@ export class StructureItem extends vscode.TreeItem {
     }
     
     private setIconForContextValue(contextValue?: string) {
-        if (!contextValue) return;
+        if (!contextValue) {return;}
         
         let icon: vscode.ThemeIcon;
         
@@ -453,7 +453,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
 
     // React Hook分析项
     private getReactHookItems(): StructureItem[] {
-        if (!this.codeAnalysis?.reactHooks) return [];
+        if (!this.codeAnalysis?.reactHooks) {return [];}
 
         const items: StructureItem[] = [];
         
@@ -512,7 +512,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
 
     // Rust异步网络分析项
     private getRustAsyncNetworkItems(): StructureItem[] {
-        if (!this.codeAnalysis?.rustAsyncNetwork) return [];
+        if (!this.codeAnalysis?.rustAsyncNetwork) {return [];}
 
         const items: StructureItem[] = [];
         const analysis = this.codeAnalysis.rustAsyncNetwork;
@@ -582,7 +582,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
 
     // 其他项目获取方法 - 简化实现
     private getImportItems(): StructureItem[] {
-        if (!this.codeAnalysis?.imports) return [];
+        if (!this.codeAnalysis?.imports) {return [];}
         
         return this.codeAnalysis.imports.map(imp =>
             new StructureItem(
@@ -602,7 +602,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
     }
 
     private getFunctionItems(): StructureItem[] {
-        if (!this.codeAnalysis?.functions) return [];
+        if (!this.codeAnalysis?.functions) {return [];}
         
         return this.codeAnalysis.functions.map(func =>
             new StructureItem(
@@ -622,7 +622,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
     }
 
     private getClassItems(): StructureItem[] {
-        if (!this.codeAnalysis?.classes) return [];
+        if (!this.codeAnalysis?.classes) {return [];}
         
         return this.codeAnalysis.classes.map(cls =>
             new StructureItem(
@@ -642,7 +642,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
     }
 
     private getVariableItems(): StructureItem[] {
-        if (!this.codeAnalysis?.variables) return [];
+        if (!this.codeAnalysis?.variables) {return [];}
         
         return this.codeAnalysis.variables.map(vari =>
             new StructureItem(
@@ -662,7 +662,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
     }
 
     private getReactComponentItems(): StructureItem[] {
-        if (!this.codeAnalysis?.reactComponents) return [];
+        if (!this.codeAnalysis?.reactComponents) {return [];}
         
         return this.codeAnalysis.reactComponents.map(component => {
             const propsCount = component.props?.length || 0;
