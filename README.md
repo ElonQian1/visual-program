@@ -97,13 +97,39 @@ npm run compile
 - `demo/rust-architecture-demo.rs` - Rust架构模式演示
 - `demo/advanced-react-enterprise-demo.tsx` - React企业级应用演示
 - `demo/advanced-rust-microservice-demo.rs` - Rust微服务架构演示
+- `demo/rust-backend-example.rs` - Rust后端架构分析示例 🆕
 
 #### 快速测试脚本
 - `quick-start.bat` - 一键安装和启动
 - `test-microservices.bat` - 微服务功能测试
 - `test-architecture.bat` - 架构分析功能测试 🆕
+- `test-backend-analysis.bat` - Rust后端架构分析测试 🆕
 
 可以用这些文件快速测试插件的各种功能！
+
+### 🆕 Rust后端架构分析功能
+
+#### 新增分析能力
+- **API设计分析**: 自动识别HTTP路由、处理器和RESTful模式
+- **安全漏洞检测**: SQL注入、硬编码密钥、unsafe代码等安全问题
+- **性能瓶颈识别**: 阻塞操作、频繁克隆等性能问题
+- **微服务就绪度评估**: 健康检查、配置管理、日志记录等评分
+- **数据库优化建议**: ORM使用、连接池、事务处理分析
+
+#### 快速测试
+```bash
+# 测试Rust后端架构分析
+npm run test-backend
+
+# 或直接运行测试脚本
+./test-backend-analysis.bat
+```
+
+#### 使用示例
+1. 打开`demo/rust-backend-example.rs`文件
+2. 右键选择"分析代码结构"
+3. 在树状视图中查看"Rust后端架构分析"节点
+4. 点击可视化面板中的架构分析节点查看详细结果
 
 ## 使用方法
 
@@ -127,6 +153,9 @@ npm run compile
 - **模块系统**：mod声明、use语句、可见性控制
 - **Web框架**：Actix-web, Axum, Warp等框架支持
 - **数据库**：Diesel, SQLx等ORM模式识别
+- **后端架构**：API设计分析、微服务就绪度评估 🆕
+- **安全审计**：SQL注入、硬编码密钥、unsafe代码检测 🆕
+- **性能分析**：数据库连接池、内存优化、CPU密集任务识别 🆕
 
 #### 智能翻译特性
 - **React术语**：
@@ -171,6 +200,9 @@ npm run compile
 - **生态系统**: Web框架、数据库、宏系统集成分析
 - **性能分析**: 内存使用、并发优化、系统性能评估
 - **架构模式**: 微服务、系统架构模式识别
+- **后端架构**: API设计、安全漏洞、微服务就绪度评估 🆕
+- **数据库集成**: ORM使用、连接池、事务处理分析 🆕
+- **安全审计**: SQL注入、硬编码密钥、unsafe代码检测 🆕
 
 #### 4. 可视化工作流
 - **拖拽节点**: 支持节点拖拽和重新布局

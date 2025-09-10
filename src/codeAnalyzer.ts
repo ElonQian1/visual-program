@@ -16,6 +16,7 @@ import { RustAsyncNetworkAnalyzer, RustAsyncNetworkAnalysis } from './rustAsyncN
 import { ReactStateManagementAnalyzer, ReactStateManagementAnalysis } from './reactStateManagementAnalyzer';
 import { RustPerformanceAnalyzer, RustPerformanceAnalysis as RustDetailedPerformanceAnalysis } from './rustPerformanceAnalyzer';
 import { ReactAdvancedAnalyzer, ReactPerformanceIssue, ReactArchitecturePattern } from './reactPerformanceAnalyzer';
+import { RustBackendArchitectureAnalyzer } from './rustBackendArchitectureAnalyzer';
 
 // 代码分析结果接口
 export interface CodeAnalysis {
@@ -84,6 +85,8 @@ export interface CodeAnalysis {
     // React高级性能分析
     reactPerformanceIssues?: ReactPerformanceIssue[];
     reactArchitecturePattern?: ReactArchitecturePattern;
+    // Rust后端架构分析
+    rustBackendArchitecture?: any; // RustBackendArchitectureAnalysis;
 }
 
 export interface FunctionInfo {
@@ -144,6 +147,7 @@ export class CodeAnalyzer {
     private reactStateManagementAnalyzer: ReactStateManagementAnalyzer;
     private rustPerformanceAnalyzer: RustPerformanceAnalyzer;
     private reactAdvancedAnalyzer: ReactAdvancedAnalyzer;
+    private rustBackendArchitectureAnalyzer: RustBackendArchitectureAnalyzer;
 
     constructor() {
         this.reactAnalyzer = new ReactAnalyzer();
@@ -164,6 +168,7 @@ export class CodeAnalyzer {
         this.reactStateManagementAnalyzer = new ReactStateManagementAnalyzer();
         this.rustPerformanceAnalyzer = new RustPerformanceAnalyzer();
         this.reactAdvancedAnalyzer = new ReactAdvancedAnalyzer();
+        this.rustBackendArchitectureAnalyzer = new RustBackendArchitectureAnalyzer();
         this.translationMap = new Map([
             // React/TypeScript 翻译
             ['useState', '使用状态'],
@@ -315,6 +320,10 @@ export class CodeAnalyzer {
                 // 添加Rust详细性能分析
                 const rustDetailedPerformanceAnalysis = this.rustPerformanceAnalyzer.analyzeRustPerformance(text, fileName);
                 analysis.rustDetailedPerformance = rustDetailedPerformanceAnalysis;
+                
+                // 添加Rust后端架构分析
+                const rustBackendAnalysis = this.rustBackendArchitectureAnalyzer.analyze(text, fileName);
+                analysis.rustBackendArchitecture = rustBackendAnalysis;
             }
         } catch (error) {
             // 使用VSCode的输出通道而不是console

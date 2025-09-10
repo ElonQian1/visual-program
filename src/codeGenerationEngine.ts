@@ -132,7 +132,7 @@ interface ${componentName}Props {
 }
 
 export const ${componentName}: React.FC<${componentName}Props> = ({ ${props.map(p => p.name).join(', ')} }) => {
-    ${hooks.map(h => this.generateHookCode(h)).join('\n    ')}
+    ${hooks.map((h: any) => this.generateHookCode(h)).join('\n    ')}
     
     return (
         <div className="${componentName.toLowerCase()}">

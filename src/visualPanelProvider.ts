@@ -448,6 +448,38 @@ export class VisualPanelProvider {
                     color: black;
                 }
 
+                /* Rust后端架构分析节点样式 */
+                .rust-api-endpoint-node {
+                    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+                    border-color: #17a2b8;
+                    color: white;
+                }
+
+                .rust-security-issue-node {
+                    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                    border-color: #dc3545;
+                    color: white;
+                    border-style: double;
+                }
+
+                .rust-performance-bottleneck-node {
+                    background: linear-gradient(135deg, #fd7e14 0%, #e8590c 100%);
+                    border-color: #fd7e14;
+                    color: white;
+                }
+
+                .rust-microservice-readiness-node {
+                    background: linear-gradient(135deg, #20c997 0%, #1ba085 100%);
+                    border-color: #20c997;
+                    color: white;
+                }
+
+                .rust-database-analysis-node {
+                    background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%);
+                    border-color: #6f42c1;
+                    color: white;
+                }
+
                 .code-splitting-node {
                     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
                     border-color: #a8edea;
@@ -647,6 +679,57 @@ export class VisualPanelProvider {
                         positionNode(node, nodeIndex, nodeSpacing);
                         canvas.appendChild(node);
                         nodeIndex++;
+                    }
+
+                    // 渲染Rust后端架构分析结果
+                    if (codeAnalysis.rustBackendArchitecture) {
+                        const backendArch = codeAnalysis.rustBackendArchitecture;
+                        
+                        // 渲染API设计节点
+                        if (backendArch.apiDesign && backendArch.apiDesign.endpoints) {
+                            backendArch.apiDesign.endpoints.forEach((endpoint, index) => {
+                                const node = createRustAPIEndpointNode(endpoint, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染安全问题节点
+                        if (backendArch.securityAnalysis && backendArch.securityAnalysis.vulnerabilities) {
+                            backendArch.securityAnalysis.vulnerabilities.forEach((vuln, index) => {
+                                const node = createRustSecurityIssueNode(vuln, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染性能问题节点
+                        if (backendArch.performanceAnalysis && backendArch.performanceAnalysis.bottlenecks) {
+                            backendArch.performanceAnalysis.bottlenecks.forEach((bottleneck, index) => {
+                                const node = createRustPerformanceBottleneckNode(bottleneck, nodeIndex);
+                                positionNode(node, nodeIndex, nodeSpacing);
+                                canvas.appendChild(node);
+                                nodeIndex++;
+                            });
+                        }
+
+                        // 渲染微服务就绪度节点
+                        if (backendArch.microserviceReadiness) {
+                            const node = createRustMicroserviceReadinessNode(backendArch.microserviceReadiness, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
+
+                        // 渲染数据库分析节点
+                        if (backendArch.databaseAnalysis) {
+                            const node = createRustDatabaseAnalysisNode(backendArch.databaseAnalysis, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        }
                     }
 
                     // 渲染React架构分析结果
@@ -2028,6 +2111,137 @@ export class VisualPanelProvider {
                             <div>必要性: \${clone.necessary ? '必要' : '可能不必要'}</div>
                             <div>建议: \${clone.suggestion || '无'}</div>
                             <div>行号: \${clone.line}</div>
+                        </div>
+                    \`;
+                    
+                    return node;
+                }
+
+                // Rust后端架构分析节点创建函数
+                function createRustAPIEndpointNode(endpoint, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-api-endpoint-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustAPIEndpoint';
+                    node.dataset.index = index;
+                    
+                    const methodColor = {
+                        'GET': '#28a745',
+                        'POST': '#007bff', 
+                        'PUT': '#ffc107',
+                        'DELETE': '#dc3545'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🌐 API接口</div>
+                        <div class="node-content">
+                            <div style="color: \${methodColor[endpoint.method] || '#666'}">
+                                <strong>\${endpoint.method} \${endpoint.path}</strong>
+                            </div>
+                            <div>处理器: \${endpoint.handler}</div>
+                            <div>参数: \${endpoint.params ? endpoint.params.join(', ') : '无'}</div>
+                            <div>行号: \${endpoint.line}</div>
+                        </div>
+                    \`;
+                    
+                    return node;
+                }
+
+                function createRustSecurityIssueNode(vuln, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-security-issue-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustSecurityIssue';
+                    node.dataset.index = index;
+                    
+                    const severityColors = {
+                        'high': '#dc3545',
+                        'medium': '#ffc107',  
+                        'low': '#28a745'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header" style="color: \${severityColors[vuln.severity] || '#666'}">
+                            🔐 安全问题
+                        </div>
+                        <div class="node-content">
+                            <div><strong>\${vuln.type}</strong></div>
+                            <div>严重程度: \${vuln.severity}</div>
+                            <div>描述: \${vuln.description}</div>
+                            <div>建议: \${vuln.suggestion}</div>
+                            <div>行号: \${vuln.line}</div>
+                        </div>
+                    \`;
+                    
+                    return node;
+                }
+
+                function createRustPerformanceBottleneckNode(bottleneck, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-performance-bottleneck-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustPerformanceBottleneck';
+                    node.dataset.index = index;
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">⚡ 性能瓶颈</div>
+                        <div class="node-content">
+                            <div><strong>\${bottleneck.type}</strong></div>
+                            <div>影响: \${bottleneck.impact}</div>
+                            <div>描述: \${bottleneck.description}</div>
+                            <div>优化建议: \${bottleneck.optimization}</div>
+                            <div>行号: \${bottleneck.line}</div>
+                        </div>
+                    \`;
+                    
+                    return node;
+                }
+
+                function createRustMicroserviceReadinessNode(readiness, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-microservice-readiness-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustMicroserviceReadiness';
+                    node.dataset.index = index;
+                    
+                    const scoreColor = readiness.score >= 8 ? '#28a745' : 
+                                     readiness.score >= 6 ? '#ffc107' : '#dc3545';
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🏗️ 微服务就绪度</div>
+                        <div class="node-content">
+                            <div style="color: \${scoreColor}">
+                                <strong>评分: \${readiness.score}/10</strong>
+                            </div>
+                            <div>状态: \${readiness.status}</div>
+                            <div>建议:</div>
+                            <ul>
+                                \${readiness.recommendations.map(rec => \`<li>\${rec}</li>\`).join('')}
+                            </ul>
+                        </div>
+                    \`;
+                    
+                    return node;
+                }
+
+                function createRustDatabaseAnalysisNode(dbAnalysis, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node rust-database-analysis-node';
+                    node.draggable = true;
+                    node.dataset.type = 'rustDatabaseAnalysis';
+                    node.dataset.index = index;
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">🗄️ 数据库分析</div>
+                        <div class="node-content">
+                            <div>ORM类型: \${dbAnalysis.ormType}</div>
+                            <div>连接池: \${dbAnalysis.hasConnectionPool ? '已配置' : '未配置'}</div>
+                            <div>事务使用: \${dbAnalysis.transactionUsage}</div>
+                            <div>查询数量: \${dbAnalysis.queryCount}</div>
+                            <div>优化建议:</div>
+                            <ul>
+                                \${dbAnalysis.optimizations.map(opt => \`<li>\${opt}</li>\`).join('')}
+                            </ul>
                         </div>
                     \`;
                     

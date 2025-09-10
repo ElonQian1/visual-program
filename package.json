@@ -54,6 +54,26 @@
         "command": "visualProgramming.createFromTemplate",
         "title": "🚀 从模板创建项目",
         "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.openUnifiedVisualization",
+        "title": "🎨 统一可视化工作台",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.openCodeOptimizer",
+        "title": "🔧 智能代码优化",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.quickOptimize",
+        "title": "⚡ 快速优化代码",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.generateQualityReport",
+        "title": "📊 生成质量报告",
+        "category": "代码可视化"
       }
     ],
     "viewsContainers": {
@@ -97,7 +117,8 @@
     "watch": "npm run compile -- --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "test-backend": "npm run compile && echo 'Testing Rust backend architecture analysis...' && code --extensionDevelopmentPath=. ./demo"
   },
   "devDependencies": {
     "@types/vscode": "^1.74.0",

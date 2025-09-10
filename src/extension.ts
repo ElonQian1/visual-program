@@ -7,6 +7,8 @@ import { CodeGenerationEngine } from './codeGenerationEngine';
 import { RealTimeCollaborationProvider } from './realTimeCollaborationProvider';
 import { AIEnhancedAnalysisEngine } from './aiEnhancedAnalysisEngine';
 import { IntelligentTemplateSystem } from './intelligentTemplateSystem';
+import { createOrShowUnifiedVisualizationPanel } from './unifiedVisualizationProvider';
+import { IntelligentCodeOptimizer } from './intelligentCodeOptimizer';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('代码可视化编程插件已激活');
@@ -19,6 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
     const collaborationProvider = new RealTimeCollaborationProvider();
     const aiAnalysisEngine = new AIEnhancedAnalysisEngine();
     const templateSystem = new IntelligentTemplateSystem();
+    const codeOptimizer = new IntelligentCodeOptimizer();
 
     // 注册命令
     const openVisualViewCommand = vscode.commands.registerCommand(
@@ -240,6 +243,72 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
+    // 🎨 统一可视化工作台命令
+    const openUnifiedVisualizationCommand = vscode.commands.registerCommand(
+        'visualProgramming.openUnifiedVisualization',
+        () => {
+            createOrShowUnifiedVisualizationPanel(context.extensionUri);
+            vscode.window.showInformationMessage('🎨 统一可视化工作台已打开');
+        }
+    );
+
+    // 🔧 智能代码优化命令
+    const openCodeOptimizerCommand = vscode.commands.registerCommand(
+        'visualProgramming.openCodeOptimizer',
+        () => {
+            codeOptimizer.createOptimizationPanel(context);
+            vscode.window.showInformationMessage('🔧 智能代码优化面板已打开');
+        }
+    );
+
+    // ⚡ 快速优化命令
+    const quickOptimizeCommand = vscode.commands.registerCommand(
+        'visualProgramming.quickOptimize',
+        async () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            try {
+                const optimizedCount = await codeOptimizer.applyAllHighPriorityOptimizations(activeEditor.document);
+                if (optimizedCount > 0) {
+                    vscode.window.showInformationMessage(`⚡ 已自动应用 ${optimizedCount} 个高优先级优化！`);
+                } else {
+                    vscode.window.showInformationMessage('✨ 代码质量良好，没有发现需要优化的地方');
+                }
+            } catch (error) {
+                vscode.window.showErrorMessage(`快速优化失败: ${error}`);
+            }
+        }
+    );
+
+    // 📊 生成质量报告命令
+    const generateQualityReportCommand = vscode.commands.registerCommand(
+        'visualProgramming.generateQualityReport',
+        async () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            try {
+                const report = await codeOptimizer.generateCodeQualityReport(activeEditor.document);
+                const doc = await vscode.workspace.openTextDocument({
+                    content: report,
+                    language: 'markdown'
+                });
+                await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
+                vscode.window.showInformationMessage('📊 代码质量报告已生成！');
+            } catch (error) {
+                vscode.window.showErrorMessage(`质量报告生成失败: ${error}`);
+            }
+        }
+    );
+
+
     // 添加到上下文
     context.subscriptions.push(
         openVisualViewCommand,
@@ -249,6 +318,10 @@ export function activate(context: vscode.ExtensionContext) {
         startRealtimeMonitoringCommand,
         aiAnalysisCommand,
         createFromTemplateCommand,
+        openUnifiedVisualizationCommand,
+        openCodeOptimizerCommand,
+        quickOptimizeCommand,
+        generateQualityReportCommand,
         codeStructureView
     );
 
