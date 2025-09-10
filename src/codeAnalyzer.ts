@@ -29,6 +29,7 @@ import { RustAdvancedArchitectureAnalyzer as RustAdvancedArch, RustArchitectureA
 import { ReactStateFlowAnalyzer, StateFlowReport } from './reactStateFlowAnalyzer';
 import { RustConcurrencySafetyAnalyzer, ConcurrencySafetyReport } from './rustConcurrencySafetyAnalyzer';
 import { RustErrorHandlingAnalyzer, ErrorHandlingAnalysis } from './rustErrorHandlingAnalyzer';
+import { ReactLifecycleOptimizationAnalyzer, LifecycleAnalysis } from './reactLifecycleOptimizationAnalyzer';
 
 // 代码分析结果接口
 export interface CodeAnalysis {
@@ -123,6 +124,8 @@ export interface CodeAnalysis {
     rustConcurrencySafety?: ConcurrencySafetyReport;
     // Rust错误处理分析
     rustErrorHandling?: import('./rustErrorHandlingAnalyzer').ErrorHandlingAnalysis;
+    // React生命周期优化分析
+    reactLifecycleOptimization?: import('./reactLifecycleOptimizationAnalyzer').ComponentLifecycleReport;
 }
 
 export interface FunctionInfo {
@@ -205,6 +208,8 @@ export class CodeAnalyzer {
     private rustConcurrencySafetyAnalyzer: RustConcurrencySafetyAnalyzer;
     // Rust错误处理分析器
     private rustErrorHandlingAnalyzer: RustErrorHandlingAnalyzer;
+    // React生命周期优化分析器
+    private reactLifecycleOptimizationAnalyzer: ReactLifecycleOptimizationAnalyzer;
 
     constructor() {
         this.reactAnalyzer = new ReactAnalyzer();
@@ -247,6 +252,8 @@ export class CodeAnalyzer {
         this.rustConcurrencySafetyAnalyzer = new RustConcurrencySafetyAnalyzer();
         // 初始化Rust错误处理分析器
         this.rustErrorHandlingAnalyzer = new RustErrorHandlingAnalyzer();
+        // 初始化React生命周期优化分析器
+        this.reactLifecycleOptimizationAnalyzer = new ReactLifecycleOptimizationAnalyzer();
         this.translationMap = new Map([
             // React/TypeScript 翻译
             ['useState', '使用状态'],
@@ -373,6 +380,10 @@ export class CodeAnalyzer {
                     // 添加React状态流分析
                     const reactStateFlowAnalysis = await this.reactStateFlowAnalyzer.analyzeStateFlow(text, fileName);
                     analysis.reactStateFlow = reactStateFlowAnalysis;
+                    
+                    // 添加React生命周期优化分析
+                    const reactLifecycleOptimizationAnalysis = await this.reactLifecycleOptimizationAnalyzer.analyzeLifecycle(text, fileName);
+                    analysis.reactLifecycleOptimization = reactLifecycleOptimizationAnalysis;
                 }
             } else if (language === 'rust') {
                 analysis = await this.analyzeRust(text, fileName, language);

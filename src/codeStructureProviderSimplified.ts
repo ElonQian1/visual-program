@@ -119,6 +119,21 @@ export class StructureItem extends vscode.TreeItem {
                 return new vscode.ThemeIcon('check', new vscode.ThemeColor('charts.green'));
             case 'errorMigration':
                 return new vscode.ThemeIcon('arrow-swap', new vscode.ThemeColor('charts.purple'));
+            // React生命周期优化分析图标
+            case 'reactLifecycleOptimizationGroup':
+                return new vscode.ThemeIcon('pulse', new vscode.ThemeColor('charts.blue'));
+            case 'lifecycleHook':
+                return new vscode.ThemeIcon('symbol-method', new vscode.ThemeColor('charts.green'));
+            case 'lifecyclePerformanceIssue':
+                return new vscode.ThemeIcon('warning', new vscode.ThemeColor('charts.orange'));
+            case 'lifecycleOptimization':
+                return new vscode.ThemeIcon('gear', new vscode.ThemeColor('charts.yellow'));
+            case 'lifecycleAntiPattern':
+                return new vscode.ThemeIcon('x', new vscode.ThemeColor('charts.red'));
+            case 'lifecycleBestPractice':
+                return new vscode.ThemeIcon('check-all', new vscode.ThemeColor('charts.green'));
+            case 'lifecycleMigration':
+                return new vscode.ThemeIcon('arrow-up', new vscode.ThemeColor('charts.purple'));
             case 'stateFlowGraph':
                 return new vscode.ThemeIcon('git-branch', new vscode.ThemeColor('charts.purple'));
             case 'stateNode':
@@ -406,6 +421,26 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
             ));
         }
 
+        // React生命周期优化分析 (新增)
+        if (this.codeAnalysis.reactLifecycleOptimization) {
+            const analysis = this.codeAnalysis.reactLifecycleOptimization;
+            const performanceScore = analysis.overallScore.performance;
+            const maintainabilityScore = analysis.overallScore.maintainability;
+            const componentsCount = analysis.componentsAnalyzed;
+            const hooksCount = analysis.hooksAnalyzed;
+            const issueCount = analysis.issuesFound;
+            const optimizationCount = analysis.optimizationsAvailable;
+            
+            items.push(new StructureItem(
+                `⚡ React生命周期优化 (性能:${performanceScore}分)`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'reactLifecycleOptimizationGroup',
+                new vscode.ThemeIcon('pulse', new vscode.ThemeColor('charts.blue')),
+                `组件: ${componentsCount}, Hooks: ${hooksCount}, 问题: ${issueCount}, 优化: ${optimizationCount}`,
+                'React组件生命周期管理、性能问题和优化建议分析'
+            ));
+        }
+
         // React实时性能监控 (新增)
         if (this.codeAnalysis.reactRealtimePerformance) {
             const monitoring = this.codeAnalysis.reactRealtimePerformance;
@@ -537,6 +572,9 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
 
             case 'rustErrorHandlingGroup':
                 return this.getRustErrorHandlingItems();
+
+            case 'reactLifecycleOptimizationGroup':
+                return this.getReactLifecycleOptimizationItems();
 
             case 'reactRealtimePerformanceGroup':
                 return this.getReactRealtimePerformanceItems();
@@ -1564,6 +1602,172 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
                 new vscode.ThemeIcon('arrow-right', new vscode.ThemeColor('charts.purple')),
                 '并发架构迁移建议',
                 '并发模式升级迁移方案'
+            ));
+        }
+
+        return items;
+    }
+
+    private getRustErrorHandlingItems(): StructureItem[] {
+        const items: StructureItem[] = [];
+        
+        if (!this.codeAnalysis?.rustErrorHandling) {
+            return items;
+        }
+
+        const analysis = this.codeAnalysis.rustErrorHandling;
+
+        // 错误模式概览
+        if (analysis.errorPatterns.length > 0) {
+            items.push(new StructureItem(
+                `🚨 错误模式 (${analysis.errorPatterns.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'errorPattern',
+                new vscode.ThemeIcon('error', new vscode.ThemeColor('charts.red')),
+                `平均使用频率: ${Math.round(analysis.errorPatterns.reduce((sum, p) => sum + p.usage.frequency, 0) / analysis.errorPatterns.length)}`,
+                '错误处理模式和使用分析'
+            ));
+        }
+
+        // 日志模式分析
+        if (analysis.loggingPatterns.length > 0) {
+            items.push(new StructureItem(
+                `📝 日志模式 (${analysis.loggingPatterns.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'loggingPattern',
+                new vscode.ThemeIcon('output', new vscode.ThemeColor('charts.blue')),
+                `平均覆盖率: ${Math.round(analysis.loggingPatterns.reduce((sum, p) => sum + p.usage.coverage.errorPaths, 0) / analysis.loggingPatterns.length)}%`,
+                '日志记录模式和配置分析'
+            ));
+        }
+
+        // 可观测性功能
+        if (analysis.observabilityFeatures.length > 0) {
+            items.push(new StructureItem(
+                `👁️ 可观测性 (${analysis.observabilityFeatures.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'observabilityFeature',
+                new vscode.ThemeIcon('eye', new vscode.ThemeColor('charts.green')),
+                `有效性: ${Math.round(analysis.observabilityFeatures.reduce((sum, f) => sum + f.effectiveness.incidentDetection, 0) / analysis.observabilityFeatures.length)}%`,
+                '可观测性特性和监控能力'
+            ));
+        }
+
+        // 韧性模式分析
+        if (analysis.resiliencePatterns.length > 0) {
+            items.push(new StructureItem(
+                `🛡️ 韧性模式 (${analysis.resiliencePatterns.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'resiliencePattern',
+                new vscode.ThemeIcon('shield-check', new vscode.ThemeColor('charts.orange')),
+                `平均恢复能力: ${Math.round(analysis.resiliencePatterns.reduce((sum, p) => sum + p.effectiveness.failureRecovery, 0) / analysis.resiliencePatterns.length)}%`,
+                '系统韧性和故障恢复模式'
+            ));
+        }
+
+        // 改进建议
+        if (analysis.improvements.length > 0) {
+            const criticalCount = analysis.improvements.filter(i => i.priority === 'critical').length;
+            items.push(new StructureItem(
+                `🔧 改进建议 (${analysis.improvements.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'errorImprovement',
+                new vscode.ThemeIcon('tools', new vscode.ThemeColor('charts.yellow')),
+                `关键级: ${criticalCount}个`,
+                '错误处理系统改进建议'
+            ));
+        }
+
+        // 最佳实践评估
+        if (analysis.bestPractices.length > 0) {
+            const excellentCount = analysis.bestPractices.filter(bp => bp.compliance === 'excellent').length;
+            const needsImprovementCount = analysis.bestPractices.filter(bp => bp.compliance === 'needs-improvement' || bp.compliance === 'poor').length;
+            
+            items.push(new StructureItem(
+                `✅ 最佳实践 (${analysis.bestPractices.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'errorBestPractice',
+                new vscode.ThemeIcon('check', new vscode.ThemeColor('charts.green')),
+                `优秀: ${excellentCount}, 需改进: ${needsImprovementCount}`,
+                '错误处理最佳实践遵循情况'
+            ));
+        }
+
+        // 迁移建议
+        if (analysis.migrationSuggestions.length > 0) {
+            items.push(new StructureItem(
+                `🔄 迁移建议 (${analysis.migrationSuggestions.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'errorMigration',
+                new vscode.ThemeIcon('arrow-swap', new vscode.ThemeColor('charts.purple')),
+                '错误处理架构迁移方案',
+                '错误处理模式升级和迁移建议'
+            ));
+        }
+
+        return items;
+    }
+
+    private getReactLifecycleOptimizationItems(): StructureItem[] {
+        const items: StructureItem[] = [];
+        
+        if (!this.codeAnalysis?.reactLifecycleOptimization) {
+            return items;
+        }
+
+        const analysis = this.codeAnalysis.reactLifecycleOptimization;
+
+        // 组件分析概览
+        if (analysis.analyses.length > 0) {
+            items.push(new StructureItem(
+                `📊 组件分析 (${analysis.analyses.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'lifecycleAnalysis',
+                new vscode.ThemeIcon('symbol-class', new vscode.ThemeColor('charts.blue')),
+                `平均问题数: ${Math.round(analysis.analyses.reduce((sum, a) => sum + a.performanceIssues.length, 0) / analysis.analyses.length)}`,
+                '各组件生命周期管理详细分析'
+            ));
+        }
+
+        // 全局推荐
+        if (analysis.globalRecommendations.length > 0) {
+            const criticalCount = analysis.globalRecommendations.filter(r => r.priority === 'critical').length;
+            items.push(new StructureItem(
+                `💡 全局建议 (${analysis.globalRecommendations.length})`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'lifecycleOptimization',
+                new vscode.ThemeIcon('lightbulb', new vscode.ThemeColor('charts.yellow')),
+                `关键级: ${criticalCount}个`,
+                '应用级生命周期优化建议'
+            ));
+        }
+
+        // 趋势分析
+        if (analysis.trends) {
+            const hookTypes = Object.keys(analysis.trends.hookUsageDistribution).length;
+            const antiPatternCount = analysis.trends.commonAntiPatterns.length;
+            
+            items.push(new StructureItem(
+                `📈 使用趋势`,
+                vscode.TreeItemCollapsibleState.Collapsed,
+                'lifecycleTrends',
+                new vscode.ThemeIcon('graph', new vscode.ThemeColor('charts.purple')),
+                `Hook类型: ${hookTypes}, 反模式: ${antiPatternCount}`,
+                '生命周期使用模式和趋势分析'
+            ));
+        }
+
+        // 迁移准备度
+        if (analysis.trends?.migrationReadiness) {
+            const migrationScore = analysis.trends.migrationReadiness.score;
+            
+            items.push(new StructureItem(
+                `🚀 迁移准备度 (${migrationScore}分)`,
+                vscode.TreeItemCollapsibleState.None,
+                'lifecycleMigration',
+                new vscode.ThemeIcon('arrow-up', new vscode.ThemeColor('charts.green')),
+                `现代化程度评估`,
+                'React现代模式迁移准备度评分'
             ));
         }
 
