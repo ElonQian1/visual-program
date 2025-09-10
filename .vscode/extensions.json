@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "ms-vscode.vscode-typescript-next",
+        "rust-lang.rust-analyzer",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode"
+    ]
+}
