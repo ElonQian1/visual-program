@@ -281,6 +281,28 @@ export class VisualPanelProvider {
                 }
 
                 /* React高级分析节点样式 */
+                .react-performance-issue-node {
+                    background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+                    border-color: #ff6b6b;
+                    border-width: 2px;
+                }
+
+                .react-architecture-pattern-node {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border-color: #667eea;
+                    border-width: 3px;
+                }
+
+                .severity-badge {
+                    display: inline-block;
+                    padding: 2px 6px;
+                    border-radius: 10px;
+                    color: white;
+                    font-size: 10px;
+                    font-weight: bold;
+                    margin-left: 8px;
+                }
+
                 .react-route-node {
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     border-color: #667eea;
@@ -607,6 +629,24 @@ export class VisualPanelProvider {
                             canvas.appendChild(node);
                             nodeIndex++;
                         });
+                    }
+
+                    // 渲染React性能问题
+                    if (codeAnalysis.reactPerformanceIssues) {
+                        codeAnalysis.reactPerformanceIssues.forEach((issue, index) => {
+                            const node = createReactPerformanceIssueNode(issue, nodeIndex);
+                            positionNode(node, nodeIndex, nodeSpacing);
+                            canvas.appendChild(node);
+                            nodeIndex++;
+                        });
+                    }
+
+                    // 渲染React架构模式
+                    if (codeAnalysis.reactArchitecturePattern) {
+                        const node = createReactArchitecturePatternNode(codeAnalysis.reactArchitecturePattern, nodeIndex);
+                        positionNode(node, nodeIndex, nodeSpacing);
+                        canvas.appendChild(node);
+                        nodeIndex++;
                     }
 
                     // 渲染React架构分析结果
@@ -1569,6 +1609,84 @@ export class VisualPanelProvider {
                         type: 'onInfo',
                         value: '导出图片功能开发中...'
                     });
+                }
+
+                // React性能问题节点创建函数
+                function createReactPerformanceIssueNode(issue, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-performance-issue-node';
+                    node.dataset.type = 'reactPerformanceIssue';
+                    node.dataset.line = issue.line;
+                    node.dataset.file = codeAnalysis.fileName;
+                    
+                    const severityColor = {
+                        'low': '#28a745',
+                        'medium': '#ffc107', 
+                        'high': '#fd7e14',
+                        'critical': '#dc3545'
+                    };
+                    
+                    const typeText = {
+                        'memory-leak': '内存泄漏',
+                        'unnecessary-render': '不必要渲染',
+                        'large-bundle': '包体积过大',
+                        'slow-component': '组件性能慢'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">
+                            <span class="node-icon">⚠️</span>
+                            <span class="node-title">性能问题</span>
+                            <span class="severity-badge" style="background-color: \${severityColor[issue.severity]}">\${issue.severity.toUpperCase()}</span>
+                        </div>
+                        <div class="node-content">
+                            <p><strong>类型:</strong> \${typeText[issue.type]}</p>
+                            <p><strong>组件:</strong> \${issue.component}</p>
+                            <p><strong>描述:</strong> \${issue.description}</p>
+                            <p><strong>建议:</strong> \${issue.suggestion}</p>
+                            <p><strong>行号:</strong> \${issue.line}</p>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
+                }
+
+                // React架构模式节点创建函数
+                function createReactArchitecturePatternNode(pattern, index) {
+                    const node = document.createElement('div');
+                    node.className = 'node react-architecture-pattern-node';
+                    node.dataset.type = 'reactArchitecturePattern';
+                    node.dataset.file = codeAnalysis.fileName;
+                    
+                    const dataFlowText = {
+                        'unidirectional': '单向数据流',
+                        'bidirectional': '双向数据流',
+                        'mixed': '混合数据流'
+                    };
+                    
+                    const stateManagementText = {
+                        'local': '本地状态管理',
+                        'global': '全局状态管理',
+                        'mixed': '混合状态管理'
+                    };
+                    
+                    node.innerHTML = \`
+                        <div class="node-header">
+                            <span class="node-icon">🏛️</span>
+                            <span class="node-title">架构模式</span>
+                        </div>
+                        <div class="node-content">
+                            <p><strong>模式:</strong> \${pattern.pattern}</p>
+                            <p><strong>数据流:</strong> \${dataFlowText[pattern.dataFlow]}</p>
+                            <p><strong>状态管理:</strong> \${stateManagementText[pattern.stateManagement]}</p>
+                            <p><strong>复杂度:</strong> \${pattern.complexity}/10</p>
+                            <p><strong>组件数:</strong> \${pattern.components.length}</p>
+                        </div>
+                    \`;
+                    
+                    addNodeEvents(node);
+                    return node;
                 }
 
                 // React架构分析节点创建函数

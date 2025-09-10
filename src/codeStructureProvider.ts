@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import { CodeAnalysis } from './codeAnalyzer';
 
 // 代码结构树项
@@ -149,6 +149,18 @@ export class StructureItem extends vscode.TreeItem {
             case 'rustMemoryAnalysis':
                 this.iconPath = new vscode.ThemeIcon('symbol-array', new vscode.ThemeColor('charts.orange'));
                 break;
+            case 'reactPerformanceIssue':
+                this.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('charts.red'));
+                break;
+            case 'reactArchitecturePattern':
+                this.iconPath = new vscode.ThemeIcon('organization', new vscode.ThemeColor('charts.blue'));
+                break;
+            case 'performanceIssue':
+                this.iconPath = new vscode.ThemeIcon('error', new vscode.ThemeColor('problemsErrorIcon.foreground'));
+                break;
+            case 'architecturePattern':
+                this.iconPath = new vscode.ThemeIcon('symbol-structure', new vscode.ThemeColor('charts.purple'));
+                break;
             case 'rustCpuAnalysis':
                 this.iconPath = new vscode.ThemeIcon('cpu', new vscode.ThemeColor('charts.yellow'));
                 break;
@@ -294,6 +306,26 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
                     vscode.TreeItemCollapsibleState.Collapsed,
                     'reactHooks',
                     new vscode.ThemeIcon('symbol-method', new vscode.ThemeColor('charts.blue'))
+                ));
+            }
+
+            // React性能分析 🔥
+            if (this.codeAnalysis.reactPerformanceIssues && this.codeAnalysis.reactPerformanceIssues.length > 0) {
+                rootItems.push(new StructureItem(
+                    `⚠️ React 性能问题 (${this.codeAnalysis.reactPerformanceIssues.length})`,
+                    vscode.TreeItemCollapsibleState.Collapsed,
+                    'reactPerformanceIssues',
+                    new vscode.ThemeIcon('warning', new vscode.ThemeColor('problemsWarningIcon.foreground'))
+                ));
+            }
+
+            // React架构分析 🔥
+            if (this.codeAnalysis.reactArchitecturePattern) {
+                rootItems.push(new StructureItem(
+                    `🏛️ React 架构模式: ${this.codeAnalysis.reactArchitecturePattern.pattern}`,
+                    vscode.TreeItemCollapsibleState.Collapsed,
+                    'reactArchitecturePattern',
+                    new vscode.ThemeIcon('organization', new vscode.ThemeColor('charts.blue'))
                 ));
             }
 
@@ -446,6 +478,10 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
                 return this.getRustAsyncNetworkItems();
             case 'rustSystemAnalysis':
                 return this.getRustSystemAnalysisItems();
+            case 'reactPerformanceIssues':
+                return this.getReactPerformanceIssueItems();
+            case 'reactArchitecturePattern':
+                return this.getReactArchitecturePatternItems();
             default:
                 return [];
         }
@@ -702,4 +738,122 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
     private getRustWebHandlerItems(): StructureItem[] { return []; }
     private getRustAsyncTaskItems(): StructureItem[] { return []; }
     private getRustSystemAnalysisItems(): StructureItem[] { return []; }
+
+    // React性能问题展示
+    private getReactPerformanceIssueItems(): StructureItem[] {
+        if (!this.codeAnalysis?.reactPerformanceIssues) { return []; }
+        
+        return this.codeAnalysis.reactPerformanceIssues.map(issue => {
+            const severityColor = {
+                'low': new vscode.ThemeColor('charts.green'),
+                'medium': new vscode.ThemeColor('charts.yellow'), 
+                'high': new vscode.ThemeColor('charts.orange'),
+                'critical': new vscode.ThemeColor('problemsErrorIcon.foreground')
+            };
+            
+            const typeText = {
+                'memory-leak': '内存泄漏',
+                'unnecessary-render': '不必要渲染',
+                'large-bundle': '包体积过大',
+                'slow-component': '组件性能慢'
+            };
+            
+            const severityIcon = {
+                'low': 'info',
+                'medium': 'warning',
+                'high': 'error',
+                'critical': 'flame'
+            };
+            
+            return new StructureItem(
+                `${typeText[issue.type]} - ${issue.component}`,
+                vscode.TreeItemCollapsibleState.None,
+                'performanceIssue',
+                new vscode.ThemeIcon(severityIcon[issue.severity], severityColor[issue.severity]),
+                `${issue.severity.toUpperCase()}`,
+                `${issue.description}\\n建议: ${issue.suggestion}`,
+                {
+                    command: 'vscode.open',
+                    title: '跳转到问题位置',
+                    arguments: [vscode.Uri.file(this.codeAnalysis!.fileName), new vscode.Position(issue.line - 1, 0)]
+                }
+            );
+        });
+    }
+
+    // React架构模式展示
+    private getReactArchitecturePatternItems(): StructureItem[] {
+        if (!this.codeAnalysis?.reactArchitecturePattern) { return []; }
+        
+        const pattern = this.codeAnalysis.reactArchitecturePattern;
+        const items: StructureItem[] = [];
+        
+        // 架构模式基本信息
+        items.push(new StructureItem(
+            `架构模式: ${pattern.pattern}`,
+            vscode.TreeItemCollapsibleState.None,
+            'architecturePattern',
+            new vscode.ThemeIcon('symbol-structure', new vscode.ThemeColor('charts.blue')),
+            '架构模式',
+            `当前应用使用 ${pattern.pattern} 架构模式`
+        ));
+        
+        // 数据流信息
+        const dataFlowText = {
+            'unidirectional': '单向数据流',
+            'bidirectional': '双向数据流', 
+            'mixed': '混合数据流'
+        };
+        items.push(new StructureItem(
+            `数据流: ${dataFlowText[pattern.dataFlow]}`,
+            vscode.TreeItemCollapsibleState.None,
+            'architecturePattern',
+            new vscode.ThemeIcon('arrow-both', new vscode.ThemeColor('charts.green')),
+            '数据流模式',
+            `应用采用${dataFlowText[pattern.dataFlow]}模式`
+        ));
+        
+        // 状态管理信息
+        const stateManagementText = {
+            'local': '本地状态管理',
+            'global': '全局状态管理',
+            'mixed': '混合状态管理' 
+        };
+        items.push(new StructureItem(
+            `状态管理: ${stateManagementText[pattern.stateManagement]}`,
+            vscode.TreeItemCollapsibleState.None,
+            'architecturePattern',
+            new vscode.ThemeIcon('database', new vscode.ThemeColor('charts.purple')),
+            '状态管理',
+            `使用${stateManagementText[pattern.stateManagement]}方式`
+        ));
+        
+        // 复杂度信息
+        const complexityLevel = pattern.complexity <= 3 ? '简单' : 
+                               pattern.complexity <= 6 ? '中等' : '复杂';
+        const complexityColor = pattern.complexity <= 3 ? new vscode.ThemeColor('charts.green') :
+                                pattern.complexity <= 6 ? new vscode.ThemeColor('charts.yellow') :
+                                new vscode.ThemeColor('charts.red');
+        
+        items.push(new StructureItem(
+            `复杂度: ${pattern.complexity}/10 (${complexityLevel})`,
+            vscode.TreeItemCollapsibleState.None,
+            'architecturePattern',
+            new vscode.ThemeIcon('pulse', complexityColor),
+            `${complexityLevel}复杂度`,
+            `架构复杂度评分: ${pattern.complexity}/10`
+        ));
+        
+        // 组件数量信息
+        items.push(new StructureItem(
+            `组件数量: ${pattern.components.length}`,
+            vscode.TreeItemCollapsibleState.None,
+            'architecturePattern',
+            new vscode.ThemeIcon('symbol-class', new vscode.ThemeColor('charts.blue')),
+            '组件统计',
+            `当前架构包含 ${pattern.components.length} 个组件`
+        ));
+        
+        return items;
+    }
 }

@@ -29,6 +29,31 @@
         "command": "visualProgramming.analyzeCode",
         "title": "分析代码结构",
         "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.openInteractiveCanvas",
+        "title": "🎨 打开交互式画布",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.generateCode",
+        "title": "✨ 智能代码生成",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.startRealtimeMonitoring",
+        "title": "🔄 启动实时监控",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.aiAnalysis",
+        "title": "🧠 AI 代码分析",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.createFromTemplate",
+        "title": "🚀 从模板创建项目",
+        "category": "代码可视化"
       }
     ],
     "viewsContainers": {

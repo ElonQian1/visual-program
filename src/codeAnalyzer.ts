@@ -81,6 +81,9 @@ export interface CodeAnalysis {
     reactStateManagement?: import('./reactStateManagementAnalyzer').ReactStateManagementAnalysis;
     // Rust性能分析
     rustDetailedPerformance?: RustDetailedPerformanceAnalysis;
+    // React高级性能分析
+    reactPerformanceIssues?: ReactPerformanceIssue[];
+    reactArchitecturePattern?: ReactArchitecturePattern;
 }
 
 export interface FunctionInfo {
@@ -140,6 +143,7 @@ export class CodeAnalyzer {
     private rustAsyncNetworkAnalyzer: RustAsyncNetworkAnalyzer;
     private reactStateManagementAnalyzer: ReactStateManagementAnalyzer;
     private rustPerformanceAnalyzer: RustPerformanceAnalyzer;
+    private reactAdvancedAnalyzer: ReactAdvancedAnalyzer;
 
     constructor() {
         this.reactAnalyzer = new ReactAnalyzer();
@@ -159,6 +163,7 @@ export class CodeAnalyzer {
         this.rustAsyncNetworkAnalyzer = new RustAsyncNetworkAnalyzer();
         this.reactStateManagementAnalyzer = new ReactStateManagementAnalyzer();
         this.rustPerformanceAnalyzer = new RustPerformanceAnalyzer();
+        this.reactAdvancedAnalyzer = new ReactAdvancedAnalyzer();
         this.translationMap = new Map([
             // React/TypeScript 翻译
             ['useState', '使用状态'],
@@ -253,6 +258,14 @@ export class CodeAnalyzer {
                     // 添加React状态管理分析
                     const reactStateManagementAnalysis = this.reactStateManagementAnalyzer.analyzeReactStateManagement(text, fileName);
                     analysis.reactStateManagement = reactStateManagementAnalysis;
+                    
+                    // 添加React高级性能和架构分析
+                    const reactComponents = analysis.reactComponents || [];
+                    const reactPerformanceIssues = this.reactAdvancedAnalyzer.analyzePerformance(text, fileName, reactComponents);
+                    const reactArchPattern = this.reactAdvancedAnalyzer.analyzeArchitecture(text, reactComponents, 
+                        analysis.reactContexts || [], analysis.reduxStores || []);
+                    analysis.reactPerformanceIssues = reactPerformanceIssues;
+                    analysis.reactArchitecturePattern = reactArchPattern;
                 }
             } else if (language === 'rust') {
                 analysis = await this.analyzeRust(text, fileName, language);
