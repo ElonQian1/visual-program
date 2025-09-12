@@ -124,6 +124,41 @@
         "command": "visualProgramming.intelligentRefactor",
         "title": "🔧 智能重构",
         "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.showOptimizationConfig",
+        "title": "⚙️ 优化配置",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.showDiagnostics",
+        "title": "🏥 系统诊断",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.clearCache",
+        "title": "🗑️ 清理缓存",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.autoOptimizeProject",
+        "title": "🚀 自动优化项目",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.openInteractiveCanvasSystem",
+        "title": "🖼️ 交互式画布",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.openAnalysisVisualization",
+        "title": "📊 分析结果可视化",
+        "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.createNodesFromAnalysis",
+        "title": "🎨 从代码创建节点",
+        "category": "代码可视化"
       }
     ],
     "viewsContainers": {

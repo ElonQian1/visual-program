@@ -198,6 +198,116 @@ export const use${contextName} = () => {
     private generateRustStruct(node: CanvasNode): string {
         const structName = node.data.name || 'GeneratedStruct';
         const fields = node.data.fields || [];
+        const derives = node.data.derives || ['Debug', 'Clone'];
+        
+        const fieldLines = fields.map((field: any) => 
+            `    pub ${field.name}: ${field.type},`
+        ).join('\n');
+        
+        return `
+#[derive(${derives.join(', ')})]
+pub struct ${structName} {
+${fieldLines || '    // TODO: 添加字段'}
+}
+
+impl ${structName} {
+    pub fn new() -> Self {
+        Self {
+            ${fields.map((field: any) => `${field.name}: Default::default()`).join(',\n            ') || '// TODO: 初始化字段'}
+        }
+    }
+}`;
+    }
+    
+    // 🔧 Rust函数生成器
+    private generateRustFunction(node: CanvasNode): string {
+        const funcName = node.data.name || 'generated_function';
+        const params = node.data.parameters || [];
+        const returnType = node.data.returnType || '()';
+        const isAsync = node.data.isAsync || false;
+        const visibility = node.data.visibility || 'pub';
+        
+        const paramStr = params.map((param: any) => 
+            `${param.name}: ${param.type}`
+        ).join(', ');
+        
+        const asyncKeyword = isAsync ? 'async ' : '';
+        
+        return `
+${visibility} ${asyncKeyword}fn ${funcName}(${paramStr}) -> ${returnType} {
+    // TODO: 实现函数逻辑
+    ${returnType === '()' ? '' : 'todo!()'}
+}`;
+    }
+    
+    // 🌐 Web处理器生成器
+    private generateWebHandler(node: CanvasNode): string {
+        const handlerName = node.data.name || 'handler';
+        const path = node.data.path || '/api/endpoint';
+        const method = node.data.method || 'GET';
+        
+        return `
+pub async fn ${handlerName}() -> impl IntoResponse {
+    Json(serde_json::json!({
+        "message": "Hello from ${handlerName}",
+        "status": "success"
+    }))
+}
+
+// 注册路由
+// Router::new().route("${path}", ${method.toLowerCase()}(${handlerName}))`;
+    }
+    
+    // 🔗 提取连接中的Props
+    private extractPropsFromConnections(nodeId: string, connections: NodeConnection[]): PropInfo[] {
+        const incomingConnections = connections.filter(c => c.targetId === nodeId);
+        const props: PropInfo[] = [];
+        
+        incomingConnections.forEach(conn => {
+            props.push({
+                name: conn.targetPort || 'data',
+                type: this.mapDataType(conn.dataType || 'any')
+            });
+        });
+        
+        // 默认props
+        if (props.length === 0) {
+            props.push({ name: 'title', type: 'string' });
+        }
+        
+        return props;
+    }
+    
+    // 🎣 Hook代码生成
+    private generateHookCode(hook: any): string {
+        switch (hook.type) {
+            case 'useState':
+                return `const [${hook.stateName || 'state'}, set${hook.stateName ? hook.stateName.charAt(0).toUpperCase() + hook.stateName.slice(1) : 'State'}] = React.useState(${hook.initialValue || 'null'});`;
+            case 'useEffect':
+                return `React.useEffect(() => {\n        // TODO: 实现effect逻辑\n    }, [${hook.dependencies ? hook.dependencies.join(', ') : ''}]);`;
+            case 'useCallback':
+                return `const ${hook.name || 'callback'} = React.useCallback(() => {\n        // TODO: 实现callback逻辑\n    }, [${hook.dependencies ? hook.dependencies.join(', ') : ''}]);`;
+            case 'useMemo':
+                return `const ${hook.name || 'memoValue'} = React.useMemo(() => {\n        // TODO: 实现memo计算\n        return null;\n    }, [${hook.dependencies ? hook.dependencies.join(', ') : ''}]);`;
+            default:
+                return `// Custom hook: ${hook.type}`;
+        }
+    }
+    
+    // 📊 数据类型映射
+    private mapDataType(dataType: string): string {
+        const typeMap: Record<string, string> = {
+            'string': 'string',
+            'number': 'number',
+            'boolean': 'boolean',
+            'array': 'any[]',
+            'object': 'object',
+            'function': '() => void',
+            'any': 'any'
+        };
+        
+        return typeMap[dataType] || 'any';
+    }
         
         return `
 #[derive(Debug, Clone)]

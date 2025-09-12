@@ -23,6 +23,79 @@ import { intelligentRefactoringEngine } from './intelligentRefactoringEngine';
 import { aiEnhancedAnalysisSystem } from './aiEnhancedAnalysisSystem';
 import { EnhancedInteractiveFeatures } from './enhancedInteractiveFeaturesSimplified';
 
+// 🚀 新增优化和诊断系统
+import { getOptimizationManager } from './projectOptimizationManager';
+import { errorDiagnostics } from './intelligentErrorDiagnostics';
+import { startCacheCleanupTask } from './intelligentAnalysisCache';
+import { analysisCache } from './intelligentAnalysisCache';
+
+// 🎨 蓝图编辑器系统
+import { BlueprintEditorProvider } from './blueprintEditorProvider';
+
+// 🖼️ 交互式画布和可视化系统
+import { InteractiveCanvasSystem } from './simplifiedInteractiveCanvas';
+import { AnalysisVisualizationPanel } from './analysisVisualizationPanel';
+
+// 项目特征分析函数
+async function analyzeProjectCharacteristics(workspaceFolder: vscode.WorkspaceFolder) {
+    const pattern = new vscode.RelativePattern(workspaceFolder, '**/*.{tsx,ts,jsx,js,rs}');
+    const files = await vscode.workspace.findFiles(pattern, '**/node_modules/**');
+    
+    let reactFileCount = 0;
+    let rustFileCount = 0;
+    let totalLinesOfCode = 0;
+    let totalFileSize = 0;
+    let hasLargeComponents = false;
+    let hasComplexState = false;
+    let hasAsyncCode = false;
+    let hasPerformanceIssues = false;
+
+    for (const file of files) {
+        try {
+            const document = await vscode.workspace.openTextDocument(file);
+            const content = document.getText();
+            const lineCount = document.lineCount;
+            
+            totalLinesOfCode += lineCount;
+            totalFileSize += content.length;
+
+            if (file.fsPath.match(/\.(tsx?|jsx?)$/)) {
+                reactFileCount++;
+                if (content.includes('useState') || content.includes('useEffect')) {
+                    hasComplexState = true;
+                }
+                if (lineCount > 200) {
+                    hasLargeComponents = true;
+                }
+                if (content.includes('Promise') || content.includes('async')) {
+                    hasAsyncCode = true;
+                }
+            } else if (file.fsPath.endsWith('.rs')) {
+                rustFileCount++;
+                if (content.includes('async fn') || content.includes('tokio')) {
+                    hasAsyncCode = true;
+                }
+            }
+        } catch (error) {
+            // 忽略无法读取的文件
+        }
+    }
+
+    // 简单的性能问题检测
+    hasPerformanceIssues = hasLargeComponents || (totalLinesOfCode > 10000);
+
+    return {
+        reactFileCount,
+        rustFileCount,
+        totalLinesOfCode,
+        averageFileSize: files.length > 0 ? totalFileSize / files.length : 0,
+        hasLargeComponents,
+        hasComplexState,
+        hasAsyncCode,
+        hasPerformanceIssues
+    };
+}
+
 // 🔥 生成诊断报告
 function generateDiagnosticReport(result: FeatureDiagnosticResult): string {
     const { projectName, overallHealth, featureCompleteness, gaps, recommendations, roadmap } = result;
@@ -168,6 +241,9 @@ export function activate(context: vscode.ExtensionContext) {
     const blueprintEditor = createBlueprintEditor(context);
     const syncOutputChannel = vscode.window.createOutputChannel('Real-Time Code Sync');
     const realTimeSync = new RealTimeCodeSyncEngine(syncOutputChannel);
+
+    // 🎨 初始化蓝图编辑器提供器
+    const blueprintEditorProvider = new BlueprintEditorProvider(context);
     const enhancedTemplateSystem = createEnhancedTemplateSystem(context);
     const interactionOptimizer = createInteractionOptimizer(context);
     const { ErrorHandler } = require('./errorHandler');
@@ -180,7 +256,79 @@ export function activate(context: vscode.ExtensionContext) {
     const userGuidance = UserGuidanceSystem.getInstance();
     const collaborationSystem = FileBasedCollaborationSystem.getInstance();
 
-    // 注册命令
+    // 🚀 初始化新的优化和诊断系统
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    let optimizationManager: ReturnType<typeof getOptimizationManager> | null = null;
+    
+    if (workspaceFolder) {
+        optimizationManager = getOptimizationManager(workspaceFolder.uri.fsPath);
+    }
+    
+    // 启动缓存清理任务
+    const cacheCleanupTask = startCacheCleanupTask();
+    context.subscriptions.push(cacheCleanupTask);
+
+    // 注册新命令
+    const showOptimizationConfigCommand = vscode.commands.registerCommand(
+        'visualProgramming.showOptimizationConfig',
+        async () => {
+            if (optimizationManager) {
+                await optimizationManager.showConfigurationPanel();
+            } else {
+                vscode.window.showWarningMessage('请先打开一个工作区');
+            }
+        }
+    );
+
+    const showDiagnosticsCommand = vscode.commands.registerCommand(
+        'visualProgramming.showDiagnostics',
+        async () => {
+            await errorDiagnostics.showDiagnosticsPanel();
+        }
+    );
+
+    const clearCacheCommand = vscode.commands.registerCommand(
+        'visualProgramming.clearCache',
+        async () => {
+            analysisCache.clear();
+            vscode.window.showInformationMessage('分析缓存已清理');
+        }
+    );
+
+    const autoOptimizeProjectCommand = vscode.commands.registerCommand(
+        'visualProgramming.autoOptimizeProject',
+        async () => {
+            if (!optimizationManager || !workspaceFolder) {
+                vscode.window.showWarningMessage('请先打开一个工作区');
+                return;
+            }
+
+            vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: '正在分析项目并自动优化配置...',
+                cancellable: false
+            }, async (progress) => {
+                // 分析项目特征
+                const projectAnalysis = await analyzeProjectCharacteristics(workspaceFolder);
+                
+                // 自动优化配置
+                const optimizedConfig = await optimizationManager!.autoOptimizeConfig(projectAnalysis);
+                
+                // 生成建议
+                const recommendations = optimizationManager!.generateOptimizationRecommendations(projectAnalysis);
+                
+                // 显示结果
+                const message = `项目自动优化完成！\n\n优化建议：\n${recommendations.join('\n')}`;
+                vscode.window.showInformationMessage(message, '查看配置').then(selection => {
+                    if (selection === '查看配置') {
+                        optimizationManager!.showConfigurationPanel();
+                    }
+                });
+            });
+        }
+    );
+
+    // 注册传统命令
     const openVisualViewCommand = vscode.commands.registerCommand(
         'visualProgramming.openVisualView',
         () => {
@@ -305,7 +453,7 @@ export function activate(context: vscode.ExtensionContext) {
     const blueprintEditorCommand = vscode.commands.registerCommand(
         'visualProgramming.openBlueprintEditor',
         () => {
-            blueprintEditor.createOrShow(context.extensionUri);
+            blueprintEditorProvider.createOrShow();
             vscode.window.showInformationMessage('🎨 蓝图可视化编辑器已打开');
         }
     );
@@ -821,6 +969,131 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
+    // 🖼️ 交互式画布系统命令
+    let canvasSystem: InteractiveCanvasSystem | undefined;
+    const openInteractiveCanvasSystemCommand = vscode.commands.registerCommand(
+        'visualProgramming.openInteractiveCanvasSystem',
+        () => {
+            if (!canvasSystem) {
+                canvasSystem = new InteractiveCanvasSystem();
+            }
+            const panel = canvasSystem.createWebviewPanel(context);
+            vscode.window.showInformationMessage('🖼️ 交互式画布已打开');
+        }
+    );
+
+    // 📊 分析结果可视化面板命令
+    let analysisVisualizationPanel: AnalysisVisualizationPanel | undefined;
+    const openAnalysisVisualizationCommand = vscode.commands.registerCommand(
+        'visualProgramming.openAnalysisVisualization',
+        async () => {
+            if (!analysisVisualizationPanel) {
+                analysisVisualizationPanel = new AnalysisVisualizationPanel(context);
+            }
+            
+            const panel = analysisVisualizationPanel.createPanel();
+            
+            // 如果有活动编辑器，自动分析并显示
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor) {
+                try {
+                    // 分析当前文件
+                    const analysisResult = await codeAnalyzer.analyzeCode(activeEditor.document.uri);
+                    
+                    // 转换为可视化格式
+                    const visualizationData = AnalysisVisualizationPanel.createAnalysisFromCodeAnalysis(analysisResult);
+                    
+                    // 更新可视化面板
+                    analysisVisualizationPanel.updateAnalysis(visualizationData);
+                    
+                    vscode.window.showInformationMessage('📊 代码分析可视化已生成');
+                } catch (error) {
+                    vscode.window.showErrorMessage(`分析失败: ${error}`);
+                }
+            } else {
+                vscode.window.showInformationMessage('📊 分析可视化面板已打开，请选择文件进行分析');
+            }
+        }
+    );
+
+    // 🎨 创建节点从代码分析命令
+    const createNodesFromAnalysisCommand = vscode.commands.registerCommand(
+        'visualProgramming.createNodesFromAnalysis',
+        async () => {
+            const activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) {
+                vscode.window.showWarningMessage('请先打开一个代码文件');
+                return;
+            }
+
+            try {
+                // 分析代码
+                const analysisResult = await codeAnalyzer.analyzeFile(activeEditor.document);
+                
+                // 创建交互式画布（如果还没有）
+                if (!canvasSystem) {
+                    canvasSystem = new InteractiveCanvasSystem();
+                    canvasSystem.createWebviewPanel(context);
+                }
+
+                // 从分析结果创建节点
+                let nodeCount = 0;
+                
+                // 函数节点
+                if (analysisResult.functions) {
+                    analysisResult.functions.forEach((func: any) => {
+                        const node = canvasSystem!.createNodeFromAnalysis({
+                            type: 'function',
+                            name: func.name,
+                            description: `函数 - 复杂度: ${func.complexity || 1}`,
+                            filePath: activeEditor.document.uri.fsPath,
+                            lineNumber: func.lineNumber || 1,
+                            complexity: func.complexity || 1
+                        });
+                        canvasSystem!.addNode(node);
+                        nodeCount++;
+                    });
+                }
+
+                // 类/结构体节点
+                if (analysisResult.classes) {
+                    analysisResult.classes.forEach((cls: any) => {
+                        const node = canvasSystem!.createNodeFromAnalysis({
+                            type: cls.name.includes('Component') ? 'reactComponent' : 'class',
+                            name: cls.name,
+                            description: `类 - ${cls.methods?.length || 0}个方法`,
+                            filePath: activeEditor.document.uri.fsPath,
+                            lineNumber: cls.lineNumber || 1,
+                            complexity: cls.complexity || 1
+                        });
+                        canvasSystem!.addNode(node);
+                        nodeCount++;
+                    });
+                }
+
+                // 变量节点
+                if (analysisResult.variables) {
+                    analysisResult.variables.slice(0, 5).forEach((variable: any) => { // 限制数量
+                        const node = canvasSystem!.createNodeFromAnalysis({
+                            type: 'variable',
+                            name: variable.name,
+                            description: `变量 - ${variable.type || 'unknown'}`,
+                            filePath: activeEditor.document.uri.fsPath,
+                            lineNumber: variable.lineNumber || 1,
+                            complexity: 1
+                        });
+                        canvasSystem!.addNode(node);
+                        nodeCount++;
+                    });
+                }
+
+                vscode.window.showInformationMessage(`🎨 已创建 ${nodeCount} 个代码节点`);
+            } catch (error) {
+                vscode.window.showErrorMessage(`创建节点失败: ${error}`);
+            }
+        }
+    );
+
     // �🔧 智能代码优化命令
     const openCodeOptimizerCommand = vscode.commands.registerCommand(
         'visualProgramming.openCodeOptimizer',
@@ -1254,6 +1527,10 @@ export function activate(context: vscode.ExtensionContext) {
         // 🚀 增强功能命令
         enhancedCodeGenerationCommand,
         aiEnhancedAnalysisCommand,
+        // 🖼️ 可视化系统命令
+        openInteractiveCanvasSystemCommand,
+        openAnalysisVisualizationCommand,
+        createNodesFromAnalysisCommand,
         // 🆕 新功能命令
         showWelcomeCommand,
         showTutorialsCommand,

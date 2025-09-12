@@ -212,31 +212,37 @@ export class CodeAnalyzer {
     private reactLifecycleOptimizationAnalyzer: ReactLifecycleOptimizationAnalyzer;
 
     constructor() {
+        // 仅初始化核心分析器，其他使用懒加载
         this.reactAnalyzer = new ReactAnalyzer();
         this.rustAnalyzer = new RustAnalyzer();
-        this.advancedReactAnalyzer = new AdvancedReactAnalyzer();
-        this.advancedRustAnalyzer = new AdvancedRustAnalyzer();
-        this.advancedRustEcosystemAnalyzer = new AdvancedRustEcosystemAnalyzer();
-        this.advancedReactPerformanceAnalyzer = new AdvancedReactPerformanceAnalyzer();
-        this.advancedRustMicroserviceAnalyzer = new AdvancedRustMicroserviceAnalyzer();
-        this.advancedReactArchitectureAnalyzer = new AdvancedReactArchitectureAnalyzer();
-        this.advancedRustArchitectureAnalyzer = new AdvancedRustArchitectureAnalyzer();
-        // 初始化新的分析器
-        this.advancedReactStateAnalyzer = new AdvancedReactStateAnalyzer();
-        this.advancedRustSystemAnalyzer = new AdvancedRustSystemAnalyzer();
-        this.reactRuntimeAnalyzer = new ReactRuntimeAnalyzer();
-        this.reactHookAnalyzer = new ReactHookAnalyzer();
-        this.rustAsyncNetworkAnalyzer = new RustAsyncNetworkAnalyzer();
-        this.reactStateManagementAnalyzer = new ReactStateManagementAnalyzer();
-        this.rustPerformanceAnalyzer = new RustPerformanceAnalyzer();
-        this.reactAdvancedAnalyzer = new ReactAdvancedAnalyzer();
-        this.rustBackendArchitectureAnalyzer = new RustBackendArchitectureAnalyzer();
-        this.reactAdvancedComponentAnalyzer = new ReactAdvancedComponentAnalyzer();
-        this.rustAdvancedSystemAnalyzerNew = new RustAdvancedSystemAnalyzer();
-        // 初始化深度优化分析器
-        this.reactDeepOptimizationAnalyzer = new ReactDeepOptimizationAnalyzer();
-        this.rustDeepOptimizationAnalyzer = new RustDeepOptimizationAnalyzer();
-        // 初始化专项优化分析器
+        
+        // 高级分析器懒加载 - 提升启动性能
+        this.advancedReactAnalyzer = null as any;
+        this.advancedRustAnalyzer = null as any;
+        this.advancedRustEcosystemAnalyzer = null as any;
+        this.advancedReactPerformanceAnalyzer = null as any;
+        this.advancedRustMicroserviceAnalyzer = null as any;
+        this.advancedReactArchitectureAnalyzer = null as any;
+        this.advancedRustArchitectureAnalyzer = null as any;
+        
+        // 新的分析器懒加载
+        this.advancedReactStateAnalyzer = null as any;
+        this.advancedRustSystemAnalyzer = null as any;
+        this.reactRuntimeAnalyzer = null as any;
+        this.reactHookAnalyzer = null as any;
+        this.rustAsyncNetworkAnalyzer = null as any;
+        this.reactStateManagementAnalyzer = null as any;
+        this.rustPerformanceAnalyzer = null as any;
+        this.reactAdvancedAnalyzer = null as any;
+        this.rustBackendArchitectureAnalyzer = null as any;
+        this.reactAdvancedComponentAnalyzer = null as any;
+        this.rustAdvancedSystemAnalyzerNew = null as any;
+        
+        // 深度优化分析器懒加载
+        this.reactDeepOptimizationAnalyzer = null as any;
+        this.rustDeepOptimizationAnalyzer = null as any;
+        
+        // 专项优化分析器懒加载
         this.reactHookOptimizationAnalyzer = new ReactHookOptimizationAnalyzer();
         this.rustMemorySafetyPerformanceAnalyzer = new RustMemorySafetyPerformanceAnalyzer();
         this.reactStateOptimizationAnalyzer = new ReactStateOptimizationAnalyzer();
@@ -290,6 +296,39 @@ export class CodeAnalyzer {
             ['Vec', '向量'],
             ['HashMap', '哈希映射']
         ]);
+    }
+
+    // 懒加载分析器的辅助方法
+    private async getAdvancedReactAnalyzer() {
+        if (!this.advancedReactAnalyzer) {
+            const { AdvancedReactAnalyzer } = await import('./advancedReactAnalyzer');
+            this.advancedReactAnalyzer = new AdvancedReactAnalyzer();
+        }
+        return this.advancedReactAnalyzer;
+    }
+
+    private async getReactPerformanceAnalyzer() {
+        if (!this.reactAdvancedAnalyzer) {
+            const { ReactAdvancedAnalyzer } = await import('./reactPerformanceAnalyzer');
+            this.reactAdvancedAnalyzer = new ReactAdvancedAnalyzer();
+        }
+        return this.reactAdvancedAnalyzer;
+    }
+
+    private async getRustPerformanceAnalyzer() {
+        if (!this.rustPerformanceAnalyzer) {
+            const { RustPerformanceAnalyzer } = await import('./rustPerformanceAnalyzer');
+            this.rustPerformanceAnalyzer = new RustPerformanceAnalyzer();
+        }
+        return this.rustPerformanceAnalyzer;
+    }
+
+    private async getReactDeepOptimizationAnalyzer() {
+        if (!this.reactDeepOptimizationAnalyzer) {
+            const { ReactDeepOptimizationAnalyzer } = await import('./reactDeepOptimizationAnalyzer');
+            this.reactDeepOptimizationAnalyzer = new ReactDeepOptimizationAnalyzer();
+        }
+        return this.reactDeepOptimizationAnalyzer;
     }
 
     async analyzeFile(document: vscode.TextDocument): Promise<CodeAnalysis> {

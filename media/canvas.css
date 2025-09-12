@@ -1,0 +1,398 @@
+/* 交互式画布CSS样式 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #1e1e1e;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #d4d4d4;
+}
+
+#canvas-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+    background: 
+        radial-gradient(circle at 20px 20px, #333333 1px, transparent 1px),
+        radial-gradient(circle at 40px 40px, #333333 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+}
+
+#canvas-container.dragging {
+    cursor: grabbing;
+}
+
+/* 工具栏样式 */
+.toolbar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(31, 41, 55, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.toolbar button {
+    background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+    border: 1px solid #6b7280;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.toolbar button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.toolbar button:hover::before {
+    left: 100%;
+}
+
+.toolbar button:hover {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-color: #60a5fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(96, 165, 250, 0.3);
+}
+
+.toolbar button.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* 节点样式 */
+.canvas-node {
+    position: absolute;
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border: 2px solid #6b7280;
+    border-radius: 16px;
+    padding: 20px;
+    min-width: 200px;
+    min-height: 120px;
+    cursor: grab;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    user-select: none;
+}
+
+.canvas-node:hover {
+    border-color: #60a5fa;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(96, 165, 250, 0.3);
+}
+
+.canvas-node.selected {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    box-shadow: 
+        0 0 0 4px rgba(59, 130, 246, 0.3),
+        0 20px 40px rgba(59, 130, 246, 0.2);
+}
+
+.canvas-node.dragging {
+    cursor: grabbing;
+    z-index: 1000;
+    transform: rotate(3deg) scale(1.08);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        0 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+/* 节点标题 */
+.node-title {
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 12px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 节点内容 */
+.node-content {
+    color: #d1d5db;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+/* 连接线样式 */
+.connection-line {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.connection-line svg {
+    overflow: visible;
+}
+
+.connection-path {
+    fill: none;
+    stroke-width: 3;
+    stroke-dasharray: 0;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.connection-path.data-flow {
+    stroke: #10b981;
+    stroke-dasharray: 0;
+}
+
+.connection-path.control-flow {
+    stroke: #8b5cf6;
+    stroke-dasharray: 8,4;
+}
+
+.connection-path.dependency {
+    stroke: #f59e0b;
+    stroke-dasharray: 4,4;
+}
+
+.connection-path:hover {
+    stroke-width: 4;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+/* 状态栏样式 */
+.status-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(31, 41, 55, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #d1d5db;
+    font-size: 13px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* 小地图样式 */
+.minimap {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 240px;
+    height: 180px;
+    background: rgba(31, 41, 55, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid #374151;
+    border-radius: 12px;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+#minimap-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+/* 空状态样式 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b7280;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.empty-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+    opacity: 0.6;
+}
+
+.empty-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #9ca3af;
+}
+
+.empty-description {
+    font-size: 16px;
+    max-width: 500px;
+    line-height: 1.6;
+    color: #6b7280;
+}
+
+/* 动画效果 */
+@keyframes nodeAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.canvas-node {
+    animation: nodeAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes connectionDraw {
+    from {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+    }
+    to {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 0;
+    }
+}
+
+.connection-path.animated {
+    animation: connectionDraw 1s ease-out forwards;
+}
+
+/* 加载动画 */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .toolbar {
+        padding: 12px;
+        gap: 8px;
+    }
+    
+    .toolbar button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .minimap {
+        width: 200px;
+        height: 150px;
+    }
+    
+    .canvas-node {
+        min-width: 160px;
+        min-height: 100px;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .toolbar {
+        flex-wrap: wrap;
+        max-width: calc(100vw - 40px);
+    }
+    
+    .minimap {
+        display: none;
+    }
+    
+    .status-bar {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .canvas-node {
+        border-width: 3px;
+    }
+    
+    .connection-path {
+        stroke-width: 4;
+    }
+    
+    .toolbar button {
+        border-width: 2px;
+    }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+    .canvas-node,
+    .toolbar button,
+    .connection-path {
+        transition: none;
+    }
+    
+    .canvas-node {
+        animation: none;
+    }
+    
+    .connection-path.animated {
+        animation: none;
+    }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
