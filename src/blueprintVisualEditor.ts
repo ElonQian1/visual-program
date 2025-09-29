@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 import { KidFriendlyCardData } from './kidFriendlyCards/types';
 import { SeniorStudentCardData } from './seniorStudentCards/types';
+import { CardSystemManager } from './cardSystem/CardSystemManagerNew';
 
 export interface BlueprintNode {
     id: string;
@@ -44,6 +45,7 @@ export class BlueprintVisualEditor {
     private panel: vscode.WebviewPanel | undefined;
     private currentGraph: BlueprintGraph | undefined;
     private readonly viewType = 'blueprintEditor';
+    private cardSystemManager: CardSystemManager | undefined;
     
     constructor(private context: vscode.ExtensionContext) {}
     
@@ -491,10 +493,13 @@ impl ${name} {
             return;
         }
 
-        this.sendMessageToWebview({
-            command: 'showKidFriendlyCard',
-            card
-        });
+        // 初始化卡片系统管理器（如果尚未初始化）
+        if (!this.cardSystemManager) {
+            this.cardSystemManager = new CardSystemManager(this.panel);
+        }
+
+        // 使用新的可移动卡片系统
+        this.cardSystemManager.showKidFriendlyCard(card);
     }
 
     async showSeniorStudentCard(card: SeniorStudentCardData): Promise<void> {
@@ -503,10 +508,13 @@ impl ${name} {
             return;
         }
 
-        this.sendMessageToWebview({
-            command: 'showSeniorStudentCard',
-            card
-        });
+        // 初始化卡片系统管理器（如果尚未初始化）
+        if (!this.cardSystemManager) {
+            this.cardSystemManager = new CardSystemManager(this.panel);
+        }
+
+        // 使用新的可移动卡片系统
+        this.cardSystemManager.showSeniorStudentCard(card);
     }
     
     // 🎨 获取Webview内容
@@ -931,6 +939,291 @@ impl ${name} {
             font-weight: 600;
             line-height: 1.5;
             border-left: 4px solid #2196f3;
+        }
+
+        /* ===== 可移动卡片系统样式 ===== */
+        .movable-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 300px;
+            max-width: 500px;
+            min-height: 200px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            z-index: 100;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            overflow: hidden;
+        }
+
+        .movable-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .movable-card.dragging {
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+            transform: rotate(1deg) scale(1.02);
+            cursor: grabbing;
+        }
+
+        .movable-card.maximized {
+            position: fixed !important;
+            top: 10px !important;
+            left: 10px !important;
+            width: calc(100vw - 20px) !important;
+            height: calc(100vh - 20px) !important;
+            max-width: none !important;
+            z-index: 9999;
+            transform: none !important;
+        }
+
+        .movable-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .movable-card-drag-handle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: grab;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .movable-card-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .card-emoji {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .card-title-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            color: #1f2937;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+            margin: 2px 0 0 0;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movable-card-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .card-control-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .card-control-btn:hover {
+            background: rgba(0, 0, 0, 0.2);
+            color: #374151;
+            transform: scale(1.1);
+        }
+
+        .card-control-btn.close-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .movable-card-content {
+            padding: 16px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .card-summary {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #374151;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .card-tag {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .card-tabs-container {
+            margin-top: 12px;
+        }
+
+        .card-tab-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .card-tab-button {
+            flex: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 8px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #6b7280;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .card-tab-button:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #374151;
+        }
+
+        .card-tab-button.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border-bottom: 2px solid #6366f1;
+            font-weight: 600;
+        }
+
+        .card-tab-content {
+            display: none;
+        }
+
+        .card-tab-content.active {
+            display: block;
+        }
+
+        .tab-description {
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .tab-points-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tab-points-list li {
+            position: relative;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .tab-points-list li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #6366f1;
+            font-size: 10px;
+            top: 2px;
+        }
+
+        .card-cta {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            color: #047857;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            border-left: 4px solid #10b981;
+        }
+
+        /* 不同类型卡片的特殊样式 */
+        .kid-friendly-card {
+            border: 2px solid #fbbf24;
+            background: linear-gradient(135deg, rgba(252, 211, 77, 0.1), rgba(251, 191, 36, 0.05));
+        }
+
+        .kid-friendly-card .movable-card-header {
+            background: linear-gradient(135deg, rgba(252, 211, 77, 0.2), rgba(251, 191, 36, 0.1));
+        }
+
+        .kid-friendly-card .card-tag {
+            background: rgba(252, 211, 77, 0.2);
+            color: #d97706;
+            border-color: rgba(252, 211, 77, 0.4);
+        }
+
+        .kid-friendly-card .tab-points-list li::before {
+            content: '✨';
+            color: #f59e0b;
+        }
+
+        .senior-student-card {
+            border: 2px solid #3b82f6;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(37, 99, 235, 0.03));
+        }
+
+        .senior-student-card .movable-card-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+        }
+
+        .senior-student-card .card-tag {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .senior-student-card .card-cta {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));
+            color: #1d4ed8;
+            border-left-color: #3b82f6;
         }
     </style>
 </head>
@@ -1461,6 +1754,19 @@ impl ${name} {
                 case 'showSeniorStudentCard':
                     renderSeniorStudentCard(message.card);
                     break;
+                case 'showMovableCard':
+                    showMovableCard(message.cardConfig);
+                    break;
+                case 'closeCard':
+                    if (window.cardManager) {
+                        window.cardManager.closeCard(message.cardId);
+                    }
+                    break;
+                case 'clearAllCards':
+                    if (window.cardManager) {
+                        window.cardManager.clearAllCards();
+                    }
+                    break;
             }
         });
         
@@ -1473,6 +1779,307 @@ impl ${name} {
                 renderNode(node);
             });
         }
+        
+        // ===== 可移动卡片系统 =====
+        
+        // 卡片拖拽引擎
+        class CardDragEngine {
+            constructor() {
+                this.currentCard = null;
+                this.isDragging = false;
+                this.startPos = { x: 0, y: 0 };
+                this.elementStartPos = { x: 0, y: 0 };
+                this.zIndexCounter = 1000;
+            }
+
+            startDrag(cardElement, startX, startY) {
+                this.currentCard = cardElement;
+                this.isDragging = true;
+                this.startPos = { x: startX, y: startY };
+                
+                const rect = cardElement.getBoundingClientRect();
+                const container = cardElement.offsetParent || document.body;
+                const containerRect = container.getBoundingClientRect();
+                
+                this.elementStartPos = {
+                    x: rect.left - containerRect.left,
+                    y: rect.top - containerRect.top
+                };
+
+                this.bringToTop(cardElement);
+                cardElement.classList.add('dragging');
+                document.body.style.userSelect = 'none';
+
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+            }
+
+            handleMouseMove(e) {
+                if (!this.isDragging || !this.currentCard) return;
+
+                e.preventDefault();
+                
+                const deltaX = e.clientX - this.startPos.x;
+                const deltaY = e.clientY - this.startPos.y;
+                
+                let newX = this.elementStartPos.x + deltaX;
+                let newY = this.elementStartPos.y + deltaY;
+
+                // 简单边界约束
+                newX = Math.max(0, Math.min(newX, window.innerWidth - this.currentCard.offsetWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - this.currentCard.offsetHeight));
+
+                this.currentCard.style.left = newX + 'px';
+                this.currentCard.style.top = newY + 'px';
+            }
+
+            handleMouseUp(e) {
+                if (!this.isDragging) return;
+
+                document.removeEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.removeEventListener('mouseup', this.handleMouseUp.bind(this));
+
+                if (this.currentCard) {
+                    this.currentCard.classList.remove('dragging');
+                }
+
+                document.body.style.userSelect = '';
+                this.currentCard = null;
+                this.isDragging = false;
+            }
+
+            bringToTop(cardElement) {
+                this.zIndexCounter += 1;
+                cardElement.style.zIndex = this.zIndexCounter;
+            }
+
+            static makeDraggable(cardElement) {
+                const engine = window.cardDragEngine || (window.cardDragEngine = new CardDragEngine());
+                const handle = cardElement.querySelector('.movable-card-drag-handle');
+                
+                if (handle) {
+                    handle.style.cursor = 'grab';
+                    handle.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                        engine.startDrag(cardElement, e.clientX, e.clientY);
+                    });
+                }
+
+                return engine;
+            }
+        }
+
+        // 卡片管理器
+        class CardManager {
+            constructor() {
+                this.cards = new Map();
+                this.zIndexCounter = 1000;
+            }
+            
+            addCard(cardConfig) {
+                const cardHTML = this.generateCardHTML(cardConfig);
+                const container = document.getElementById('canvas') || document.body;
+                
+                const temp = document.createElement('div');
+                temp.innerHTML = cardHTML;
+                const cardElement = temp.firstElementChild;
+                
+                container.appendChild(cardElement);
+                CardDragEngine.makeDraggable(cardElement);
+                
+                this.cards.set(cardConfig.id, {
+                    config: cardConfig,
+                    element: cardElement,
+                    state: {
+                        isMinimized: false,
+                        isMaximized: false,
+                        zIndex: this.zIndexCounter++
+                    }
+                });
+                
+                return cardElement;
+            }
+            
+            generateCardHTML(config) {
+                const { id, type, data, position, size } = config;
+                
+                return \`
+                    <div id="\${id}" 
+                         class="movable-card \${type}-card" 
+                         style="left: \${position.x}px; top: \${position.y}px; width: \${size.width}px; height: \${size.height}px;">
+                        
+                        <div class="movable-card-header">
+                            <div class="movable-card-drag-handle">
+                                <div class="card-emoji">\${data.emoji || '📄'}</div>
+                                <div class="card-title-wrapper">
+                                    <div class="card-title">\${data.chineseName || '卡片标题'}</div>
+                                    <div class="card-subtitle">\${data.englishName || ''}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="movable-card-controls">
+                                <button class="card-control-btn minimize-btn" title="最小化" onclick="cardManager.minimizeCard('\${id}')">−</button>
+                                <button class="card-control-btn maximize-btn" title="最大化" onclick="cardManager.toggleMaximize('\${id}')">⬜</button>
+                                <button class="card-control-btn close-btn" title="关闭" onclick="cardManager.closeCard('\${id}')">×</button>
+                            </div>
+                        </div>
+                        
+                        <div class="movable-card-content">
+                            \${this.generateCardContent(data)}
+                        </div>
+                    </div>
+                \`;
+            }
+            
+            generateCardContent(data) {
+                let content = '';
+                
+                if (data.summary) {
+                    content += \`<div class="card-summary">\${data.summary}</div>\`;
+                }
+                
+                if (data.tags && data.tags.length > 0) {
+                    content += \`
+                        <div class="card-tags">
+                            \${data.tags.map(tag => \`<span class="card-tag">\${tag}</span>\`).join('')}
+                        </div>
+                    \`;
+                }
+                
+                if (data.tabs && data.tabs.length > 0) {
+                    content += \`
+                        <div class="card-tabs-container">
+                            <div class="card-tab-buttons">
+                                \${data.tabs.map((tab, index) => \`
+                                    <button class="card-tab-button \${index === 0 ? 'active' : ''}" 
+                                            onclick="cardManager.switchTab('\${data.id}', '\${tab.id}')">
+                                        \${tab.title}
+                                    </button>
+                                \`).join('')}
+                            </div>
+                            
+                            <div class="card-tab-contents">
+                                \${data.tabs.map((tab, index) => \`
+                                    <div class="card-tab-content \${index === 0 ? 'active' : ''}" data-tab-id="\${tab.id}">
+                                        \${tab.description ? \`<div class="tab-description">\${tab.description}</div>\` : ''}
+                                        \${tab.points && tab.points.length > 0 ? \`
+                                            <ul class="tab-points-list">
+                                                \${tab.points.map(point => \`<li>\${point}</li>\`).join('')}
+                                            </ul>
+                                        \` : ''}
+                                    </div>
+                                \`).join('')}
+                            </div>
+                        </div>
+                    \`;
+                }
+                
+                if (data.callToAction) {
+                    content += \`<div class="card-cta">\${data.callToAction}</div>\`;
+                }
+                
+                return content;
+            }
+            
+            minimizeCard(cardId) {
+                const card = this.cards.get(cardId);
+                if (!card) return;
+                
+                const content = card.element.querySelector('.movable-card-content');
+                const minimizeBtn = card.element.querySelector('.minimize-btn');
+                
+                if (card.state.isMinimized) {
+                    content.style.display = 'block';
+                    minimizeBtn.innerHTML = '−';
+                    minimizeBtn.title = '最小化';
+                    card.state.isMinimized = false;
+                } else {
+                    content.style.display = 'none';
+                    minimizeBtn.innerHTML = '+';
+                    minimizeBtn.title = '恢复';
+                    card.state.isMinimized = true;
+                }
+            }
+            
+            toggleMaximize(cardId) {
+                const card = this.cards.get(cardId);
+                if (!card) return;
+                
+                const maximizeBtn = card.element.querySelector('.maximize-btn');
+                
+                if (card.state.isMaximized) {
+                    card.element.classList.remove('maximized');
+                    maximizeBtn.innerHTML = '⬜';
+                    maximizeBtn.title = '最大化';
+                    card.state.isMaximized = false;
+                } else {
+                    card.element.classList.add('maximized');
+                    maximizeBtn.innerHTML = '⧉';
+                    maximizeBtn.title = '还原';
+                    card.state.isMaximized = true;
+                }
+            }
+            
+            closeCard(cardId) {
+                const card = this.cards.get(cardId);
+                if (!card) return;
+                
+                card.element.style.transition = 'all 0.3s ease';
+                card.element.style.opacity = '0';
+                card.element.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    if (card.element.parentNode) {
+                        card.element.parentNode.removeChild(card.element);
+                    }
+                    this.cards.delete(cardId);
+                }, 300);
+            }
+            
+            switchTab(cardId, tabId) {
+                const card = this.cards.get(cardId);
+                if (!card) return;
+                
+                const buttons = card.element.querySelectorAll('.card-tab-button');
+                const contents = card.element.querySelectorAll('.card-tab-content');
+                
+                buttons.forEach(btn => btn.classList.remove('active'));
+                contents.forEach(content => content.classList.remove('active'));
+                
+                const activeContent = card.element.querySelector(\`[data-tab-id="\${tabId}"]\`);
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                    const buttonIndex = Array.from(contents).indexOf(activeContent);
+                    if (buttons[buttonIndex]) {
+                        buttons[buttonIndex].classList.add('active');
+                    }
+                }
+            }
+            
+            clearAllCards() {
+                this.cards.forEach(card => {
+                    if (card.element.parentNode) {
+                        card.element.parentNode.removeChild(card.element);
+                    }
+                });
+                this.cards.clear();
+            }
+        }
+        
+        // 初始化卡片管理器
+        window.cardManager = new CardManager();
+        
+        // 可移动卡片显示函数
+        function showMovableCard(cardConfig) {
+            if (window.cardManager) {
+                window.cardManager.addCard(cardConfig);
+            }
+        }
+        
+        // 添加到全局
+        window.CardDragEngine = CardDragEngine;
+        window.CardManager = CardManager;
+        window.showMovableCard = showMovableCard;
         
         // 初始化
         updateStatus();
