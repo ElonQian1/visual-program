@@ -40,7 +40,7 @@ export class EnhancedCodeGenerationEngine {
         description: string, 
         options: ReactCodeGenerationOptions
     ): Promise<EnhancedCodeGenerationResult> {
-        const code = this.generateReactComponent(description, options);
+        const code = this.generateReactComponentFromDescription(description, options);
         
         return {
             generatedCode: code,
@@ -60,7 +60,7 @@ export class EnhancedCodeGenerationEngine {
         description: string,
         options: RustCodeGenerationOptions
     ): Promise<EnhancedCodeGenerationResult> {
-        const code = this.generateRustModule(description, options);
+        const code = this.generateRustModuleFromDescription(description, options);
         
         return {
             generatedCode: code,
@@ -75,9 +75,9 @@ export class EnhancedCodeGenerationEngine {
         };
     }
 
-    private generateReactComponent(description: string, options: ReactCodeGenerationOptions): string {
+    // 🔧 公共方法：生成React组件
+    public generateReactComponent(componentName: string, options: ReactCodeGenerationOptions): string {
         const { componentType, stateManagement, styling, hooks, typescript, optimizeForPerformance } = options;
-        const componentName = this.extractComponentName(description);
         
         let code = '';
         
@@ -97,447 +97,420 @@ export class EnhancedCodeGenerationEngine {
         // 类型定义 (TypeScript)
         if (typescript) {
             code += `interface ${componentName}Props {\n`;
-            code += `  // TODO: 定义props类型\n`;
+            code += `  children?: React.ReactNode;\n`;
+            code += `  className?: string;\n`;
             code += `}\n\n`;
         }
         
-        // 组件定义
+        // 组件代码
         if (componentType === 'functional') {
-            const propsType = typescript ? `: React.FC<${componentName}Props>` : '';
-            code += `const ${componentName}${propsType} = (${typescript ? 'props' : '{ /* props */ }'}) => {\n`;
-            
-            // 状态管理
-            if (stateManagement === 'useState') {
-                code += `  const [state, setState] = useState(${typescript ? '<StateType>' : ''}(initialState));\n`;
-            } else if (stateManagement === 'useReducer') {
-                code += `  const [state, dispatch] = useReducer(reducer, initialState);\n`;
-            }
-            
-            // 性能优化
-            if (optimizeForPerformance) {
-                code += `\n  // 性能优化：记忆化计算\n`;
-                code += `  const memoizedValue = useMemo(() => {\n`;
-                code += `    // 昂贵的计算逻辑\n`;
-                code += `    return computeExpensiveValue();\n`;
-                code += `  }, [/* 依赖数组 */]);\n`;
-                
-                code += `\n  // 性能优化：记忆化回调\n`;
-                code += `  const handleClick = useCallback(() => {\n`;
-                code += `    // 事件处理逻辑\n`;
-                code += `  }, [/* 依赖数组 */]);\n`;
-            }
-            
-            // 副作用
-            if (hooks.includes('useEffect')) {
-                code += `\n  useEffect(() => {\n`;
-                code += `    // 副作用逻辑\n`;
-                code += `    return () => {\n`;
-                code += `      // 清理逻辑\n`;
-                code += `    };\n`;
-                code += `  }, [/* 依赖数组 */]);\n`;
-            }
-            
-            // 渲染
-            code += `\n  return (\n`;
-            if (styling === 'styled-components') {
-                code += `    <StyledContainer>\n`;
-                code += `      <h1>TODO: 实现${description}</h1>\n`;
-                code += `      {/* 组件内容 */}\n`;
-                code += `    </StyledContainer>\n`;
+            if (typescript) {
+                code += `const ${componentName}: React.FC<${componentName}Props> = ({ children, className }) => {\n`;
             } else {
-                code += `    <div className="${componentName.toLowerCase()}">\n`;
-                code += `      <h1>TODO: 实现${description}</h1>\n`;
-                code += `      {/* 组件内容 */}\n`;
-                code += `    </div>\n`;
+                code += `const ${componentName} = ({ children, className }) => {\n`;
             }
+            
+            if (stateManagement === 'useState' && hooks.includes('useState')) {
+                code += `  const [state, setState] = useState(null);\n\n`;
+            }
+            
+            code += `  return (\n`;
+            code += `    <div className={className}>\n`;
+            code += `      {/* ${componentName} content */}\n`;
+            code += `      {children}\n`;
+            code += `    </div>\n`;
             code += `  );\n`;
-            code += `};\n`;
-            
-            // 性能优化：React.memo
-            if (optimizeForPerformance) {
-                code += `\n// 性能优化：防止不必要的重渲染\n`;
-                code += `export default React.memo(${componentName});\n`;
-            } else {
-                code += `\nexport default ${componentName};\n`;
-            }
+            code += `};\n\n`;
         }
         
-        // 样式组件 (styled-components)
-        if (styling === 'styled-components') {
-            code += `\nconst StyledContainer = styled.div\`\n`;
-            code += `  /* 样式定义 */\n`;
-            code += `  display: flex;\n`;
-            code += `  flex-direction: column;\n`;
-            code += `  padding: 1rem;\n`;
-            code += `\`;\n`;
+        if (optimizeForPerformance) {
+            code += `export default React.memo(${componentName});\n`;
+        } else {
+            code += `export default ${componentName};\n`;
         }
         
         return code;
     }
 
-    private generateRustModule(description: string, options: RustCodeGenerationOptions): string {
-        const { moduleType, asyncPattern, errorHandling, memoryOptimization, concurrency, safetyLevel } = options;
+    // 🔧 公共方法：生成React组件测试
+    public generateComponentTest(componentName: string, props: any[]): string {
+        return `import React from 'react';
+import { render, screen } from '@testing-library/react';
+import ${componentName} from './${componentName}';
+
+describe('${componentName}', () => {
+  test('renders without crashing', () => {
+    render(<${componentName} />);
+  });
+
+  test('displays children correctly', () => {
+    const testText = 'Test Content';
+    render(<${componentName}>{testText}</${componentName}>);
+    expect(screen.getByText(testText)).toBeInTheDocument();
+  });
+
+  ${props.map(prop => `
+  test('handles ${prop.name} prop', () => {
+    const ${prop.name} = 'test-${prop.name}';
+    render(<${componentName} ${prop.name}={${prop.name}} />);
+    // Add specific assertions for ${prop.name}
+  });`).join('')}
+});
+`;
+    }
+
+    // 🔧 公共方法：生成Rust结构体
+    public generateRustStruct(structName: string, options: RustCodeGenerationOptions): string {
+        const { asyncPattern, errorHandling, memoryOptimization, concurrency, safetyLevel } = options;
         
         let code = '';
         
         // 导入语句
         if (asyncPattern) {
-            code += `use std::future::Future;\n`;
             code += `use tokio;\n`;
         }
-        
-        if (concurrency !== 'none') {
-            if (concurrency === 'threads') {
-                code += `use std::thread;\nuse std::sync::{Arc, Mutex};\n`;
-            } else if (concurrency === 'channels') {
-                code += `use std::sync::mpsc;\nuse tokio::sync::mpsc as async_mpsc;\n`;
-            }
-        }
-        
         if (errorHandling === 'result') {
-            code += `use std::error::Error;\nuse std::result::Result;\n`;
+            code += `use std::result::Result;\n`;
+        }
+        if (concurrency === 'channels') {
+            code += `use std::sync::mpsc;\n`;
         }
         
         code += '\n';
         
-        // 错误类型定义
-        if (errorHandling === 'result') {
-            code += `#[derive(Debug)]\npub enum ModuleError {\n`;
-            code += `    InvalidInput(String),\n`;
-            code += `    ProcessingFailed(String),\n`;
-            code += `    IoError(std::io::Error),\n`;
-            code += `}\n\n`;
-            
-            code += `impl std::fmt::Display for ModuleError {\n`;
-            code += `    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n`;
-            code += `        match self {\n`;
-            code += `            ModuleError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),\n`;
-            code += `            ModuleError::ProcessingFailed(msg) => write!(f, "Processing failed: {}", msg),\n`;
-            code += `            ModuleError::IoError(err) => write!(f, "IO error: {}", err),\n`;
-            code += `        }\n`;
-            code += `    }\n`;
-            code += `}\n\n`;
-            
-            code += `impl Error for ModuleError {}\n\n`;
-        }
-        
-        // 主要代码结构
-        switch (moduleType) {
-            case 'struct':
-                code += this.generateRustStruct(description, options);
-                break;
-            case 'trait':
-                code += this.generateRustTrait(description, options);
-                break;
-            case 'function':
-                code += this.generateRustFunction(description, options);
-                break;
-            case 'enum':
-                code += this.generateRustEnum(description, options);
-                break;
-        }
-        
-        // 测试模块
-        code += `\n#[cfg(test)]\nmod tests {\n`;
-        code += `    use super::*;\n\n`;
-        code += `    #[test]\n`;
-        code += `    fn test_basic_functionality() {\n`;
-        code += `        // TODO: 实现测试用例\n`;
-        code += `        assert!(true);\n`;
-        code += `    }\n`;
-        
-        if (asyncPattern) {
-            code += `\n    #[tokio::test]\n`;
-            code += `    async fn test_async_functionality() {\n`;
-            code += `        // TODO: 实现异步测试用例\n`;
-            code += `        assert!(true);\n`;
-            code += `    }\n`;
-        }
-        
-        code += `}\n`;
-        
-        return code;
-    }
-
-    private generateRustStruct(description: string, options: RustCodeGenerationOptions): string {
-        const structName = this.extractStructName(description);
-        let code = '';
-        
         // 结构体定义
-        code += `/// ${description}\n`;
         code += `#[derive(Debug, Clone)]\n`;
-        code += `pub struct ${structName} {\n`;
-        code += `    // TODO: 定义字段\n`;
-        code += `    id: u64,\n`;
-        code += `    name: String,\n`;
-        
-        if (options.memoryOptimization) {
-            code += `    // 内存优化：使用Box减少栈大小\n`;
-            code += `    data: Box<Vec<u8>>,\n`;
-        } else {
-            code += `    data: Vec<u8>,\n`;
+        if (memoryOptimization) {
+            code += `#[repr(C)]\n`;
         }
-        
+        code += `pub struct ${structName} {\n`;
+        code += `    // TODO: 添加字段\n`;
+        code += `    pub id: u64,\n`;
+        code += `    pub name: String,\n`;
         code += `}\n\n`;
         
         // 实现块
         code += `impl ${structName} {\n`;
-        
-        // 构造函数
-        code += `    /// 创建新实例\n`;
         code += `    pub fn new(id: u64, name: String) -> Self {\n`;
-        code += `        Self {\n`;
-        code += `            id,\n`;
-        code += `            name,\n`;
-        if (options.memoryOptimization) {
-            code += `            data: Box::new(Vec::new()),\n`;
-        } else {
-            code += `            data: Vec::new(),\n`;
-        }
-        code += `        }\n`;
-        code += `    }\n`;
+        code += `        Self { id, name }\n`;
+        code += `    }\n\n`;
         
-        // 异步方法
-        if (options.asyncPattern) {
-            const returnType = options.errorHandling === 'result' ? 'Result<(), ModuleError>' : '()';
-            code += `\n    /// 异步处理方法\n`;
-            code += `    pub async fn process_async(&mut self) -> ${returnType} {\n`;
-            code += `        // TODO: 实现异步逻辑\n`;
-            if (options.errorHandling === 'result') {
-                code += `        Ok(())\n`;
-            }
-            code += `    }\n`;
-        }
-        
-        // 同步方法
-        const returnType = options.errorHandling === 'result' ? 'Result<(), ModuleError>' : '()';
-        code += `\n    /// 处理方法\n`;
-        code += `    pub fn process(&mut self) -> ${returnType} {\n`;
-        code += `        // TODO: 实现处理逻辑\n`;
-        if (options.errorHandling === 'result') {
+        if (asyncPattern) {
+            code += `    pub async fn process(&self) -> Result<(), Box<dyn std::error::Error>> {\n`;
+            code += `        // TODO: 实现异步处理逻辑\n`;
             code += `        Ok(())\n`;
+            code += `    }\n\n`;
         }
-        code += `    }\n`;
         
         code += `}\n`;
         
         return code;
     }
 
-    private generateRustTrait(description: string, options: RustCodeGenerationOptions): string {
-        const traitName = this.extractTraitName(description);
-        let code = '';
-        
-        code += `/// ${description}\n`;
-        code += `pub trait ${traitName} {\n`;
-        
-        if (options.asyncPattern) {
-            const returnType = options.errorHandling === 'result' ? 'Result<(), ModuleError>' : '()';
-            code += `    /// 异步处理方法\n`;
-            code += `    async fn process_async(&mut self) -> ${returnType};\n`;
+    // 🔧 公共方法：生成Rust Web服务
+    public generateRustWebService(serviceName: string, endpoints: string[]): string {
+        return `use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    response::Json,
+    routing::{get, post},
+    Router,
+};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tokio;
+
+#[derive(Serialize, Deserialize)]
+pub struct ${serviceName}Response {
+    pub message: String,
+    pub status: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ${serviceName}Request {
+    pub data: String,
+}
+
+pub struct ${serviceName}State {
+    pub config: HashMap<String, String>,
+}
+
+impl ${serviceName}State {
+    pub fn new() -> Self {
+        Self {
+            config: HashMap::new(),
         }
-        
-        const returnType = options.errorHandling === 'result' ? 'Result<(), ModuleError>' : '()';
-        code += `    /// 同步处理方法\n`;
-        code += `    fn process(&mut self) -> ${returnType};\n`;
-        
-        code += `}\n`;
-        
-        return code;
+    }
+}
+
+${endpoints.map(endpoint => `
+async fn ${endpoint}_handler(
+    State(state): State<${serviceName}State>,
+) -> Result<Json<${serviceName}Response>, StatusCode> {
+    // TODO: 实现${endpoint}逻辑
+    Ok(Json(${serviceName}Response {
+        message: "${endpoint} executed successfully".to_string(),
+        status: "ok".to_string(),
+    }))
+}`).join('\n')}
+
+pub fn create_${serviceName.toLowerCase()}_router() -> Router {
+    let state = ${serviceName}State::new();
+    
+    Router::new()
+        ${endpoints.map(endpoint => `.route("/${endpoint}", get(${endpoint}_handler))`).join('\n        ')}
+        .with_state(state)
+}
+
+#[tokio::main]
+async fn main() {
+    let app = create_${serviceName.toLowerCase()}_router();
+    
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    println!("${serviceName} running on http://0.0.0.0:3000");
+    
+    axum::serve(listener, app).await.unwrap();
+}
+`;
     }
 
-    private generateRustFunction(description: string, options: RustCodeGenerationOptions): string {
-        const functionName = this.extractFunctionName(description);
-        let code = '';
+    // 🔧 公共方法：生成Cargo.toml
+    public generateCargoToml(projectName: string, dependencies: string[]): string {
+        return `[package]
+name = "${projectName.toLowerCase()}"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+${dependencies.map(dep => {
+    const versions: Record<string, string> = {
+        'axum': '0.7',
+        'tokio': '{ version = "1.0", features = ["full"] }',
+        'serde': '{ version = "1.0", features = ["derive"] }',
+        'serde_json': '1.0',
+        'uuid': '{ version = "1.0", features = ["v4"] }',
+        'chrono': '{ version = "0.4", features = ["serde"] }',
+        'sqlx': '{ version = "0.7", features = ["runtime-tokio-rustls", "postgres"] }',
+        'anyhow': '1.0',
+        'thiserror': '1.0'
+    };
+    return `${dep} = ${versions[dep] || '"*"'}`;
+}).join('\n')}
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[[bin]]
+name = "${projectName.toLowerCase()}"
+path = "src/main.rs"
+`;
+    }
+
+    // 🔧 公共方法：生成完整项目
+    public async generateFullProject(config: {
+        projectName: string;
+        projectType: 'react' | 'rust' | 'fullstack';
+        features: string[];
+    }): Promise<Array<{ filename: string; content: string }>> {
+        const files: Array<{ filename: string; content: string }> = [];
         
-        const returnType = options.errorHandling === 'result' ? 'Result<String, ModuleError>' : 'String';
+        if (config.projectType === 'react' || config.projectType === 'fullstack') {
+            // React项目文件
+            files.push({
+                filename: 'package.json',
+                content: this.generatePackageJson(config.projectName, config.features)
+            });
+            
+            files.push({
+                filename: 'src/App.tsx',
+                content: this.generateReactComponent('App', {
+                    componentType: 'functional',
+                    stateManagement: 'useState',
+                    styling: 'css',
+                    hooks: ['useState'],
+                    typescript: true,
+                    optimizeForPerformance: true
+                })
+            });
+        }
         
-        if (options.asyncPattern) {
-            code += `/// ${description} (异步版本)\n`;
-            code += `pub async fn ${functionName}_async(input: &str) -> ${returnType} {\n`;
-            code += `    // TODO: 实现异步逻辑\n`;
-            if (options.errorHandling === 'result') {
-                code += `    Ok(input.to_string())\n`;
-            } else {
-                code += `    input.to_string()\n`;
+        if (config.projectType === 'rust' || config.projectType === 'fullstack') {
+            // Rust项目文件
+            files.push({
+                filename: 'Cargo.toml',
+                content: this.generateCargoToml(config.projectName, ['axum', 'tokio', 'serde'])
+            });
+            
+            files.push({
+                filename: 'src/main.rs',
+                content: this.generateRustWebService(config.projectName, ['health', 'api'])
+            });
+        }
+        
+        return files;
+    }
+
+    // 🔧 公共方法：保存生成的文件
+    public async saveGeneratedFiles(files: Array<{ filename: string; content: string }>): Promise<void> {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            throw new Error('No workspace folder found');
+        }
+        
+        for (const file of files) {
+            const filePath = vscode.Uri.joinPath(workspaceFolder.uri, file.filename);
+            const fileContent = new TextEncoder().encode(file.content);
+            
+            // 创建目录（如果不存在）
+            const dir = vscode.Uri.joinPath(filePath, '..');
+            try {
+                await vscode.workspace.fs.createDirectory(dir);
+            } catch (error) {
+                // 目录可能已存在
             }
-            code += `}\n\n`;
+            
+            await vscode.workspace.fs.writeFile(filePath, fileContent);
+            vscode.window.showInformationMessage(`Generated: ${file.filename}`);
         }
-        
-        code += `/// ${description}\n`;
-        code += `pub fn ${functionName}(input: &str) -> ${returnType} {\n`;
-        code += `    // TODO: 实现逻辑\n`;
-        if (options.errorHandling === 'result') {
-            code += `    Ok(input.to_string())\n`;
-        } else {
-            code += `    input.to_string()\n`;
-        }
-        code += `}\n`;
-        
-        return code;
     }
 
-    private generateRustEnum(description: string, options: RustCodeGenerationOptions): string {
-        const enumName = this.extractEnumName(description);
-        let code = '';
-        
-        code += `/// ${description}\n`;
-        code += `#[derive(Debug, Clone, PartialEq)]\n`;
-        code += `pub enum ${enumName} {\n`;
-        code += `    // TODO: 定义枚举变体\n`;
-        code += `    Variant1(String),\n`;
-        code += `    Variant2 { id: u64, data: Vec<u8> },\n`;
-        code += `    Variant3,\n`;
-        code += `}\n\n`;
-        
-        // 实现方法
-        code += `impl ${enumName} {\n`;
-        code += `    /// 处理枚举值\n`;
-        const returnType = options.errorHandling === 'result' ? 'Result<String, ModuleError>' : 'String';
-        code += `    pub fn process(&self) -> ${returnType} {\n`;
-        code += `        match self {\n`;
-        code += `            ${enumName}::Variant1(s) => {\n`;
-        if (options.errorHandling === 'result') {
-            code += `                Ok(format!("Variant1: {}", s))\n`;
-        } else {
-            code += `                format!("Variant1: {}", s)\n`;
-        }
-        code += `            },\n`;
-        code += `            ${enumName}::Variant2 { id, data } => {\n`;
-        if (options.errorHandling === 'result') {
-            code += `                Ok(format!("Variant2: id={}, data_len={}", id, data.len()))\n`;
-        } else {
-            code += `                format!("Variant2: id={}, data_len={}", id, data.len())\n`;
-        }
-        code += `            },\n`;
-        code += `            ${enumName}::Variant3 => {\n`;
-        if (options.errorHandling === 'result') {
-            code += `                Ok("Variant3".to_string())\n`;
-        } else {
-            code += `                "Variant3".to_string()\n`;
-        }
-        code += `            },\n`;
-        code += `        }\n`;
-        code += `    }\n`;
-        code += `}\n`;
-        
-        return code;
+    // 私有辅助方法
+    private generateReactComponentFromDescription(description: string, options: ReactCodeGenerationOptions): string {
+        const componentName = this.extractComponentName(description);
+        return this.generateReactComponent(componentName, options);
     }
 
-    // 优化建议
+    private generateRustModuleFromDescription(description: string, options: RustCodeGenerationOptions): string {
+        const moduleName = this.extractModuleName(description);
+        return this.generateRustStruct(moduleName, options);
+    }
+
+    private generatePackageJson(projectName: string, features: string[]): string {
+        const deps: string[] = [
+            '"react": "^18.2.0"',
+            '"react-dom": "^18.2.0"',
+            '"typescript": "^4.9.0"',
+            '"web-vitals": "^2.1.0"'
+        ];
+
+        if (features.includes('router')) {
+            deps.push('"react-router-dom": "^6.0.0"');
+        }
+        if (features.includes('state')) {
+            deps.push('"@reduxjs/toolkit": "^1.9.0"');
+        }
+        if (features.includes('ui')) {
+            deps.push('"@mui/material": "^5.0.0"');
+        }
+
+        return `{
+  "name": "${projectName.toLowerCase()}",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    ${deps.join(',\n    ')}
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react-scripts": "5.0.1"
+  }
+}`;
+    }
+
+    private extractComponentName(description: string): string {
+        // 从描述中提取组件名
+        const match = description.match(/(\w+)\s*组件|(\w+)\s*Component/i);
+        return match ? (match[1] || match[2]) : 'MyComponent';
+    }
+
+    private extractModuleName(description: string): string {
+        // 从描述中提取模块名
+        const match = description.match(/(\w+)\s*模块|(\w+)\s*Module/i);
+        return match ? (match[1] || match[2]) : 'MyModule';
+    }
+
     private getReactOptimizations(options: ReactCodeGenerationOptions): string[] {
-        const optimizations = [];
+        const optimizations: string[] = [];
         
         if (options.optimizeForPerformance) {
-            optimizations.push('使用React.memo防止不必要的重渲染');
-            optimizations.push('使用useMemo缓存昂贵的计算');
-            optimizations.push('使用useCallback缓存事件处理函数');
+            optimizations.push('使用React.memo优化重渲染');
+            optimizations.push('使用useCallback和useMemo优化计算');
         }
         
-        if (options.typescript) {
-            optimizations.push('TypeScript类型检查提供编译时优化');
-        }
-        
-        if (options.stateManagement === 'useReducer') {
-            optimizations.push('useReducer适合复杂状态逻辑管理');
+        if (options.hooks.includes('useState')) {
+            optimizations.push('合理使用useState避免不必要的状态');
         }
         
         return optimizations;
+    }
+
+    private getReactBestPractices(options: ReactCodeGenerationOptions): string[] {
+        const practices: string[] = [];
+        
+        practices.push('使用函数组件和Hooks');
+        practices.push('保持组件单一职责');
+        
+        if (options.typescript) {
+            practices.push('充分利用TypeScript类型系统');
+        }
+        
+        return practices;
     }
 
     private getRustOptimizations(options: RustCodeGenerationOptions): string[] {
-        const optimizations = [];
+        const optimizations: string[] = [];
         
         if (options.memoryOptimization) {
-            optimizations.push('使用Box减少大结构体的栈分配');
-            optimizations.push('考虑使用Cow减少不必要的克隆');
+            optimizations.push('使用#[repr(C)]优化内存布局');
+            optimizations.push('避免不必要的堆分配');
         }
         
         if (options.asyncPattern) {
-            optimizations.push('异步处理避免阻塞线程');
-        }
-        
-        if (options.errorHandling === 'result') {
-            optimizations.push('Result类型提供优雅的错误处理');
-        }
-        
-        if (options.safetyLevel === 'safe') {
-            optimizations.push('纯安全代码避免undefined behavior');
+            optimizations.push('使用async/await实现非阻塞IO');
         }
         
         return optimizations;
     }
 
-    // 最佳实践
-    private getReactBestPractices(options: ReactCodeGenerationOptions): string[] {
-        return [
-            '组件职责单一，功能内聚',
-            '合理使用useEffect依赖数组',
-            '避免在渲染中进行昂贵计算',
-            '使用正确的key属性',
-            '遵循React Hook规则'
-        ];
-    }
-
     private getRustBestPractices(options: RustCodeGenerationOptions): string[] {
-        return [
-            '优先使用owned类型而非引用',
-            '合理使用生命周期注解',
-            '避免不必要的clone操作',
-            '使用适当的错误处理策略',
-            '遵循Rust命名约定'
-        ];
-    }
-
-    // 工具方法
-    private extractComponentName(description: string): string {
-        // 从描述中提取组件名
-        const match = description.match(/(\w+)/);
-        return match ? this.toPascalCase(match[1]) : 'MyComponent';
-    }
-
-    private extractStructName(description: string): string {
-        const match = description.match(/(\w+)/);
-        return match ? this.toPascalCase(match[1]) : 'MyStruct';
-    }
-
-    private extractTraitName(description: string): string {
-        const match = description.match(/(\w+)/);
-        return match ? this.toPascalCase(match[1]) : 'MyTrait';
-    }
-
-    private extractFunctionName(description: string): string {
-        const match = description.match(/(\w+)/);
-        return match ? this.toSnakeCase(match[1]) : 'my_function';
-    }
-
-    private extractEnumName(description: string): string {
-        const match = description.match(/(\w+)/);
-        return match ? this.toPascalCase(match[1]) : 'MyEnum';
-    }
-
-    private toPascalCase(str: string): string {
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-    }
-
-    private toSnakeCase(str: string): string {
-        return str.toLowerCase().replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        const practices: string[] = [];
+        
+        practices.push('遵循Rust所有权规则');
+        practices.push('使用Result类型进行错误处理');
+        
+        if (options.safetyLevel === 'safe') {
+            practices.push('避免使用unsafe代码');
+        }
+        
+        return practices;
     }
 
     private estimateReactRenderTime(code: string): number {
-        // 基于代码复杂度估算渲染时间（毫秒）
+        // 简单的渲染时间估算
         const complexity = code.split('\n').length;
-        return Math.max(1, complexity * 0.1);
+        return complexity * 0.1; // 每行0.1ms
     }
 
     private estimateRustMemoryUsage(code: string): number {
-        // 基于代码复杂度估算内存使用（字节）
-        const complexity = code.split('\n').length;
-        return complexity * 64; // 假设每行64字节
+        // 简单的内存使用估算
+        const structCount = (code.match(/struct/g) || []).length;
+        const enumCount = (code.match(/enum/g) || []).length;
+        return (structCount * 64) + (enumCount * 32); // 字节
     }
 
     private assessComplexity(code: string): 'low' | 'medium' | 'high' {
         const lines = code.split('\n').length;
+        
         if (lines < 50) return 'low';
         if (lines < 200) return 'medium';
         return 'high';

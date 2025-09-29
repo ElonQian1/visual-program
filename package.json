@@ -159,6 +159,46 @@
         "command": "visualProgramming.createNodesFromAnalysis",
         "title": "🎨 从代码创建节点",
         "category": "代码可视化"
+      },
+      {
+        "command": "visualProgramming.analyzeReactProject",
+        "title": "⚛️ 深度分析React项目",
+        "category": "React前端"
+      },
+      {
+        "command": "visualProgramming.optimizeReactPerformance",
+        "title": "⚡ 优化React性能",
+        "category": "React前端"
+      },
+      {
+        "command": "visualProgramming.generateReactComponents",
+        "title": "🚀 生成React组件",
+        "category": "React前端"
+      },
+      {
+        "command": "visualProgramming.visualizeReactArchitecture",
+        "title": "🏗️ 可视化React架构",
+        "category": "React前端"
+      },
+      {
+        "command": "visualProgramming.analyzeRustProject",
+        "title": "🦀 深度分析Rust项目", 
+        "category": "Rust后端"
+      },
+      {
+        "command": "visualProgramming.optimizeRustPerformance",
+        "title": "⚡ 优化Rust性能",
+        "category": "Rust后端"
+      },
+      {
+        "command": "visualProgramming.generateRustCode",
+        "title": "🚀 生成Rust代码",
+        "category": "Rust后端"
+      },
+      {
+        "command": "visualProgramming.visualizeRustArchitecture",
+        "title": "🏗️ 可视化Rust架构",
+        "category": "Rust后端"
       }
     ],
     "viewsContainers": {

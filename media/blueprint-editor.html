@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码蓝图编辑器</title>
+    <link rel="stylesheet" href="{{cssUri}}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+            overflow: hidden;
+        }
+
+        .editor-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* 左侧工具面板 */
+        .tool-panel {
+            width: 300px;
+            background: var(--vscode-sideBar-background);
+            border-right: 1px solid var(--vscode-sideBar-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--vscode-sideBar-border);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* 节点面板 */
+        .node-palette {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .palette-section {
+            margin-bottom: 16px;
+        }
+
+        .palette-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--vscode-textPreformat-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .node-template {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin: 4px 0;
+            background: var(--vscode-button-secondaryBackground);
+            border: 1px solid var(--vscode-button-secondaryBorder);
+            border-radius: 4px;
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+
+        .node-template:hover {
+            background: var(--vscode-button-secondaryHoverBackground);
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .node-template:active {
+            cursor: grabbing;
+        }
+
+        .node-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            background: var(--vscode-symbolIcon-variableForeground);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .node-info {
+            flex: 1;
+        }
+
+        .node-name {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .node-desc {
+            font-size: 11px;
+            color: var(--vscode-descriptionForeground);
+        }
+
+        /* 属性面板 */
+        .properties-panel {
+            border-top: 1px solid var(--vscode-sideBar-border);
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .properties-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .property-group {
+            margin-bottom: 16px;
+        }
+
+        .property-label {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--vscode-textPreformat-foreground);
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 6px 8px;
+            background: var(--vscode-input-background);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 3px;
+            color: var(--vscode-input-foreground);
+            font-size: 13px;
+        }
+
+        /* 主编辑区域 */
+        .main-editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            height: 48px;
+            background: var(--vscode-editorGroupHeader-tabsBackground);
+            border-bottom: 1px solid var(--vscode-editorGroupHeader-tabsBorder);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+        }
+
+        .toolbar-button {
+            padding: 6px 12px;
+            background: var(--vscode-button-secondaryBackground);
+            border: 1px solid var(--vscode-button-secondaryBorder);
+            border-radius: 3px;
+            color: var(--vscode-button-secondaryForeground);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-button:hover {
+            background: var(--vscode-button-secondaryHoverBackground);
+        }
+
+        .toolbar-button.active {
+            background: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border-color: var(--vscode-focusBorder);
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: var(--vscode-sideBar-border);
+            margin: 0 8px;
+        }
+
+        /* 画布区域 */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #blueprint-canvas {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: 
+                radial-gradient(circle, var(--vscode-textPreformat-foreground) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: -10px -10px;
+            opacity: 0.1;
+        }
+
+        .canvas-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #nodes-layer {
+            pointer-events: auto;
+        }
+
+        /* 节点样式 */
+        .blueprint-node {
+            position: absolute;
+            background: var(--vscode-editor-background);
+            border: 2px solid var(--vscode-textBlockQuote-border);
+            border-radius: 8px;
+            min-width: 150px;
+            cursor: move;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .blueprint-node:hover {
+            border-color: var(--vscode-focusBorder);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .blueprint-node.selected {
+            border-color: var(--vscode-focusBorder);
+            box-shadow: 0 0 0 2px rgba(14, 99, 156, 0.3);
+        }
+
+        .node-header {
+            padding: 12px 16px;
+            background: var(--vscode-titleBar-activeBackground);
+            border-radius: 6px 6px 0 0;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .node-body {
+            padding: 12px 16px;
+        }
+
+        .node-ports {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .port {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--vscode-symbolIcon-functionForeground);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .port.input {
+            margin-left: -22px;
+        }
+
+        .port.output {
+            margin-right: -22px;
+        }
+
+        .port:hover {
+            background: var(--vscode-focusBorder);
+            transform: scale(1.2);
+        }
+
+        /* 连接线样式 */
+        .connection {
+            stroke: var(--vscode-symbolIcon-functionForeground);
+            stroke-width: 2;
+            fill: none;
+            pointer-events: stroke;
+            cursor: pointer;
+        }
+
+        .connection:hover {
+            stroke: var(--vscode-focusBorder);
+            stroke-width: 3;
+        }
+
+        .connection.selected {
+            stroke: var(--vscode-focusBorder);
+            stroke-width: 3;
+            stroke-dasharray: 5,5;
+            animation: dash 1s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        /* 临时连接线 */
+        .temp-connection {
+            stroke: var(--vscode-focusBorder);
+            stroke-width: 2;
+            stroke-dasharray: 3,3;
+            fill: none;
+            pointer-events: none;
+        }
+
+        /* 状态指示器 */
+        .status-bar {
+            height: 28px;
+            background: var(--vscode-statusBar-background);
+            border-top: 1px solid var(--vscode-statusBar-border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 12px;
+            color: var(--vscode-statusBar-foreground);
+            gap: 16px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 右键菜单 */
+        .context-menu {
+            position: absolute;
+            background: var(--vscode-menu-background);
+            border: 1px solid var(--vscode-menu-border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 150px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.15s ease;
+            pointer-events: none;
+        }
+
+        .context-menu.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .context-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid var(--vscode-menu-separatorBackground);
+        }
+
+        .context-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .context-menu-item:hover {
+            background: var(--vscode-menu-selectionBackground);
+            color: var(--vscode-menu-selectionForeground);
+        }
+
+        .context-menu-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 加载状态 */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--vscode-progressBar-background);
+            border-top: 3px solid var(--vscode-progressBar-foreground);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <!-- 左侧工具面板 -->
+        <div class="tool-panel">
+            <div class="tool-header">节点库</div>
+            
+            <!-- 节点面板 -->
+            <div class="node-palette" id="node-palette">
+                <div class="palette-section">
+                    <h3>React 组件</h3>
+                    <div class="node-template" data-type="react-component">
+                        <div class="node-icon" style="background: #61dafb;">⚛</div>
+                        <div class="node-info">
+                            <div class="node-name">React组件</div>
+                            <div class="node-desc">函数式或类组件</div>
+                        </div>
+                    </div>
+                    <div class="node-template" data-type="react-hook">
+                        <div class="node-icon" style="background: #f39c12;">🎣</div>
+                        <div class="node-info">
+                            <div class="node-name">React Hook</div>
+                            <div class="node-desc">状态和副作用管理</div>
+                        </div>
+                    </div>
+                    <div class="node-template" data-type="react-context">
+                        <div class="node-icon" style="background: #9b59b6;">🌐</div>
+                        <div class="node-info">
+                            <div class="node-name">Context</div>
+                            <div class="node-desc">全局状态管理</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Rust 结构</h3>
+                    <div class="node-template" data-type="rust-struct">
+                        <div class="node-icon" style="background: #ce422b;">🏗</div>
+                        <div class="node-info">
+                            <div class="node-name">结构体</div>
+                            <div class="node-desc">数据结构定义</div>
+                        </div>
+                    </div>
+                    <div class="node-template" data-type="rust-enum">
+                        <div class="node-icon" style="background: #e67e22;">📋</div>
+                        <div class="node-info">
+                            <div class="node-name">枚举</div>
+                            <div class="node-desc">类型变体定义</div>
+                        </div>
+                    </div>
+                    <div class="node-template" data-type="rust-trait">
+                        <div class="node-icon" style="background: #27ae60;">🎯</div>
+                        <div class="node-info">
+                            <div class="node-name">特征</div>
+                            <div class="node-desc">行为接口定义</div>
+                        </div>
+                    </div>
+                    <div class="node-template" data-type="rust-function">
+                        <div class="node-icon" style="background: #3498db;">⚡</div>
+                        <div class="node-info">
+                            <div class="node-name">函数</div>
+                            <div class="node-desc">功能实现</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="palette-section">
+                    <h3>Web API</h3>
+                    <div class="node-template" data-type="api-endpoint">
+                        <div class="node-icon" style="background: #16a085;">🌐</div>
+                        <div class="node-info">
+                            <div class="node-name">API端点</div>
+                            <div class="node-desc">HTTP路由处理</div>
+                        </div>
+                    </div>
+                    <div class="node-template" data-type="database-model">
+                        <div class="node-icon" style="background: #8e44ad;">💾</div>
+                        <div class="node-info">
+                            <div class="node-name">数据模型</div>
+                            <div class="node-desc">数据库实体</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 属性面板 -->
+            <div class="properties-panel">
+                <div class="tool-header">属性</div>
+                <div class="properties-content" id="properties-content">
+                    <div class="property-group">
+                        <div class="property-label">选择一个节点查看属性</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主编辑区域 -->
+        <div class="main-editor">
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <button class="toolbar-button" id="btn-select" title="选择工具">
+                    <span>🖱️ 选择</span>
+                </button>
+                <button class="toolbar-button" id="btn-connect" title="连接工具">
+                    <span>🔗 连接</span>
+                </button>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-button" id="btn-zoom-in" title="放大">
+                    <span>🔍+ 放大</span>
+                </button>
+                <button class="toolbar-button" id="btn-zoom-out" title="缩小">
+                    <span>🔍- 缩小</span>
+                </button>
+                <button class="toolbar-button" id="btn-zoom-fit" title="适应屏幕">
+                    <span>📏 适应</span>
+                </button>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-button" id="btn-generate" title="生成代码">
+                    <span>⚡ 生成代码</span>
+                </button>
+                <button class="toolbar-button" id="btn-save" title="保存蓝图">
+                    <span>💾 保存</span>
+                </button>
+                <button class="toolbar-button" id="btn-load" title="加载蓝图">
+                    <span>📂 加载</span>
+                </button>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-button" id="btn-clear" title="清空画布">
+                    <span>🗑️ 清空</span>
+                </button>
+            </div>
+
+            <!-- 画布区域 -->
+            <div class="canvas-container">
+                <div id="blueprint-canvas"></div>
+                
+                <!-- SVG层用于连接线 -->
+                <svg class="canvas-layer" id="connections-layer">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                         refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" 
+                             fill="var(--vscode-symbolIcon-functionForeground)" />
+                        </marker>
+                    </defs>
+                </svg>
+                
+                <!-- 临时连接线层 -->
+                <svg class="canvas-layer" id="temp-connection-layer"></svg>
+                
+                <!-- 节点层 -->
+                <div class="canvas-layer" id="nodes-layer"></div>
+            </div>
+
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <span>节点: <span id="node-count">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span>连接: <span id="connection-count">0</span></span>
+                </div>
+                <div class="status-item">
+                    <span>缩放: <span id="zoom-level">100%</span></span>
+                </div>
+                <div class="status-item">
+                    <span id="status-message">就绪</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右键菜单 -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" data-action="copy">复制</div>
+        <div class="context-menu-item" data-action="paste">粘贴</div>
+        <div class="context-menu-item" data-action="delete">删除</div>
+        <div class="context-menu-item" data-action="duplicate">复制节点</div>
+        <div class="context-menu-item" data-action="properties">属性</div>
+    </div>
+
+    <!-- 加载覆盖层 -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="{{scriptUri}}"></script>
+</body>
+</html>
