@@ -27,6 +27,19 @@ npm run test
 
 ### 2️⃣ 插件功能完整测试清单
 
+## 🖱️ 资源管理器右键菜单（推荐）
+
+1. 在 VS Code 资源管理器中右键任意支持的代码文件（`.ts/.tsx/.js/.jsx/.rs`）。
+2. 选择顶层菜单 **🎨 可视化分析**。
+3. 根据文件类型选择对应子菜单：
+   - **⚛️ React分析**：只会在 React 组件文件中显示。
+   - **🦀 Rust可视化分析**：仅在 Rust 文件中可见。
+   - **🔧 通用工具**：所有受支持语言共享的分析/生成能力。
+   - **🚀 高级功能**：蓝图编辑、AI 分析与实时同步入口。
+4. 插件会自动聚焦所选文件，并调用已有命令完成分析或生成任务。
+
+> 小贴士：新的上下文菜单和命令面板是互补关系——无需再手动搜索命令，实现「右键即用」。
+
 ## ⚛️ React前端功能测试
 
 ### 步骤1：准备React测试文件
@@ -34,7 +47,7 @@ npm run test
 2. 或创建一个新的React文件
 
 ### 步骤2：测试React专用命令
-通过 `Ctrl+Shift+P` 打开命令面板，尝试以下命令：
+通过 `Ctrl+Shift+P` 或资源管理器右键菜单尝试以下命令：
 
 ```
 🔍 测试命令：
@@ -56,7 +69,7 @@ npm run test
 2. 或创建一个新的Rust文件
 
 ### 步骤2：测试Rust专用命令
-通过 `Ctrl+Shift+P` 打开命令面板，尝试以下命令：
+通过 `Ctrl+Shift+P` 或资源管理器右键菜单尝试以下命令：
 
 ```
 🔍 测试命令：
@@ -79,15 +92,37 @@ npm run test
 ```
 **预期效果**：打开拖拽式节点编辑界面
 
+### 测试儿童友好讲解卡片（预览）
+```
+命令：🧒 小朋友能懂的讲解（测试） - visualProgramming.context.advanced.showKidFriendlyCard
+右键路径：🚀 高级功能 → 🧒 小朋友能懂的讲解
+```
+**预期效果**：
+- 自动打开蓝图编辑器，在右下角展示一张中文故事卡片。
+- 第一行显示 AI 翻译后的中文文件名，下一行显示原始英文文件名。
+- 卡片内置分页按钮，Tab 1 讲这个文件在做什么，Tab 2 提醒要注意的地方，Tab 3 给出可以尝试的优化建议。
+- 每个要点都用简单中文和 emoji 解释，方便小朋友理解。
+
+### 测试高年级学生代码分析（全新功能）
+```
+命令：🎓 高年级学生代码分析 - visualProgramming.context.advanced.showSeniorStudentCard
+右键路径：🚀 高级功能 → 🎓 高年级学生代码分析
+```
+**预期效果**：
+- 自动打开蓝图编辑器，展示专业化的技术分析卡片。
+- 采用更直接的技术描述，不使用比喻，直接告诉学生代码作用。
+- 包含4个专业化Tab页：组件功能、性能问题分析、优化技术方案、代码结构建议。
+- 使用专业术语和具体的技术解决方案，适合有一定编程基础的高年级学生。
+
 ### 测试分析可视化
 ```
-命令：📊 显示分析可视化 - visualProgramming.showAnalysisVisualization  
+命令：📊 显示分析可视化 - visualProgramming.openAnalysisVisualization  
 ```
 **预期效果**：打开多标签页分析结果界面
 
 ### 测试代码结构视图
 ```
-命令：🔍 显示代码结构 - visualProgramming.showCodeStructure
+命令：🔍 分析代码结构 - visualProgramming.analyzeCode
 ```
 **预期效果**：在侧边栏显示树形结构视图
 
@@ -109,7 +144,7 @@ npm run test
 
 ### 测试实时协作
 ```
-命令：🤝 启动实时协作 - visualProgramming.startCollaboration
+命令：🔄 启动实时同步 - visualProgramming.startRealTimeSync
 ```
 **预期效果**：启动WebSocket协作服务器
 

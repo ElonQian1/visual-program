@@ -22,6 +22,9 @@ import { advancedUISystem } from './advancedUISystem';
 import { intelligentRefactoringEngine } from './intelligentRefactoringEngine';
 import { aiEnhancedAnalysisSystem } from './aiEnhancedAnalysisSystem';
 import { EnhancedInteractiveFeatures } from './enhancedInteractiveFeaturesSimplified';
+import { ContextMenuManager } from './contextMenu/ContextMenuManager';
+import { KidFriendlyCardController } from './kidFriendlyCards/kidFriendlyCardController';
+import { SeniorStudentCardController } from './seniorStudentCards/seniorStudentCardController';
 
 // 🚀 新增优化和诊断系统
 import { getOptimizationManager } from './projectOptimizationManager';
@@ -239,6 +242,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     // 🆕 初始化新功能组件
     const blueprintEditor = createBlueprintEditor(context);
+    const kidFriendlyController = new KidFriendlyCardController(blueprintEditor, context.extensionUri);
+    const seniorStudentController = new SeniorStudentCardController(blueprintEditor);
     const syncOutputChannel = vscode.window.createOutputChannel('Real-Time Code Sync');
     const realTimeSync = new RealTimeCodeSyncEngine(syncOutputChannel);
 
@@ -255,6 +260,19 @@ export function activate(context: vscode.ExtensionContext) {
     const performanceMonitor = PerformanceMonitor.getInstance();
     const userGuidance = UserGuidanceSystem.getInstance();
     const collaborationSystem = FileBasedCollaborationSystem.getInstance();
+
+    // 注册资源右键菜单命令
+    const contextMenuManager = new ContextMenuManager({
+        advanced: {
+            showKidFriendlyCard: async () => {
+                await kidFriendlyController.showDemoCard();
+            },
+            showSeniorStudentCard: async () => {
+                await seniorStudentController.showDemoCard();
+            }
+        }
+    });
+    contextMenuManager.registerCommands(context);
 
     // 🚀 初始化新的优化和诊断系统
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];

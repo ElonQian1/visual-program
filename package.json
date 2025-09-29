@@ -199,6 +199,96 @@
         "command": "visualProgramming.visualizeRustArchitecture",
         "title": "🏗️ 可视化Rust架构",
         "category": "Rust后端"
+      },
+      {
+        "command": "visualProgramming.context.react.analyzeProject",
+        "title": "⚛️ 深度分析React（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.react.optimizePerformance",
+        "title": "⚡ React性能体检（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.react.generateComponents",
+        "title": "🚀 生成React组件（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.react.visualizeArchitecture",
+        "title": "🏗️ 可视化React架构（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.rust.analyzeProject",
+        "title": "🦀 深度分析Rust（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.rust.optimizePerformance",
+        "title": "⚡ Rust性能体检（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.rust.generateCode",
+        "title": "🚀 生成Rust代码（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.rust.visualizeArchitecture",
+        "title": "🏗️ 可视化Rust架构（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.general.analyzeCode",
+        "title": "🔍 分析代码结构（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.general.generateCode",
+        "title": "💡 智能代码生成（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.general.enhancedGenerate",
+        "title": "✨ 增强代码生成（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.general.openVisualView",
+        "title": "🎨 打开可视化视图（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.advanced.openBlueprint",
+        "title": "🎨 打开蓝图编辑器（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.advanced.openVisualization",
+        "title": "📊 显示分析可视化（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.advanced.aiEnhancedAnalysis",
+        "title": "🧠 AI增强分析（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.advanced.startRealTimeSync",
+        "title": "🔄 启动实时同步（选中文件）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.advanced.showKidFriendlyCard",
+        "title": "🧒 小朋友能懂的讲解（测试）",
+        "category": "代码可视化/上下文"
+      },
+      {
+        "command": "visualProgramming.context.advanced.showSeniorStudentCard",
+        "title": "🎓 高年级学生代码分析",
+        "category": "代码可视化/上下文"
       }
     ],
     "viewsContainers": {
@@ -230,24 +320,14 @@
       "explorer/context": [
         {
           "submenu": "visualProgramming.main",
-          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx",
-          "group": "8_visual@1"
-        },
-        {
-          "submenu": "visualProgramming.rust",
-          "when": "resourceExtname == .rs",
+          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx || resourceExtname == .rs",
           "group": "8_visual@1"
         }
       ],
       "editor/context": [
         {
           "submenu": "visualProgramming.main",
-          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx",
-          "group": "8_visual@1"
-        },
-        {
-          "submenu": "visualProgramming.rust",
-          "when": "resourceExtname == .rs",
+          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx || resourceExtname == .rs",
           "group": "8_visual@1"
         }
       ],
@@ -256,6 +336,11 @@
           "submenu": "visualProgramming.react",
           "when": "resourceExtname == .tsx || resourceExtname == .jsx",
           "group": "1_react@1"
+        },
+        {
+          "submenu": "visualProgramming.rust",
+          "when": "resourceExtname == .rs",
+          "group": "1_rust@1"
         },
         {
           "submenu": "visualProgramming.general",
@@ -268,74 +353,82 @@
       ],
       "visualProgramming.react": [
         {
-          "command": "visualProgramming.analyzeReactProject",
+          "command": "visualProgramming.context.react.analyzeProject",
           "group": "1_analysis@1"
         },
         {
-          "command": "visualProgramming.optimizeReactPerformance",
+          "command": "visualProgramming.context.react.optimizePerformance",
           "group": "1_analysis@2"
         },
         {
-          "command": "visualProgramming.generateReactComponents",
+          "command": "visualProgramming.context.react.generateComponents",
           "group": "2_generation@1"
         },
         {
-          "command": "visualProgramming.visualizeReactArchitecture",
+          "command": "visualProgramming.context.react.visualizeArchitecture",
           "group": "3_visualization@1"
         }
       ],
       "visualProgramming.rust": [
         {
-          "command": "visualProgramming.analyzeRustProject",
+          "command": "visualProgramming.context.rust.analyzeProject",
           "group": "1_analysis@1"
         },
         {
-          "command": "visualProgramming.optimizeRustPerformance",
+          "command": "visualProgramming.context.rust.optimizePerformance",
           "group": "1_analysis@2"
         },
         {
-          "command": "visualProgramming.generateRustCode",
+          "command": "visualProgramming.context.rust.generateCode",
           "group": "2_generation@1"
         },
         {
-          "command": "visualProgramming.visualizeRustArchitecture",
+          "command": "visualProgramming.context.rust.visualizeArchitecture",
           "group": "3_visualization@1"
         }
       ],
       "visualProgramming.general": [
         {
-          "command": "visualProgramming.analyzeCode",
+          "command": "visualProgramming.context.general.analyzeCode",
           "group": "1_analysis@1"
         },
         {
-          "command": "visualProgramming.showCodeStructure",
-          "group": "1_analysis@2"
-        },
-        {
-          "command": "visualProgramming.generateCode",
+          "command": "visualProgramming.context.general.generateCode",
           "group": "2_generation@1"
         },
         {
-          "command": "visualProgramming.enhancedCodeGeneration",
+          "command": "visualProgramming.context.general.enhancedGenerate",
           "group": "2_generation@2"
+        },
+        {
+          "command": "visualProgramming.context.general.openVisualView",
+          "group": "3_visualization@1"
         }
       ],
       "visualProgramming.advanced": [
         {
-          "command": "visualProgramming.openBlueprintEditor",
+          "command": "visualProgramming.context.advanced.openBlueprint",
           "group": "1_advanced@1"
         },
         {
-          "command": "visualProgramming.showAnalysisVisualization",
+          "command": "visualProgramming.context.advanced.openVisualization",
           "group": "1_advanced@2"
         },
         {
-          "command": "visualProgramming.aiEnhancedAnalysis",
+          "command": "visualProgramming.context.advanced.aiEnhancedAnalysis",
           "group": "2_ai@1"
         },
         {
-          "command": "visualProgramming.startCollaboration",
+          "command": "visualProgramming.context.advanced.startRealTimeSync",
           "group": "3_collaboration@1"
+        },
+        {
+          "command": "visualProgramming.context.advanced.showKidFriendlyCard",
+          "group": "4_kids@1"
+        },
+        {
+          "command": "visualProgramming.context.advanced.showSeniorStudentCard",
+          "group": "4_kids@2"
         }
       ]
     },

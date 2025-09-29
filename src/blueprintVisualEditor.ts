@@ -1,5 +1,7 @@
 // 🎨 蓝图式可视化编辑器 - 完整实现
 import * as vscode from 'vscode';
+import { KidFriendlyCardData } from './kidFriendlyCards/types';
+import { SeniorStudentCardData } from './seniorStudentCards/types';
 
 export interface BlueprintNode {
     id: string;
@@ -482,6 +484,30 @@ impl ${name} {
             this.panel.webview.postMessage(message);
         }
     }
+
+    async showKidFriendlyCard(card: KidFriendlyCardData): Promise<void> {
+        if (!this.panel) {
+            vscode.window.showWarningMessage('请先打开蓝图编辑器');
+            return;
+        }
+
+        this.sendMessageToWebview({
+            command: 'showKidFriendlyCard',
+            card
+        });
+    }
+
+    async showSeniorStudentCard(card: SeniorStudentCardData): Promise<void> {
+        if (!this.panel) {
+            vscode.window.showWarningMessage('请先打开蓝图编辑器');
+            return;
+        }
+
+        this.sendMessageToWebview({
+            command: 'showSeniorStudentCard',
+            card
+        });
+    }
     
     // 🎨 获取Webview内容
     private getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri): string {
@@ -628,6 +654,284 @@ impl ${name} {
             display: flex;
             justify-content: space-between;
         }
+
+        .kid-card-panel {
+            position: absolute;
+            right: 10px;
+            bottom: 80px;
+            width: 320px;
+            max-height: 65vh;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            padding: 18px 20px;
+            color: #1a237e;
+            backdrop-filter: blur(4px);
+        }
+
+        .kid-card-panel.hidden {
+            display: none;
+        }
+
+        .kid-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .kid-card-emoji {
+            font-size: 34px;
+        }
+
+        .kid-card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            color: #1a237e;
+        }
+
+        .kid-card-subtitle {
+            font-size: 12px;
+            color: #5c6bc0;
+            margin: 2px 0 0 0;
+            letter-spacing: 0.05em;
+        }
+
+        .kid-card-summary {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .kid-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .kid-card-tag {
+            background: #e8eaf6;
+            color: #3949ab;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .kid-card-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .kid-card-tab-button {
+            flex: 1 1 auto;
+            background: #c5cae9;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: #1a237e;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .kid-card-tab-button.active {
+            background: #3f51b5;
+            color: white;
+            box-shadow: 0 6px 14px rgba(63, 81, 181, 0.4);
+        }
+
+        .kid-card-tab-content {
+            display: none;
+        }
+
+        .kid-card-tab-content.active {
+            display: block;
+        }
+
+        .kid-card-tab-description {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #303f9f;
+        }
+
+        .kid-card-tab-list {
+            list-style: none;
+            padding-left: 18px;
+            margin: 0;
+        }
+
+        .kid-card-tab-list li {
+            position: relative;
+            margin-bottom: 6px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .kid-card-tab-list li::before {
+            content: '✨';
+            position: absolute;
+            left: -18px;
+        }
+
+        .kid-card-cta {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #ffb74d, #ffa726);
+            color: #4e342e;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .kid-card-empty {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* 高年级学生卡片样式 - 更专业、更简洁 */
+        .senior-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e3f2fd;
+            padding-bottom: 8px;
+        }
+
+        .senior-card-emoji {
+            font-size: 28px;
+        }
+
+        .senior-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            color: #0d47a1;
+        }
+
+        .senior-card-subtitle {
+            font-size: 11px;
+            color: #1976d2;
+            margin: 2px 0 0 0;
+            letter-spacing: 0.05em;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+        }
+
+        .senior-card-summary {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #37474f;
+        }
+
+        .senior-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .senior-card-tag {
+            background: #e1f5fe;
+            color: #0277bd;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid #b3e5fc;
+        }
+
+        .senior-card-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .senior-card-tab-button {
+            flex: 1 1 auto;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 8px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #546e7a;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .senior-card-tab-button:hover {
+            background: #f5f5f5;
+            color: #263238;
+        }
+
+        .senior-card-tab-button.active {
+            background: transparent;
+            color: #1976d2;
+            border-bottom: 2px solid #2196f3;
+            font-weight: 600;
+        }
+
+        .senior-card-tab-content {
+            display: none;
+        }
+
+        .senior-card-tab-content.active {
+            display: block;
+        }
+
+        .senior-card-tab-description {
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #455a64;
+            font-weight: 500;
+        }
+
+        .senior-card-tab-list {
+            list-style: none;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .senior-card-tab-list li {
+            position: relative;
+            margin-bottom: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #37474f;
+        }
+
+        .senior-card-tab-list li::before {
+            content: '▶';
+            position: absolute;
+            left: -20px;
+            color: #2196f3;
+            font-size: 10px;
+        }
+
+        .senior-card-cta {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #0d47a1;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            border-left: 4px solid #2196f3;
+        }
     </style>
 </head>
 <body>
@@ -662,6 +966,13 @@ impl ${name} {
         </div>
         
         <div class="canvas" id="canvas"></div>
+
+        <div class="kid-card-panel" id="kidCardPanel">
+            <div class="kid-card-empty">
+                点击右键 → 🚀 高级功能 → 🧒 小朋友能懂的讲解<br />
+                我们会在这里用中文讲故事~
+            </div>
+        </div>
         
         <div class="status-bar">
             <span id="nodeCount">节点: 0</span>
@@ -676,6 +987,10 @@ impl ${name} {
         let selectedNode = null;
         let isDragging = false;
         let dragOffset = { x: 0, y: 0 };
+    let kidFriendlyCardData = null;
+    let kidFriendlyActiveTabId = null;
+    let seniorStudentCardData = null;
+    let seniorStudentActiveTabId = null;
         
         // 添加节点
         function addNode(type) {
@@ -728,6 +1043,281 @@ impl ${name} {
                 default: 
                     return [];
             }
+        }
+
+        function renderKidFriendlyCard(card) {
+            const panel = document.getElementById('kidCardPanel');
+            if (!panel) return;
+
+            kidFriendlyCardData = card;
+            kidFriendlyActiveTabId = (card.tabs && card.tabs.length > 0) ? card.tabs[0].id : null;
+
+            panel.innerHTML = '';
+
+            const header = document.createElement('div');
+            header.className = 'kid-card-header';
+
+            const emojiEl = document.createElement('div');
+            emojiEl.className = 'kid-card-emoji';
+            emojiEl.textContent = card.emoji || '📘';
+            header.appendChild(emojiEl);
+
+            const titleWrapper = document.createElement('div');
+            const titleEl = document.createElement('div');
+            titleEl.className = 'kid-card-title';
+            titleEl.textContent = card.chineseName || '小小代码故事';
+            titleWrapper.appendChild(titleEl);
+
+            const subtitleEl = document.createElement('div');
+            subtitleEl.className = 'kid-card-subtitle';
+            subtitleEl.textContent = card.englishName || '';
+            titleWrapper.appendChild(subtitleEl);
+
+            header.appendChild(titleWrapper);
+            panel.appendChild(header);
+
+            if (card.summary) {
+                const summaryEl = document.createElement('div');
+                summaryEl.className = 'kid-card-summary';
+                summaryEl.textContent = card.summary;
+                panel.appendChild(summaryEl);
+            }
+
+            if (Array.isArray(card.tags) && card.tags.length > 0) {
+                const tagsEl = document.createElement('div');
+                tagsEl.className = 'kid-card-tags';
+                card.tags.forEach(tag => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'kid-card-tag';
+                    tagEl.textContent = tag;
+                    tagsEl.appendChild(tagEl);
+                });
+                panel.appendChild(tagsEl);
+            }
+
+            if (Array.isArray(card.tabs) && card.tabs.length > 0) {
+                const tabsEl = document.createElement('div');
+                tabsEl.className = 'kid-card-tabs';
+                const contentWrapper = document.createElement('div');
+
+                card.tabs.forEach(tab => {
+                    const button = document.createElement('button');
+                    button.className = 'kid-card-tab-button';
+                    button.dataset.tabId = tab.id;
+                    button.textContent = tab.title;
+                    button.addEventListener('click', () => {
+                        kidFriendlyActiveTabId = tab.id;
+                        activateKidFriendlyTab(tab.id);
+                    });
+                    tabsEl.appendChild(button);
+
+                    const contentEl = document.createElement('div');
+                    contentEl.className = 'kid-card-tab-content';
+                    contentEl.dataset.tabId = tab.id;
+
+                    if (tab.description) {
+                        const descEl = document.createElement('div');
+                        descEl.className = 'kid-card-tab-description';
+                        descEl.textContent = tab.description;
+                        contentEl.appendChild(descEl);
+                    }
+
+                    if (Array.isArray(tab.points) && tab.points.length > 0) {
+                        const listEl = document.createElement('ul');
+                        listEl.className = 'kid-card-tab-list';
+                        tab.points.forEach(point => {
+                            const li = document.createElement('li');
+                            li.textContent = point;
+                            listEl.appendChild(li);
+                        });
+                        contentEl.appendChild(listEl);
+                    }
+
+                    contentWrapper.appendChild(contentEl);
+                });
+
+                panel.appendChild(tabsEl);
+                panel.appendChild(contentWrapper);
+            }
+
+            if (card.callToAction) {
+                const ctaEl = document.createElement('div');
+                ctaEl.className = 'kid-card-cta';
+                ctaEl.textContent = card.callToAction;
+                panel.appendChild(ctaEl);
+            }
+
+            activateKidFriendlyTab(kidFriendlyActiveTabId);
+        }
+
+        function activateKidFriendlyTab(tabId) {
+            const panel = document.getElementById('kidCardPanel');
+            if (!panel) return;
+
+            if (!tabId) {
+                const firstButton = panel.querySelector('.kid-card-tab-button');
+                tabId = firstButton ? firstButton.dataset.tabId : null;
+            }
+
+            if (!tabId) {
+                return;
+            }
+
+            const buttons = panel.querySelectorAll('.kid-card-tab-button');
+            const contents = panel.querySelectorAll('.kid-card-tab-content');
+
+            buttons.forEach(button => {
+                const isActive = button.dataset.tabId === tabId;
+                button.classList.toggle('active', isActive);
+            });
+
+            contents.forEach(content => {
+                const isActive = content.dataset.tabId === tabId;
+                content.classList.toggle('active', isActive);
+            });
+
+            kidFriendlyActiveTabId = tabId;
+        }
+
+        // 高年级学生卡片渲染函数
+        function renderSeniorStudentCard(card) {
+            const panel = document.getElementById('kidCardPanel'); // 复用同一个面板
+            if (!panel) return;
+
+            seniorStudentCardData = card;
+            seniorStudentActiveTabId = (card.tabs && card.tabs.length > 0) ? card.tabs[0].id : null;
+
+            panel.innerHTML = '';
+
+            const header = document.createElement('div');
+            header.className = 'senior-card-header';
+
+            const emojiEl = document.createElement('div');
+            emojiEl.className = 'senior-card-emoji';
+            emojiEl.textContent = card.emoji || '📊';
+            header.appendChild(emojiEl);
+
+            const titleWrapper = document.createElement('div');
+            const titleEl = document.createElement('div');
+            titleEl.className = 'senior-card-title';
+            titleEl.textContent = card.chineseName || '代码分析报告';
+            titleWrapper.appendChild(titleEl);
+
+            const subtitleEl = document.createElement('div');
+            subtitleEl.className = 'senior-card-subtitle';
+            subtitleEl.textContent = card.englishName || '';
+            titleWrapper.appendChild(subtitleEl);
+
+            header.appendChild(titleWrapper);
+            panel.appendChild(header);
+
+            if (card.summary) {
+                const summaryEl = document.createElement('div');
+                summaryEl.className = 'senior-card-summary';
+                summaryEl.textContent = card.summary;
+                panel.appendChild(summaryEl);
+            }
+
+            if (Array.isArray(card.tags) && card.tags.length > 0) {
+                const tagsEl = document.createElement('div');
+                tagsEl.className = 'senior-card-tags';
+                card.tags.forEach(tag => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'senior-card-tag';
+                    tagEl.textContent = tag;
+                    tagsEl.appendChild(tagEl);
+                });
+                panel.appendChild(tagsEl);
+            }
+
+            if (Array.isArray(card.tabs) && card.tabs.length > 0) {
+                const tabsEl = document.createElement('div');
+                tabsEl.className = 'senior-card-tabs';
+                const contentWrapper = document.createElement('div');
+
+                card.tabs.forEach(tab => {
+                    const button = document.createElement('button');
+                    button.className = 'senior-card-tab-button';
+                    button.dataset.tabId = tab.id;
+                    button.textContent = tab.title;
+                    button.addEventListener('click', () => {
+                        seniorStudentActiveTabId = tab.id;
+                        activateSeniorStudentTab(tab.id);
+                    });
+                    tabsEl.appendChild(button);
+
+                    const contentEl = document.createElement('div');
+                    contentEl.className = 'senior-card-tab-content';
+                    contentEl.dataset.tabId = tab.id;
+
+                    if (tab.description) {
+                        const descEl = document.createElement('div');
+                        descEl.className = 'senior-card-tab-description';
+                        descEl.textContent = tab.description;
+                        contentEl.appendChild(descEl);
+                    }
+
+                    if (Array.isArray(tab.points) && tab.points.length > 0) {
+                        const listEl = document.createElement('ul');
+                        listEl.className = 'senior-card-tab-list';
+                        tab.points.forEach(point => {
+                            const li = document.createElement('li');
+                            li.textContent = point;
+                            listEl.appendChild(li);
+                        });
+                        contentEl.appendChild(listEl);
+                    }
+
+                    contentWrapper.appendChild(contentEl);
+                });
+
+                panel.appendChild(tabsEl);
+                panel.appendChild(contentWrapper);
+            }
+
+            if (card.callToAction) {
+                const ctaEl = document.createElement('div');
+                ctaEl.className = 'senior-card-cta';
+                ctaEl.textContent = card.callToAction;
+                panel.appendChild(ctaEl);
+            }
+
+            activateSeniorStudentTab(seniorStudentActiveTabId);
+        }
+
+        function activateSeniorStudentTab(tabId) {
+            const panel = document.getElementById('kidCardPanel');
+            if (!panel) return;
+
+            if (!tabId) {
+                const firstButton = panel.querySelector('.senior-card-tab-button');
+                tabId = firstButton ? firstButton.dataset.tabId : null;
+            }
+
+            if (!tabId) {
+                return;
+            }
+
+            const buttons = panel.querySelectorAll('.senior-card-tab-button');
+            const contents = panel.querySelectorAll('.senior-card-tab-content');
+
+            buttons.forEach(button => {
+                if (button.dataset.tabId === tabId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            contents.forEach(content => {
+                if (content.dataset.tabId === tabId) {
+                    content.style.display = 'block';
+                } else {
+                    content.style.display = 'none';
+                }
+            });
+
+            seniorStudentActiveTabId = tabId;
         }
         
         // 渲染节点
@@ -864,6 +1454,12 @@ impl ${name} {
                     currentGraph = message.graph;
                     renderGraph();
                     updateStatus();
+                    break;
+                case 'showKidFriendlyCard':
+                    renderKidFriendlyCard(message.card);
+                    break;
+                case 'showSeniorStudentCard':
+                    renderSeniorStudentCard(message.card);
                     break;
             }
         });

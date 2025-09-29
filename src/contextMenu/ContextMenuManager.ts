@@ -5,7 +5,11 @@ import * as vscode from 'vscode';
 import { ReactMenuHandler } from './handlers/ReactMenuHandler';
 import { RustMenuHandler } from './handlers/RustMenuHandler';
 import { GeneralMenuHandler } from './handlers/GeneralMenuHandler';
-import { AdvancedMenuHandler } from './handlers/AdvancedMenuHandler';
+import { AdvancedMenuHandler, AdvancedMenuHandlerOptions } from './handlers/AdvancedMenuHandler';
+
+export interface ContextMenuManagerOptions {
+    advanced?: AdvancedMenuHandlerOptions;
+}
 
 export class ContextMenuManager {
     private reactHandler: ReactMenuHandler;
@@ -13,11 +17,11 @@ export class ContextMenuManager {
     private generalHandler: GeneralMenuHandler;
     private advancedHandler: AdvancedMenuHandler;
 
-    constructor() {
+    constructor(options: ContextMenuManagerOptions = {}) {
         this.reactHandler = new ReactMenuHandler();
         this.rustHandler = new RustMenuHandler();
         this.generalHandler = new GeneralMenuHandler();
-        this.advancedHandler = new AdvancedMenuHandler();
+        this.advancedHandler = new AdvancedMenuHandler(options.advanced);
     }
 
     /**
@@ -115,7 +119,7 @@ export class ContextMenuManager {
             { label: '🎨 打开蓝图编辑器', description: '可视化代码设计工具' },
             { label: '📊 显示分析可视化', description: '显示详细分析结果' },
             { label: '🧠 AI增强分析', description: '使用AI进行深度分析' },
-            { label: '🤝 启动实时协作', description: '开启多用户协作模式' }
+            { label: '🔄 启动实时同步', description: '开启多用户协作模式' }
         );
 
         const selected = await vscode.window.showQuickPick(items, {
@@ -143,9 +147,9 @@ export class ContextMenuManager {
             '🔍 分析代码结构': 'visualProgramming.analyzeCode',
             '💡 智能代码生成': 'visualProgramming.generateCode',
             '🎨 打开蓝图编辑器': 'visualProgramming.openBlueprintEditor',
-            '📊 显示分析可视化': 'visualProgramming.showAnalysisVisualization',
+            '📊 显示分析可视化': 'visualProgramming.openAnalysisVisualization',
             '🧠 AI增强分析': 'visualProgramming.aiEnhancedAnalysis',
-            '🤝 启动实时协作': 'visualProgramming.startCollaboration'
+            '🔄 启动实时同步': 'visualProgramming.startRealTimeSync'
         };
 
         const command = commandMap[label];
