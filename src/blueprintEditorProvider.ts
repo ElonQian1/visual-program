@@ -52,7 +52,7 @@ export class BlueprintEditorProvider {
      * 设置WebView消息处理
      */
     private setupWebviewMessageHandling(): void {
-        if (!this.panel) return;
+        if (!this.panel) {return;}
 
         this.panel.webview.onDidReceiveMessage(
             async (message) => {
@@ -219,7 +219,7 @@ export class BlueprintEditorProvider {
                 }
             });
             
-            if (!result) return;
+            if (!result) {return;}
             savePath = result.fsPath;
         }
 
@@ -246,7 +246,7 @@ export class BlueprintEditorProvider {
                 canSelectMany: false
             });
             
-            if (!result || result.length === 0) return;
+            if (!result || result.length === 0) {return;}
             loadPath = result[0].fsPath;
         }
 
@@ -278,7 +278,7 @@ export class BlueprintEditorProvider {
      */
     private async handleUpdateNodeProperties(data: { nodeId: string; properties: Record<string, any> }): Promise<void> {
         const graph = this.editor.getCurrentGraph();
-        if (!graph) return;
+        if (!graph) {return;}
 
         const node = graph.nodes.find(n => n.id === data.nodeId);
         if (node) {
@@ -292,7 +292,7 @@ export class BlueprintEditorProvider {
      */
     private async handleDeleteNode(data: { nodeId: string }): Promise<void> {
         const graph = this.editor.getCurrentGraph();
-        if (!graph) return;
+        if (!graph) {return;}
 
         // 删除节点
         graph.nodes = graph.nodes.filter(n => n.id !== data.nodeId);
@@ -315,7 +315,7 @@ export class BlueprintEditorProvider {
      */
     private async handleDeleteConnection(data: { connectionId: string }): Promise<void> {
         const graph = this.editor.getCurrentGraph();
-        if (!graph) return;
+        if (!graph) {return;}
 
         graph.connections = graph.connections.filter(c => c.id !== data.connectionId);
         graph.metadata.updatedAt = new Date();

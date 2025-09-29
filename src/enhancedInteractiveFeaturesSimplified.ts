@@ -74,10 +74,10 @@ export class EnhancedInteractiveFeatures {
     public handleDoubleClick(target: 'node' | 'connection' | 'canvas', id?: string): void {
         switch (target) {
             case 'node':
-                if (id) this.editNodeInline(id);
+                if (id) {this.editNodeInline(id);}
                 break;
             case 'connection':
-                if (id) this.editConnectionLabel(id);
+                if (id) {this.editConnectionLabel(id);}
                 break;
             case 'canvas':
                 this.createNodeAtCursor();
@@ -218,7 +218,7 @@ export class EnhancedInteractiveFeatures {
     }
 
     private highlightNodesInSelection(): void {
-        if (!this.selectionArea) return;
+        if (!this.selectionArea) {return;}
         
         const nodesInArea = this.getNodesInSelectionArea(this.selectionArea);
         this.canvas.highlightNodes(nodesInArea.map((n: CanvasNode) => n.id));
@@ -246,9 +246,9 @@ export class EnhancedInteractiveFeatures {
         const itemText = JSON.stringify(item).toLowerCase();
         const queryText = query.toLowerCase();
         
-        if (itemText === queryText) return 1.0;
-        if (itemText.startsWith(queryText)) return 0.8;
-        if (itemText.includes(queryText)) return 0.6;
+        if (itemText === queryText) {return 1.0;}
+        if (itemText.startsWith(queryText)) {return 0.8;}
+        if (itemText.includes(queryText)) {return 0.6;}
         
         return 0.0;
     }
@@ -340,10 +340,10 @@ export class EnhancedInteractiveFeatures {
     private executeContextAction(action: string, nodeId?: string): void {
         switch (action) {
             case '编辑节点':
-                if (nodeId) this.editNodeInline(nodeId);
+                if (nodeId) {this.editNodeInline(nodeId);}
                 break;
             case '复制节点':
-                if (nodeId) this.duplicateNode(nodeId);
+                if (nodeId) {this.duplicateNode(nodeId);}
                 break;
             case '复制':
                 this.copySelectedNodes();

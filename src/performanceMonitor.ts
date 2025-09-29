@@ -105,7 +105,7 @@ export class PerformanceMonitor extends EventEmitter {
         update: Partial<Pick<PerformanceMetrics, 'fileCount' | 'linesOfCode' | 'metadata'>>
     ): void {
         const metric = this.metrics.get(operationId);
-        if (!metric) return;
+        if (!metric) {return;}
 
         Object.assign(metric, update);
         this.recordMemoryUsage(operationId);
@@ -120,7 +120,7 @@ export class PerformanceMonitor extends EventEmitter {
         errorMessage?: string
     ): PerformanceMetrics | undefined {
         const metric = this.metrics.get(operationId);
-        if (!metric) return undefined;
+        if (!metric) {return undefined;}
 
         metric.endTime = Date.now();
         metric.duration = metric.endTime - metric.startTime;
@@ -152,7 +152,7 @@ export class PerformanceMonitor extends EventEmitter {
     // 记录内存使用情况
     private recordMemoryUsage(operationId: string): void {
         const metric = this.metrics.get(operationId);
-        if (!metric) return;
+        if (!metric) {return;}
 
         const memInfo = process.memoryUsage();
         metric.memoryUsage = {

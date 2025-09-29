@@ -511,8 +511,8 @@ path = "src/main.rs"
     private assessComplexity(code: string): 'low' | 'medium' | 'high' {
         const lines = code.split('\n').length;
         
-        if (lines < 50) return 'low';
-        if (lines < 200) return 'medium';
+        if (lines < 50) {return 'low';}
+        if (lines < 200) {return 'medium';}
         return 'high';
     }
 }

@@ -267,7 +267,7 @@ export class UserGuidanceSystem {
 
     // 显示当前步骤
     private async showCurrentStep(): Promise<void> {
-        if (!this.currentTutorial) return;
+        if (!this.currentTutorial) {return;}
 
         const { tutorial, currentStepIndex } = this.currentTutorial;
         const step = tutorial.steps[currentStepIndex];
@@ -586,7 +586,7 @@ export class UserGuidanceSystem {
 
     // 下一步
     private async nextStep(): Promise<void> {
-        if (!this.currentTutorial) return;
+        if (!this.currentTutorial) {return;}
 
         this.currentTutorial.currentStepIndex++;
         await this.showCurrentStep();
@@ -594,7 +594,7 @@ export class UserGuidanceSystem {
 
     // 上一步
     private async previousStep(): Promise<void> {
-        if (!this.currentTutorial) return;
+        if (!this.currentTutorial) {return;}
 
         if (this.currentTutorial.currentStepIndex > 0) {
             this.currentTutorial.currentStepIndex--;
@@ -604,7 +604,7 @@ export class UserGuidanceSystem {
 
     // 完成教程
     private async completeTutorial(): Promise<void> {
-        if (!this.currentTutorial) return;
+        if (!this.currentTutorial) {return;}
 
         const tutorial = this.currentTutorial.tutorial;
         this.completedTutorials.add(tutorial.id);
@@ -647,7 +647,7 @@ export class UserGuidanceSystem {
 
     // 检查先决条件
     private arePrerequisitesMet(tutorial: Tutorial): boolean {
-        if (!tutorial.prerequisites) return true;
+        if (!tutorial.prerequisites) {return true;}
         return tutorial.prerequisites.every(prereq => this.completedTutorials.has(prereq));
     }
 

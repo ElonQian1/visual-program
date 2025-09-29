@@ -151,10 +151,10 @@ export class ProjectFeatureDiagnostics {
                 
                 for (const file of files) {
                     if (file.endsWith('.ts')) {
-                        if (file.includes('Analyzer')) structure.analyzers.push(file);
-                        else if (file.includes('Provider')) structure.providers.push(file);
-                        else if (file.includes('Engine')) structure.engines.push(file);
-                        else structure.interfaces.push(file);
+                        if (file.includes('Analyzer')) {structure.analyzers.push(file);}
+                        else if (file.includes('Provider')) {structure.providers.push(file);}
+                        else if (file.includes('Engine')) {structure.engines.push(file);}
+                        else {structure.interfaces.push(file);}
                     }
                 }
             }

@@ -378,10 +378,10 @@ export class RustAsyncPerformanceAnalyzer {
     }
 
     private detectRuntimeType(code: string): 'tokio' | 'async-std' | 'smol' | 'futures' | 'custom' {
-        if (code.includes('tokio::') || code.includes('#[tokio::main]')) return 'tokio';
-        if (code.includes('async_std::') || code.includes('#[async_std::main]')) return 'async-std';
-        if (code.includes('smol::')) return 'smol';
-        if (code.includes('futures::')) return 'futures';
+        if (code.includes('tokio::') || code.includes('#[tokio::main]')) {return 'tokio';}
+        if (code.includes('async_std::') || code.includes('#[async_std::main]')) {return 'async-std';}
+        if (code.includes('smol::')) {return 'smol';}
+        if (code.includes('futures::')) {return 'futures';}
         return 'custom';
     }
 

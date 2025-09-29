@@ -756,7 +756,7 @@ export class InteractiveCanvasSystem {
 
     // 🔧 设置消息处理
     private setupMessageHandling(): void {
-        if (!this.panelProvider) return;
+        if (!this.panelProvider) {return;}
 
         this.panelProvider.webview.onDidReceiveMessage(
             message => {
@@ -794,7 +794,7 @@ export class InteractiveCanvasSystem {
     // ✏️ 处理编辑节点
     private handleEditNode(nodeId: string): void {
         const node = this.state.nodes.find(n => n.id === nodeId);
-        if (!node) return;
+        if (!node) {return;}
 
         vscode.window.showInputBox({
             prompt: '编辑节点名称',

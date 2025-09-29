@@ -138,10 +138,10 @@ export class EnhancedInteractiveFeatures {
     public handleDoubleClick(target: 'node' | 'connection' | 'canvas', id?: string): void {
         switch (target) {
             case 'node':
-                if (id) this.editNodeInline(id);
+                if (id) {this.editNodeInline(id);}
                 break;
             case 'connection':
-                if (id) this.editConnectionLabel(id);
+                if (id) {this.editConnectionLabel(id);}
                 break;
             case 'canvas':
                 this.createNodeAtCursor();
@@ -181,7 +181,7 @@ export class EnhancedInteractiveFeatures {
     }
 
     public updateDrag(currentX: number, currentY: number): void {
-        if (!this.dragState) return;
+        if (!this.dragState) {return;}
 
         const deltaX = currentX - this.dragState.startX;
         const deltaY = currentY - this.dragState.startY;
@@ -271,7 +271,7 @@ export class EnhancedInteractiveFeatures {
     }
 
     public handleTouchMove(touches: Touch[]): void {
-        if (!this.touchState) return;
+        if (!this.touchState) {return;}
 
         if (this.touchState.type === 'single' && touches.length === 1) {
             // 拖拽平移
@@ -396,7 +396,7 @@ export class EnhancedInteractiveFeatures {
 
     public animateNodePosition(nodeId: string, targetX: number, targetY: number, duration: number = 300): void {
         const node = this.canvas.getNode(nodeId);
-        if (!node) return;
+        if (!node) {return;}
 
         const startX = node.position.x;
         const startY = node.position.y;
@@ -430,7 +430,7 @@ export class EnhancedInteractiveFeatures {
     }
 
     private highlightNodesInSelection(): void {
-        if (!this.selectionArea) return;
+        if (!this.selectionArea) {return;}
         
         const nodesInArea = this.getNodesInSelectionArea(this.selectionArea);
         this.canvas.highlightNodes(nodesInArea.map(n => n.id));
@@ -461,7 +461,7 @@ export class EnhancedInteractiveFeatures {
     }
 
     private applyDraggedPositions(): void {
-        if (!this.dragState) return;
+        if (!this.dragState) {return;}
 
         const deltaX = this.dragState.currentX - this.dragState.startX;
         const deltaY = this.dragState.currentY - this.dragState.startY;
@@ -512,9 +512,9 @@ export class EnhancedInteractiveFeatures {
 
     private getShortcutKey(shortcut: KeyboardShortcut): string {
         let key = shortcut.key.toLowerCase();
-        if (shortcut.ctrlKey) key = 'ctrl+' + key;
-        if (shortcut.shiftKey) key = 'shift+' + key;
-        if (shortcut.altKey) key = 'alt+' + key;
+        if (shortcut.ctrlKey) {key = 'ctrl+' + key;}
+        if (shortcut.shiftKey) {key = 'shift+' + key;}
+        if (shortcut.altKey) {key = 'alt+' + key;}
         return key;
     }
 
@@ -649,9 +649,9 @@ export class EnhancedInteractiveFeatures {
         const itemText = JSON.stringify(item).toLowerCase();
         const queryText = query.toLowerCase();
         
-        if (itemText === queryText) return 1.0;
-        if (itemText.startsWith(queryText)) return 0.8;
-        if (itemText.includes(queryText)) return 0.6;
+        if (itemText === queryText) {return 1.0;}
+        if (itemText.startsWith(queryText)) {return 0.8;}
+        if (itemText.includes(queryText)) {return 0.6;}
         
         return 0.0;
     }

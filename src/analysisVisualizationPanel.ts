@@ -1307,7 +1307,7 @@ export class AnalysisVisualizationPanel {
 
     // 🔧 设置消息处理
     private setupMessageHandling(): void {
-        if (!this.panel) return;
+        if (!this.panel) {return;}
 
         this.panel.webview.onDidReceiveMessage(
             message => {

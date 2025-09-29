@@ -512,8 +512,8 @@ export class EnhancedTemplateSystem {
             const aIsStd = a.includes('std::');
             const bIsStd = b.includes('std::');
             
-            if (aIsStd && !bIsStd) return -1;
-            if (!aIsStd && bIsStd) return 1;
+            if (aIsStd && !bIsStd) {return -1;}
+            if (!aIsStd && bIsStd) {return 1;}
             
             return a.localeCompare(b);
         });

@@ -1832,4 +1832,75 @@ export class RustPerformanceAnalyzer {
         ).length;
         return allocations > 2;
     }
+
+    // 添加缺失的优化建议生成方法
+    generateOptimizationSuggestions(content: string): Promise<{
+        suggestions: Array<{
+            priority: 'high' | 'medium' | 'low';
+            title: string;
+            description: string;
+            example?: string;
+        }>;
+    }> {
+        return new Promise((resolve) => {
+            const suggestions = [];
+            
+            // 检查常见Rust优化点
+            if (content.includes('String::new()') && content.includes('for ')) {
+                suggestions.push({
+                    priority: 'high' as const,
+                    title: '优化字符串分配',
+                    description: '在循环中避免频繁的String分配，考虑使用StringBuilder或预分配容量',
+                    example: 'let mut s = String::with_capacity(expected_size);'
+                });
+            }
+            
+            if (content.includes('clone()') && !content.includes('Rc<') && !content.includes('Arc<')) {
+                suggestions.push({
+                    priority: 'medium' as const,
+                    title: '减少不必要的clone调用',
+                    description: '考虑使用引用、Rc或Arc来避免昂贵的克隆操作',
+                    example: 'use std::rc::Rc; let shared_data = Rc::new(data);'
+                });
+            }
+            
+            if (content.includes('unwrap()') || content.includes('expect(')) {
+                suggestions.push({
+                    priority: 'high' as const,
+                    title: '改进错误处理',
+                    description: '使用match或if let代替unwrap()来提高代码健壮性',
+                    example: 'match result { Ok(value) => ..., Err(e) => ... }'
+                });
+            }
+            
+            if (content.includes('Vec::new()') && content.includes('push(')) {
+                suggestions.push({
+                    priority: 'medium' as const,
+                    title: '预分配Vec容量',
+                    description: '如果知道大致大小，预分配Vec容量可以避免多次重新分配',
+                    example: 'let mut vec = Vec::with_capacity(expected_size);'
+                });
+            }
+            
+            if (content.includes('HashMap::new()')) {
+                suggestions.push({
+                    priority: 'medium' as const,
+                    title: '优化HashMap性能',
+                    description: '考虑预分配HashMap容量或使用更适合的数据结构',
+                    example: 'let mut map = HashMap::with_capacity(expected_size);'
+                });
+            }
+            
+            if (content.includes('async ') && content.includes('.await')) {
+                suggestions.push({
+                    priority: 'low' as const,
+                    title: '优化异步性能',
+                    description: '检查是否可以并行执行多个异步操作',
+                    example: 'let (result1, result2) = tokio::join!(async1(), async2());'
+                });
+            }
+            
+            resolve({ suggestions });
+        });
+    }
 }

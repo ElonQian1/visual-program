@@ -160,7 +160,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
                     prompt: '请输入协作会话ID',
                     placeHolder: '例如: COLLAB-ABCD1234'
                 });
-                if (!input) return;
+                if (!input) {return;}
                 sessionId = input;
             }
 
@@ -221,7 +221,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 初始化同步
     private async initializeSync(): Promise<void> {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
 
         const syncFolder = this.currentSession.syncFolder;
 
@@ -242,7 +242,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 处理文件变化
     private async handleFileChange(uri: vscode.Uri): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
+        if (!this.currentSession || !this.currentUser) {return;}
 
         const filePath = uri.fsPath;
         const fileName = path.basename(filePath);
@@ -343,7 +343,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 保存用户在线状态
     private async saveUserPresence(action: 'join' | 'leave' | 'update'): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
+        if (!this.currentSession || !this.currentUser) {return;}
 
         const userFile = path.join(this.currentSession.syncFolder, 'users', `user-${this.currentUser.id}.json`);
         
@@ -369,7 +369,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 发送协作消息
     public async sendCollaborationMessage(message: Omit<CollaborationMessage, 'timestamp'>): Promise<void> {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
 
         const fullMessage: CollaborationMessage = {
             ...message,
@@ -387,7 +387,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 更新光标位置
     public async updateCursorPosition(cursor: vscode.Position, activeFile: string): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
+        if (!this.currentSession || !this.currentUser) {return;}
 
         const cursorData = {
             userId: this.currentUser.id,
@@ -415,13 +415,13 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 更新光标装饰
     private updateCursorDecoration(user: User): void {
-        if (!user.cursor || !user.activeFile) return;
+        if (!user.cursor || !user.activeFile) {return;}
 
         const editor = vscode.window.visibleTextEditors.find(
             e => e.document.fileName === user.activeFile
         );
 
-        if (!editor) return;
+        if (!editor) {return;}
 
         // 创建或获取装饰类型
         let decorationType = this.collaborationDecorations.get(`cursor-${user.id}`);
@@ -446,13 +446,13 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 更新选择装饰
     private updateSelectionDecoration(user: User): void {
-        if (!user.selection || !user.activeFile) return;
+        if (!user.selection || !user.activeFile) {return;}
 
         const editor = vscode.window.visibleTextEditors.find(
             e => e.document.fileName === user.activeFile
         );
 
-        if (!editor) return;
+        if (!editor) {return;}
 
         // 创建或获取装饰类型
         let decorationType = this.collaborationDecorations.get(`selection-${user.id}`);
@@ -489,7 +489,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
     private setupEventListeners(): void {
         // 监听光标位置变化
         vscode.window.onDidChangeTextEditorSelection(event => {
-            if (!this.currentSession || !this.currentUser) return;
+            if (!this.currentSession || !this.currentUser) {return;}
 
             const cursor = event.textEditor.selection.active;
             const activeFile = event.textEditor.document.fileName;
@@ -504,8 +504,8 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
         // 监听文档变化
         vscode.workspace.onDidChangeTextDocument(event => {
-            if (!this.currentSession || !this.currentUser) return;
-            if (!this.currentSession.settings.permissions.canEdit) return;
+            if (!this.currentSession || !this.currentUser) {return;}
+            if (!this.currentSession.settings.permissions.canEdit) {return;}
 
             // 简化处理：只记录编辑活动
             this.currentUser.lastSeen = Date.now();
@@ -701,7 +701,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
     }
 
     private getUserDisplayName(userId: string): string {
-        if (!this.currentSession) return '未知用户';
+        if (!this.currentSession) {return '未知用户';}
         const user = this.currentSession.users.get(userId);
         return user?.name || '未知用户';
     }
@@ -763,7 +763,7 @@ export class FileBasedCollaborationSystem extends EventEmitter {
 
     // 公共API
     public async leaveSession(): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
+        if (!this.currentSession || !this.currentUser) {return;}
 
         await this.saveUserPresence('leave');
         this.cleanup();
@@ -772,8 +772,8 @@ export class FileBasedCollaborationSystem extends EventEmitter {
     }
 
     public async sendChatMessage(text: string): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
-        if (!this.currentSession.settings.permissions.canChat) return;
+        if (!this.currentSession || !this.currentUser) {return;}
+        if (!this.currentSession.settings.permissions.canChat) {return;}
 
         await this.sendCollaborationMessage({
             type: 'chat',

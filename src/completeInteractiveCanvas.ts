@@ -105,7 +105,7 @@ export class InteractiveCanvasSystem {
 
     // 🎭 设置事件监听器
     private setupEventListeners(): void {
-        if (!this.canvas) return;
+        if (!this.canvas) {return;}
 
         // 鼠标事件
         this.addEventListener(this.canvas, 'mousedown', this.onMouseDown.bind(this));
@@ -186,7 +186,7 @@ export class InteractiveCanvasSystem {
     // 🔴 处理节点点击
     private handleNodeClick(nodeId: string, pos: { x: number; y: number }, event: MouseEvent): void {
         const node = this.state.nodes.find(n => n.id === nodeId);
-        if (!node) return;
+        if (!node) {return;}
 
         if (event.ctrlKey || event.metaKey) {
             // 多选
@@ -244,7 +244,7 @@ export class InteractiveCanvasSystem {
         // 标记被拖拽的节点
         this.state.dragState.draggedNodes.forEach(id => {
             const node = this.state.nodes.find(n => n.id === id);
-            if (node) node.dragging = true;
+            if (node) {node.dragging = true;}
         });
     }
 
@@ -328,7 +328,7 @@ export class InteractiveCanvasSystem {
     // ✅ 完成连接
     private finishConnection(pos: { x: number; y: number }): void {
         const tempConn = this.state.dragState.tempConnection;
-        if (!tempConn) return;
+        if (!tempConn) {return;}
 
         const targetElement = this.getElementAtPosition(pos);
         
@@ -414,7 +414,7 @@ export class InteractiveCanvasSystem {
 
     // 📍 获取画布坐标
     private getCanvasPosition(event: MouseEvent): { x: number; y: number } {
-        if (!this.canvas) return { x: 0, y: 0 };
+        if (!this.canvas) {return { x: 0, y: 0 };}
         
         const rect = this.canvas.getBoundingClientRect();
         return {
@@ -471,7 +471,7 @@ export class InteractiveCanvasSystem {
         const sourceNode = this.state.nodes.find(n => n.id === connection.source);
         const targetNode = this.state.nodes.find(n => n.id === connection.target);
         
-        if (!sourceNode || !targetNode) return false;
+        if (!sourceNode || !targetNode) {return false;}
 
         // 简化：检查点到线段的距离
         const sourcePos = { x: sourceNode.position.x + sourceNode.size.width, y: sourceNode.position.y + sourceNode.size.height / 2 };
@@ -491,7 +491,7 @@ export class InteractiveCanvasSystem {
         const dy = lineEnd.y - lineStart.y;
         const length = Math.sqrt(dx * dx + dy * dy);
         
-        if (length === 0) return Math.sqrt(Math.pow(point.x - lineStart.x, 2) + Math.pow(point.y - lineStart.y, 2));
+        if (length === 0) {return Math.sqrt(Math.pow(point.x - lineStart.x, 2) + Math.pow(point.y - lineStart.y, 2));}
         
         const t = Math.max(0, Math.min(1, ((point.x - lineStart.x) * dx + (point.y - lineStart.y) * dy) / (length * length)));
         const projection = {
@@ -504,7 +504,7 @@ export class InteractiveCanvasSystem {
 
     // 🎨 渲染画布
     private render(): void {
-        if (!this.canvas) return;
+        if (!this.canvas) {return;}
 
         this.canvas.innerHTML = '';
         
@@ -537,17 +537,17 @@ export class InteractiveCanvasSystem {
     private renderConnections(container: SVGElement): void {
         this.state.connections.forEach(connection => {
             const line = this.createConnectionElement(connection);
-            if (line) container.appendChild(line);
+            if (line) {container.appendChild(line);}
         });
     }
 
     // ⚡ 渲染临时连接线
     private renderTempConnection(container: SVGElement): void {
         const tempConn = this.state.dragState.tempConnection;
-        if (!tempConn) return;
+        if (!tempConn) {return;}
 
         const sourceNode = this.state.nodes.find(n => n.id === tempConn.sourceNode);
-        if (!sourceNode) return;
+        if (!sourceNode) {return;}
 
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', String(sourceNode.position.x + sourceNode.size.width));
@@ -566,7 +566,7 @@ export class InteractiveCanvasSystem {
     private renderNodes(container: SVGElement): void {
         this.state.nodes.forEach(node => {
             const nodeElement = this.createNodeElement(node);
-            if (nodeElement) container.appendChild(nodeElement);
+            if (nodeElement) {container.appendChild(nodeElement);}
         });
     }
 
@@ -575,7 +575,7 @@ export class InteractiveCanvasSystem {
         const sourceNode = this.state.nodes.find(n => n.id === connection.source);
         const targetNode = this.state.nodes.find(n => n.id === connection.target);
         
-        if (!sourceNode || !targetNode) return null;
+        if (!sourceNode || !targetNode) {return null;}
 
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', String(sourceNode.position.x + sourceNode.size.width));

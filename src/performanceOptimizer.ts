@@ -118,7 +118,7 @@ export class PerformanceOptimizer {
     
     // 📈 性能分析
     private analyzePerformance(): void {
-        if (this.metrics.length < 5) return;
+        if (this.metrics.length < 5) {return;}
         
         const suggestions = this.generateOptimizationSuggestions();
         

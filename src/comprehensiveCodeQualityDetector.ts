@@ -122,7 +122,7 @@ export class ComprehensiveCodeQualityDetector {
 
     // 🔍 语言检测
     private detectLanguage(languageId: string, content: string): 'react' | 'rust' | 'other' {
-        if (languageId === 'rust') return 'rust';
+        if (languageId === 'rust') {return 'rust';}
         
         if ((languageId === 'typescript' || languageId === 'javascript' || 
              languageId === 'typescriptreact' || languageId === 'javascriptreact') &&
@@ -179,14 +179,14 @@ export class ComprehensiveCodeQualityDetector {
         if (language === 'react') {
             // React最佳实践
             aiAnalysis.suggestions?.forEach((suggestion: any) => {
-                if (suggestion.type === 'modernize') bonus += 5;
-                if (suggestion.type === 'optimize') bonus += 3;
+                if (suggestion.type === 'modernize') {bonus += 5;}
+                if (suggestion.type === 'optimize') {bonus += 3;}
             });
         } else if (language === 'rust') {
             // Rust最佳实践
             aiAnalysis.codeSmells?.forEach((smell: any) => {
-                if (smell.message.includes('unwrap()')) deductions += 5;
-                if (smell.message.includes('clone()')) deductions += 2;
+                if (smell.message.includes('unwrap()')) {deductions += 5;}
+                if (smell.message.includes('clone()')) {deductions += 2;}
             });
         }
 
@@ -555,8 +555,8 @@ ${this.generateQualitySummary(overallScore, criticalIssues.length, recommendatio
     }
 
     private mapPriorityToLevel(priority: number): 'high' | 'medium' | 'low' {
-        if (priority >= 8) return 'high';
-        if (priority >= 5) return 'medium';
+        if (priority >= 8) {return 'high';}
+        if (priority >= 5) {return 'medium';}
         return 'low';
     }
 
@@ -607,10 +607,10 @@ ${this.generateQualitySummary(overallScore, criticalIssues.length, recommendatio
     }
 
     private getScoreEmoji(score: number): string {
-        if (score >= 90) return '🟢 优秀';
-        if (score >= 80) return '🟡 良好';
-        if (score >= 70) return '🟠 一般';
-        if (score >= 60) return '🔴 需改进';
+        if (score >= 90) {return '🟢 优秀';}
+        if (score >= 80) {return '🟡 良好';}
+        if (score >= 70) {return '🟠 一般';}
+        if (score >= 60) {return '🔴 需改进';}
         return '⚫ 急需优化';
     }
 

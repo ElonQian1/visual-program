@@ -177,7 +177,7 @@ export class IntelligentErrorDiagnostics {
         const diagnosticMap = new Map<string, vscode.Diagnostic[]>();
 
         for (const error of this.errors.values()) {
-            if (error.resolved || !error.fileName) continue;
+            if (error.resolved || !error.fileName) {continue;}
 
             const diagnostic = new vscode.Diagnostic(
                 new vscode.Range(
@@ -212,10 +212,10 @@ export class IntelligentErrorDiagnostics {
     // 自动修复错误
     async autoFixError(errorId: string): Promise<boolean> {
         const error = this.errors.get(errorId);
-        if (!error) return false;
+        if (!error) {return false;}
 
         const pattern = this.matchErrorPattern(error.message);
-        if (!pattern || !pattern.autoFixable) return false;
+        if (!pattern || !pattern.autoFixable) {return false;}
 
         try {
             // 根据错误类型执行自动修复
@@ -266,7 +266,7 @@ export class IntelligentErrorDiagnostics {
     // 修复package.json问题
     private async fixPackageJsonIssue(filePath: string): Promise<void> {
         const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(filePath));
-        if (!workspaceFolder) return;
+        if (!workspaceFolder) {return;}
 
         const packageJsonPath = vscode.Uri.joinPath(workspaceFolder.uri, 'package.json');
         
@@ -296,7 +296,7 @@ export class IntelligentErrorDiagnostics {
 
     // 修复TypeScript错误
     private async fixTypeScriptError(error: DiagnosticError): Promise<void> {
-        if (!error.fileName) return;
+        if (!error.fileName) {return;}
 
         const document = await vscode.workspace.openTextDocument(error.fileName);
         const edit = new vscode.WorkspaceEdit();

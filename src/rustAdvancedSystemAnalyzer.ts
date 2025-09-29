@@ -456,8 +456,8 @@ export class RustAdvancedSystemAnalyzer {
     }
 
     private determineModuleVisibility(line: string): 'public' | 'private' | 'crate' {
-        if (line.includes('pub mod')) return 'public';
-        if (line.includes('pub(crate) mod')) return 'crate';
+        if (line.includes('pub mod')) {return 'public';}
+        if (line.includes('pub(crate) mod')) {return 'crate';}
         return 'private';
     }
 
@@ -511,9 +511,9 @@ export class RustAdvancedSystemAnalyzer {
     }
 
     private analyzeErrorHandlingPattern(functionCode: string): 'propagated' | 'handled' | 'panicked' {
-        if (functionCode.includes('?')) return 'propagated';
-        if (functionCode.includes('match') && functionCode.includes('Err')) return 'handled';
-        if (functionCode.includes('panic!') || functionCode.includes('unwrap()')) return 'panicked';
+        if (functionCode.includes('?')) {return 'propagated';}
+        if (functionCode.includes('match') && functionCode.includes('Err')) {return 'handled';}
+        if (functionCode.includes('panic!') || functionCode.includes('unwrap()')) {return 'panicked';}
         return 'handled';
     }
 
@@ -594,8 +594,8 @@ export class RustAdvancedSystemAnalyzer {
     }
 
     private determineOwnershipType(line: string): 'move' | 'borrow' | 'mutable_borrow' {
-        if (line.includes('&mut')) return 'mutable_borrow';
-        if (line.includes('&')) return 'borrow';
+        if (line.includes('&mut')) {return 'mutable_borrow';}
+        if (line.includes('&')) {return 'borrow';}
         return 'move';
     }
 
@@ -610,8 +610,8 @@ export class RustAdvancedSystemAnalyzer {
     }
 
     private suggestCloneAlternative(line: string): string {
-        if (line.includes('String')) return '考虑使用&str引用';
-        if (line.includes('Vec')) return '考虑使用切片&[T]';
+        if (line.includes('String')) {return '考虑使用&str引用';}
+        if (line.includes('Vec')) {return '考虑使用切片&[T]';}
         return '考虑使用引用或Arc共享数据';
     }
 
@@ -629,8 +629,8 @@ export class RustAdvancedSystemAnalyzer {
 
     private estimateTestCoverage(functionCode: string): 'low' | 'medium' | 'high' {
         const assertCount = (functionCode.match(/assert!/g) || []).length;
-        if (assertCount > 3) return 'high';
-        if (assertCount > 1) return 'medium';
+        if (assertCount > 3) {return 'high';}
+        if (assertCount > 1) {return 'medium';}
         return 'low';
     }
 
@@ -684,8 +684,8 @@ export class RustAdvancedSystemAnalyzer {
         const highRiskCrates = ['openssl-sys', 'libc'];
         const mediumRiskCrates = ['reqwest', 'hyper'];
         
-        if (highRiskCrates.includes(crateName)) return 'high';
-        if (mediumRiskCrates.includes(crateName)) return 'medium';
+        if (highRiskCrates.includes(crateName)) {return 'high';}
+        if (mediumRiskCrates.includes(crateName)) {return 'medium';}
         return 'low';
     }
 

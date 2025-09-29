@@ -371,24 +371,24 @@ export class ReactAdvancedComponentAnalyzer {
     }
 
     private suggestEffectOptimization(deps: string[]): string {
-        if (deps.length === 0) return '考虑是否需要依赖数组';
-        if (deps.length > 5) return '依赖过多，考虑拆分useEffect';
+        if (deps.length === 0) {return '考虑是否需要依赖数组';}
+        if (deps.length > 5) {return '依赖过多，考虑拆分useEffect';}
         return '依赖合理';
     }
 
     private suggestMemoOptimization(deps: string[]): string {
-        if (deps.length === 0) return '不需要useMemo，考虑移除';
-        if (deps.length > 3) return '依赖较多，确保必要性';
+        if (deps.length === 0) {return '不需要useMemo，考虑移除';}
+        if (deps.length > 3) {return '依赖较多，确保必要性';}
         return '使用合理';
     }
 
     private suggestCallbackOptimization(deps: string[]): string {
-        if (deps.length === 0) return '考虑是否真的需要useCallback';
+        if (deps.length === 0) {return '考虑是否真的需要useCallback';}
         return '使用合理，有助于性能优化';
     }
 
     private estimateRecomputeFrequency(deps: string[], code: string): 'low' | 'medium' | 'high' {
-        if (deps.length === 0) return 'low';
+        if (deps.length === 0) {return 'low';}
         
         let changeFreq = 0;
         deps.forEach(dep => {
@@ -405,8 +405,8 @@ export class ReactAdvancedComponentAnalyzer {
             issue.includes('内联函数') || issue.includes('key属性')
         ).length;
         
-        if (highImpactIssues > 0) return '20-40%性能提升';
-        if (issues.length > 2) return '10-20%性能提升';
+        if (highImpactIssues > 0) {return '20-40%性能提升';}
+        if (issues.length > 2) {return '10-20%性能提升';}
         return '5-10%性能提升';
     }
 
@@ -424,10 +424,10 @@ export class ReactAdvancedComponentAnalyzer {
     }
 
     private inferStateType(initialValue: string): string {
-        if (initialValue.includes('[')) return 'array';
-        if (initialValue.includes('{')) return 'object';
-        if (initialValue.includes('true') || initialValue.includes('false')) return 'boolean';
-        if (!isNaN(Number(initialValue))) return 'number';
+        if (initialValue.includes('[')) {return 'array';}
+        if (initialValue.includes('{')) {return 'object';}
+        if (initialValue.includes('true') || initialValue.includes('false')) {return 'boolean';}
+        if (!isNaN(Number(initialValue))) {return 'number';}
         return 'string';
     }
 
@@ -463,8 +463,8 @@ export class ReactAdvancedComponentAnalyzer {
         potential += heavyComps.length * 20;
         potential += unused.length * 5;
         
-        if (potential > 50) return '高优化潜力';
-        if (potential > 20) return '中等优化潜力';
+        if (potential > 50) {return '高优化潜力';}
+        if (potential > 20) {return '中等优化潜力';}
         return '低优化潜力';
     }
 }

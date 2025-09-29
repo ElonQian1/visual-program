@@ -176,7 +176,7 @@ export class IntelligentCodeOptimizer {
                 });
                 
                 // 防止无限循环
-                if (!rule.pattern.global) break;
+                if (!rule.pattern.global) {break;}
             }
         }
         
@@ -226,7 +226,7 @@ export class IntelligentCodeOptimizer {
         
         for (const suggestion of sortedSuggestions) {
             const success = await this.applyOptimization(document, suggestion);
-            if (success) appliedCount++;
+            if (success) {appliedCount++;}
         }
         
         if (appliedCount > 0) {
@@ -374,7 +374,7 @@ ${this.generateOverallRecommendations(suggestions, metrics)}
         // 处理来自WebView的消息
         panel.webview.onDidReceiveMessage(async (message) => {
             const activeEditor = vscode.window.activeTextEditor;
-            if (!activeEditor) return;
+            if (!activeEditor) {return;}
             
             switch (message.command) {
                 case 'analyze':

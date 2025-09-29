@@ -646,10 +646,10 @@ export class ReactLifecycleOptimizationAnalyzer {
         let complexity = 1;
         
         // 增加复杂度的因素
-        if (hookCode.includes('if')) complexity += 1;
-        if (hookCode.includes('for') || hookCode.includes('while')) complexity += 2;
-        if (hookCode.includes('try') || hookCode.includes('catch')) complexity += 1;
-        if (hookCode.includes('async') || hookCode.includes('await')) complexity += 1;
+        if (hookCode.includes('if')) {complexity += 1;}
+        if (hookCode.includes('for') || hookCode.includes('while')) {complexity += 2;}
+        if (hookCode.includes('try') || hookCode.includes('catch')) {complexity += 1;}
+        if (hookCode.includes('async') || hookCode.includes('await')) {complexity += 1;}
         
         const nestingLevel = (hookCode.match(/\{/g) || []).length;
         complexity += Math.floor(nestingLevel / 2);
@@ -661,10 +661,10 @@ export class ReactLifecycleOptimizationAnalyzer {
         let score = 10;
         
         // 减少可维护性的因素
-        if (hookCode.length > 200) score -= 2;
-        if (!this.hasMeaningfulVariableNames(hookCode)) score -= 2;
-        if (!this.hasComments(hookCode)) score -= 1;
-        if (this.hasComplexLogic(hookCode)) score -= 2;
+        if (hookCode.length > 200) {score -= 2;}
+        if (!this.hasMeaningfulVariableNames(hookCode)) {score -= 2;}
+        if (!this.hasComments(hookCode)) {score -= 1;}
+        if (this.hasComplexLogic(hookCode)) {score -= 2;}
         
         return Math.max(1, score);
     }
@@ -672,11 +672,11 @@ export class ReactLifecycleOptimizationAnalyzer {
     private determineUsagePattern(hookCode: string, hookType: string): 'correct' | 'suboptimal' | 'incorrect' | 'dangerous' {
         // 简化的模式检测
         if (hookType === 'useEffect') {
-            if (!hookCode.includes('[')) return 'dangerous'; // 缺少依赖数组
-            if (hookCode.includes('setState') && !hookCode.includes('return')) return 'incorrect'; // 缺少清理
+            if (!hookCode.includes('[')) {return 'dangerous';} // 缺少依赖数组
+            if (hookCode.includes('setState') && !hookCode.includes('return')) {return 'incorrect';} // 缺少清理
         }
         
-        if (hookType === 'useState' && hookCode.includes('useState({}')) return 'suboptimal'; // 复杂初始状态
+        if (hookType === 'useState' && hookCode.includes('useState({}')) {return 'suboptimal';} // 复杂初始状态
         
         return 'correct';
     }
@@ -745,7 +745,7 @@ export class ReactLifecycleOptimizationAnalyzer {
     // 继续实现其他方法...
     private extractEffectDependencies(hookCode: string): string[] {
         const depMatch = hookCode.match(/\[([^\]]*)\]/);
-        if (!depMatch) return [];
+        if (!depMatch) {return [];}
         
         return depMatch[1]
             .split(',')
@@ -763,14 +763,14 @@ export class ReactLifecycleOptimizationAnalyzer {
 
     private findLineNumber(code: string, searchString: string): number {
         const index = code.indexOf(searchString);
-        if (index === -1) return 1;
+        if (index === -1) {return 1;}
         
         return code.substring(0, index).split('\n').length;
     }
 
     private extractComponentCode(code: string, startPattern: string): string {
         const startIndex = code.indexOf(startPattern);
-        if (startIndex === -1) return '';
+        if (startIndex === -1) {return '';}
         
         // 简化的代码提取 - 实际实现需要更复杂的括号匹配
         let braceCount = 0;

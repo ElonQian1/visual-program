@@ -42,7 +42,7 @@ export interface ReactComponentDependency {
     strength: number;
 }
 
-export class ReactAdvancedAnalyzer {
+export class ReactPerformanceAnalyzer {
     private performancePatterns: Map<string, RegExp>;
     
     constructor() {
@@ -227,7 +227,7 @@ export class ReactAdvancedAnalyzer {
         return dependencies;
     }
 
-    generateOptimizationSuggestions(issues: ReactPerformanceIssue[], 
+    generateOptimizationSuggestionsOld(issues: ReactPerformanceIssue[], 
                                    architecture: ReactArchitecturePattern): string[] {
         const suggestions: string[] = [];
         
@@ -367,4 +367,165 @@ export class ReactAdvancedAnalyzer {
         const propsCount = (propsText.match(/\w+=/g) || []).length;
         return Math.min(propsCount, 5);
     }
+
+    // 添加缺失的主要分析方法
+    analyzeReactPerformance(content: string, fileName?: string): Promise<{
+        renderScore: number;
+        memoryScore: number;
+        optimizationScore: number;
+        issues: ReactPerformanceIssue[];
+        bundleAnalysis: ReactBundleAnalysis;
+    }> {
+        return new Promise((resolve) => {
+            const issues = this.analyzePerformance(content, fileName || '', []);
+            
+            // 计算性能得分
+            const criticalIssues = issues.filter(i => i.severity === 'critical').length;
+            const highIssues = issues.filter(i => i.severity === 'high').length;
+            const mediumIssues = issues.filter(i => i.severity === 'medium').length;
+            
+            const renderScore = Math.max(0, 100 - (criticalIssues * 30 + highIssues * 15 + mediumIssues * 5));
+            const memoryScore = Math.max(0, 100 - (criticalIssues * 25 + highIssues * 10 + mediumIssues * 3));
+            const optimizationScore = Math.max(0, 100 - (criticalIssues * 20 + highIssues * 8 + mediumIssues * 2));
+            
+            // 简化的bundle分析
+            const bundleAnalysis: ReactBundleAnalysis = {
+                totalSize: this.estimateBundleSize(content),
+                chunks: this.analyzeChunks(content),
+                duplicatedDependencies: this.findDuplicatedDeps(content),
+                unusedDependencies: this.findUnusedDeps(content),
+                heavyComponents: this.findHeavyComponents(content)
+            };
+            
+            resolve({
+                renderScore,
+                memoryScore,
+                optimizationScore,
+                issues,
+                bundleAnalysis
+            });
+        });
+    }
+
+    generateOptimizationSuggestions(content: string): Promise<{
+        suggestions: Array<{
+            priority: 'high' | 'medium' | 'low';
+            title: string;
+            description: string;
+            example?: string;
+        }>;
+    }> {
+        return new Promise((resolve) => {
+            const suggestions = [];
+            
+            // 检查常见优化点
+            if (content.includes('useEffect') && !content.includes('dependency array')) {
+                suggestions.push({
+                    priority: 'high' as const,
+                    title: '优化useEffect依赖',
+                    description: '添加正确的依赖数组以避免不必要的重新渲染',
+                    example: 'useEffect(() => { ... }, [dependency1, dependency2])'
+                });
+            }
+            
+            if (content.includes('function ') && content.includes('onClick')) {
+                suggestions.push({
+                    priority: 'medium' as const,
+                    title: '使用useCallback优化事件处理器',
+                    description: '缓存事件处理函数以减少子组件重新渲染',
+                    example: 'const handleClick = useCallback(() => { ... }, [deps])'
+                });
+            }
+            
+            if (content.includes('map(') && !content.includes('key=')) {
+                suggestions.push({
+                    priority: 'high' as const,
+                    title: '为列表项添加key属性',
+                    description: '为map渲染的列表项添加唯一key以提高渲染性能',
+                    example: '{items.map(item => <Item key={item.id} {...item} />)}'
+                });
+            }
+            
+            if (content.includes('expensive calculation')) {
+                suggestions.push({
+                    priority: 'medium' as const,
+                    title: '使用useMemo缓存计算结果',
+                    description: '对昂贵的计算使用useMemo进行缓存',
+                    example: 'const expensiveValue = useMemo(() => calculation(), [deps])'
+                });
+            }
+            
+            resolve({ suggestions });
+        });
+    }
+
+    private estimateBundleSize(content: string): number {
+        // 简化的bundle大小估算
+        return Math.floor(content.length * 0.8); // 假设压缩后约80%
+    }
+
+    private analyzeChunks(content: string): ReactChunk[] {
+        // 简化的chunk分析
+        return [
+            {
+                name: 'main',
+                size: this.estimateBundleSize(content) * 0.6,
+                files: ['main.js']
+            },
+            {
+                name: 'vendors',
+                size: this.estimateBundleSize(content) * 0.4,
+                files: ['vendors.js']
+            }
+        ];
+    }
+
+    private findDuplicatedDeps(content: string): string[] {
+        // 简化的重复依赖检测
+        const imports = content.match(/import.*from ['"]([^'"]+)['"]/g) || [];
+        const deps = imports.map(imp => imp.match(/from ['"]([^'"]+)['"]/)?.[1]).filter(Boolean);
+        const duplicated = deps.filter((dep, index) => deps.indexOf(dep) !== index);
+        return [...new Set(duplicated)] as string[];
+    }
+
+    private findUnusedDeps(content: string): string[] {
+        // 简化的未使用依赖检测
+        const imports = content.match(/import\s+(?:\{[^}]*\}|\w+)\s+from\s+['"]([^'"]+)['"]/g) || [];
+        const unused: string[] = [];
+        
+        imports.forEach(imp => {
+            const match = imp.match(/import\s+(?:\{([^}]*)\}|(\w+))\s+from\s+['"]([^'"]+)['"]/);
+            if (match) {
+                const [, namedImports, defaultImport] = match;
+                if (namedImports) {
+                    namedImports.split(',').forEach(named => {
+                        const name = named.trim();
+                        if (!content.includes(name)) {
+                            unused.push(name);
+                        }
+                    });
+                } else if (defaultImport && !content.includes(defaultImport)) {
+                    unused.push(defaultImport);
+                }
+            }
+        });
+        
+        return unused;
+    }
+
+    private findHeavyComponents(content: string): string[] {
+        // 检测可能的重型组件
+        const components = content.match(/(?:function|const)\s+(\w+).*?(?:React\.FC|JSX\.Element)/g) || [];
+        return components
+            .map(comp => comp.match(/(?:function|const)\s+(\w+)/)?.[1])
+            .filter(Boolean)
+            .filter(name => {
+                // 简单启发式：包含大量代码的组件可能较重
+                const componentMatch = content.match(new RegExp(`(?:function|const)\\s+${name}[\\s\\S]*?(?=(?:function|const|export|$))`));
+                return componentMatch && componentMatch[0].length > 1000;
+            }) as string[];
+    }
 }
+
+// 为了兼容性，也导出ReactAdvancedAnalyzer别名
+export { ReactPerformanceAnalyzer as ReactAdvancedAnalyzer };

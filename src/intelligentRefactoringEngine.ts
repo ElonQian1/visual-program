@@ -193,7 +193,7 @@ export class IntelligentRefactoringEngine {
     private detectDuplicateCode(): CodeSmell[] {
         const smells: CodeSmell[] = [];
         
-        if (!this.sourceFile) return smells;
+        if (!this.sourceFile) {return smells;}
         
         const functions: ts.FunctionDeclaration[] = [];
         
@@ -240,7 +240,7 @@ export class IntelligentRefactoringEngine {
     private detectComplexFunctions(): CodeSmell[] {
         const smells: CodeSmell[] = [];
         
-        if (!this.sourceFile) return smells;
+        if (!this.sourceFile) {return smells;}
         
         const visit = (node: ts.Node) => {
             if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
@@ -289,7 +289,7 @@ export class IntelligentRefactoringEngine {
     private detectLongFunctions(): CodeSmell[] {
         const smells: CodeSmell[] = [];
         
-        if (!this.sourceFile) return smells;
+        if (!this.sourceFile) {return smells;}
         
         const visit = (node: ts.Node) => {
             if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
@@ -329,7 +329,7 @@ export class IntelligentRefactoringEngine {
     private detectDeadCode(): CodeSmell[] {
         const smells: CodeSmell[] = [];
         
-        if (!this.sourceFile || !this.typeChecker) return smells;
+        if (!this.sourceFile || !this.typeChecker) {return smells;}
         
         const visit = (node: ts.Node) => {
             // 检测未使用的变量
@@ -369,7 +369,7 @@ export class IntelligentRefactoringEngine {
     private detectTightCoupling(): CodeSmell[] {
         const smells: CodeSmell[] = [];
         
-        if (!this.sourceFile) return smells;
+        if (!this.sourceFile) {return smells;}
         
         const classes: ts.ClassDeclaration[] = [];
         
@@ -417,7 +417,7 @@ export class IntelligentRefactoringEngine {
     private detectNamingIssues(): CodeSmell[] {
         const smells: CodeSmell[] = [];
         
-        if (!this.sourceFile) return smells;
+        if (!this.sourceFile) {return smells;}
         
         const visit = (node: ts.Node) => {
             // 检测函数命名
@@ -657,13 +657,13 @@ export class IntelligentRefactoringEngine {
         const text1 = node1.getFullText().trim();
         const text2 = node2.getFullText().trim();
         
-        if (text1 === text2) return 1;
+        if (text1 === text2) {return 1;}
         
         // 简单的相似度计算
         const longer = text1.length > text2.length ? text1 : text2;
         const shorter = text1.length > text2.length ? text2 : text1;
         
-        if (longer.length === 0) return 1;
+        if (longer.length === 0) {return 1;}
         
         const editDistance = this.levenshteinDistance(longer, shorter);
         return (longer.length - editDistance) / longer.length;

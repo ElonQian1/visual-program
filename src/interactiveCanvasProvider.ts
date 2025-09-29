@@ -45,7 +45,7 @@ export class InteractiveCanvasProvider {
         const sourceNode = this.nodes.get(sourceId);
         const targetNode = this.nodes.get(targetId);
         
-        if (!sourceNode || !targetNode) return false;
+        if (!sourceNode || !targetNode) {return false;}
         
         // 智能连线验证
         if (this.isValidConnection(sourceNode, targetNode, type)) {

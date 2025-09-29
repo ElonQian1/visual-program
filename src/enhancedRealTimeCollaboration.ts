@@ -273,7 +273,7 @@ export class RealTimeCollaborationProvider {
     // 🔥 智能协作建议
     public generateCollaborationInsights(sessionId: string): CollaborationInsight[] {
         const session = this.sessions.get(sessionId);
-        if (!session) return [];
+        if (!session) {return [];}
 
         const insights: CollaborationInsight[] = [];
 
@@ -364,7 +364,7 @@ export class RealTimeCollaborationProvider {
 
     private handleCollaborationMessage(sessionId: string, userId: string, message: any): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         switch (message.type) {
             case 'cursor-move':
@@ -397,7 +397,7 @@ export class RealTimeCollaborationProvider {
 
     private handleUserDisconnect(sessionId: string, userId: string): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         // 移除用户
         session.users = session.users.filter(u => u.id !== userId);

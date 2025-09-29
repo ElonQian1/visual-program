@@ -661,7 +661,7 @@ impl \${nodeContent.replace(/\\s+/g, '') || 'MyService'} {
     
     // 📡 消息处理器
     private setupMessageHandlers(): void {
-        if (!this.currentPanel) return;
+        if (!this.currentPanel) {return;}
         
         this.currentPanel.webview.onDidReceiveMessage(
             async (message) => {

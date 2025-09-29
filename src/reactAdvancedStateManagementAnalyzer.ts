@@ -1104,19 +1104,19 @@ export class ReactAdvancedStateManagementAnalyzer {
     private generateReduxOptimizations(code: string): StateOptimization[] { return []; }
 
     private async analyzeRedux(code: string): Promise<ReduxAnalysis | undefined> {
-        if (!code.includes('redux')) return undefined;
+        if (!code.includes('redux')) {return undefined;}
         // Redux详细分析实现
         return undefined;
     }
 
     private async analyzeZustand(code: string): Promise<ZustandAnalysis | undefined> {
-        if (!code.includes('zustand')) return undefined;
+        if (!code.includes('zustand')) {return undefined;}
         // Zustand详细分析实现
         return undefined;
     }
 
     private async analyzeContext(code: string): Promise<ContextAnalysis | undefined> {
-        if (!code.includes('createContext')) return undefined;
+        if (!code.includes('createContext')) {return undefined;}
         // Context详细分析实现
         return undefined;
     }

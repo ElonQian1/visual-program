@@ -575,7 +575,7 @@ use crossbeam::channel;
         const structs = (code.match(/struct\s+\w+/g) || []).length;
         const totalElements = functions + structs;
         
-        if (totalElements === 0) return 100;
+        if (totalElements === 0) {return 100;}
         
         // 假设相关元素的比例代表内聚性
         const relatedElements = Math.min(functions, structs * 2); // 简化计算

@@ -126,7 +126,7 @@ export class RealTimeCollaborationServer {
     // 📝 处理协作消息
     private handleMessage(sessionId: string, userId: string, message: CollaborationMessage): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         switch (message.type) {
             case 'node-update':
@@ -150,7 +150,7 @@ export class RealTimeCollaborationServer {
     // 🔄 处理节点更新
     private handleNodeUpdate(sessionId: string, userId: string, nodeData: any): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         // 更新会话中的图表数据
         if (session.graph && session.graph.nodes) {
@@ -176,7 +176,7 @@ export class RealTimeCollaborationServer {
     // 🔗 处理连接创建
     private handleConnectionCreate(sessionId: string, userId: string, connectionData: any): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         // 添加连接到图表
         if (session.graph && session.graph.connections) {
@@ -197,7 +197,7 @@ export class RealTimeCollaborationServer {
     // 🗑️ 处理连接删除
     private handleConnectionDelete(sessionId: string, userId: string, connectionId: string): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         // 从图表中删除连接
         if (session.graph && session.graph.connections) {
@@ -218,7 +218,7 @@ export class RealTimeCollaborationServer {
     // 🖱️ 处理用户光标
     private handleUserCursor(sessionId: string, userId: string, cursorData: { x: number; y: number }): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         const user = session.users.get(userId);
         if (user) {
@@ -238,7 +238,7 @@ export class RealTimeCollaborationServer {
     // 📊 处理图表更新
     private handleGraphUpdate(sessionId: string, userId: string, graphData: any): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         session.graph = graphData;
         session.lastModified = Date.now();
@@ -287,7 +287,7 @@ export class RealTimeCollaborationServer {
     // 👋 离开会话
     private leaveSession(sessionId: string, userId: string): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         session.users.delete(userId);
 
@@ -308,7 +308,7 @@ export class RealTimeCollaborationServer {
     // 📡 广播消息给会话中的其他用户
     private broadcastToSession(sessionId: string, excludeUserId: string, message: any): void {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {return;}
 
         session.users.forEach((user, userId) => {
             if (userId !== excludeUserId) {
@@ -400,7 +400,7 @@ export class RealTimeCollaborationServer {
         lastModified: number;
     } | null {
         const session = this.sessions.get(sessionId);
-        if (!session) return null;
+        if (!session) {return null;}
 
         return {
             userCount: session.users.size,

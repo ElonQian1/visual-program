@@ -187,9 +187,9 @@ ${roadmap.phase3.features.map(f => `- ${f}`).join('\n')}
 
 // 辅助函数
 function getHealthIcon(health: number): string {
-    if (health >= 80) return '🟢';
-    if (health >= 60) return '🟡';
-    if (health >= 40) return '🟠';
+    if (health >= 80) {return '🟢';}
+    if (health >= 60) {return '🟡';}
+    if (health >= 40) {return '🟠';}
     return '🔴';
 }
 
@@ -504,7 +504,7 @@ export function activate(context: vscode.ExtensionContext) {
                                 return undefined;
                             }
                         });
-                        if (value !== undefined) variables[variable.name] = value;
+                        if (value !== undefined) {variables[variable.name] = value;}
                     } else if (variable.type === 'boolean') {
                         const choice = await vscode.window.showQuickPick(['是', '否'], {
                             placeHolder: variable.description
@@ -514,7 +514,7 @@ export function activate(context: vscode.ExtensionContext) {
                         const choice = await vscode.window.showQuickPick(variable.choices, {
                             placeHolder: variable.description
                         });
-                        if (choice) variables[variable.name] = choice;
+                        if (choice) {variables[variable.name] = choice;}
                     }
                 }
                 
@@ -783,7 +783,7 @@ export function activate(context: vscode.ExtensionContext) {
                             prompt: '输入组件名称',
                             value: 'MyComponent'
                         });
-                        if (componentName) variables.componentName = componentName;
+                        if (componentName) {variables.componentName = componentName;}
                         variables.useHooks = true;
                         variables.useStyles = true;
                         variables.props = [];
@@ -794,7 +794,7 @@ export function activate(context: vscode.ExtensionContext) {
                             prompt: '输入服务名称',
                             value: 'my-service'
                         });
-                        if (serviceName) variables.serviceName = serviceName;
+                        if (serviceName) {variables.serviceName = serviceName;}
                         variables.port = 3000;
                     }
 
@@ -828,7 +828,7 @@ export function activate(context: vscode.ExtensionContext) {
                 { label: '📦 生成完整项目', value: 'full-project' }
             ], { placeHolder: '选择代码生成类型' });
 
-            if (!options) return;
+            if (!options) {return;}
 
             try {
                 switch (options.value) {

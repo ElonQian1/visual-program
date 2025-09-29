@@ -661,14 +661,14 @@ export class RustConcurrencySafetyAnalyzer {
         let score = 80; // 基础分数
         
         // 检查性能反模式
-        if (code.includes('block_on')) score -= 20; // 阻塞调用
-        if (code.includes('spawn_blocking')) score -= 10; // 阻塞任务
+        if (code.includes('block_on')) {score -= 20;} // 阻塞调用
+        if (code.includes('spawn_blocking')) {score -= 10;} // 阻塞任务
         const joinHandles = (code.match(/join!/g) || []).length;
-        if (joinHandles > 5) score -= 15; // 过多join
+        if (joinHandles > 5) {score -= 15;} // 过多join
         
         // 检查优化模式
-        if (code.includes('select!')) score += 10; // 并发选择
-        if (code.includes('FuturesUnordered')) score += 5; // 高效并发
+        if (code.includes('select!')) {score += 10;} // 并发选择
+        if (code.includes('FuturesUnordered')) {score += 5;} // 高效并发
         
         return Math.max(0, Math.min(100, score));
     }
@@ -820,12 +820,12 @@ while let Some(result) = futures.next().await {
         let score = 60; // 基础分数较低，因为手动线程管理风险高
         
         // 安全模式加分
-        if (code.includes('Arc<Mutex')) score += 20;
-        if (code.includes('Arc<RwLock')) score += 15;
-        if (code.includes('mpsc::')) score += 25;
+        if (code.includes('Arc<Mutex')) {score += 20;}
+        if (code.includes('Arc<RwLock')) {score += 15;}
+        if (code.includes('mpsc::')) {score += 25;}
         
         // 危险模式扣分
-        if (code.includes('unsafe')) score -= 30;
+        if (code.includes('unsafe')) {score -= 30;}
         const rawPointers = (code.match(/\*const|\*mut/g) || []).length;
         score -= rawPointers * 10;
         
@@ -837,13 +837,13 @@ while let Some(result) = futures.next().await {
         
         // 性能反模式
         const mutexCount = (code.match(/Mutex/g) || []).length;
-        if (mutexCount > 5) score -= 20; // 过多mutex
+        if (mutexCount > 5) {score -= 20;} // 过多mutex
         
-        if (code.includes('thread::sleep')) score -= 15; // 阻塞睡眠
+        if (code.includes('thread::sleep')) {score -= 15;} // 阻塞睡眠
         
         // 性能优化模式
-        if (code.includes('RwLock')) score += 10; // 读写锁
-        if (code.includes('Atomic')) score += 15; // 原子操作
+        if (code.includes('RwLock')) {score += 10;} // 读写锁
+        if (code.includes('Atomic')) {score += 15;} // 原子操作
         
         return Math.max(0, Math.min(100, score));
     }
@@ -912,9 +912,9 @@ while let Some(result) = futures.next().await {
         let dataRaces = 10;
         let undefinedBehavior = 15;
         
-        if (unsafeCode.includes('*')) memoryCorruption += 40;
-        if (unsafeCode.includes('transmute')) undefinedBehavior += 50;
-        if (unsafeCode.includes('union')) memoryCorruption += 30;
+        if (unsafeCode.includes('*')) {memoryCorruption += 40;}
+        if (unsafeCode.includes('transmute')) {undefinedBehavior += 50;}
+        if (unsafeCode.includes('union')) {memoryCorruption += 30;}
         
         const overallRisk = (memoryCorruption + dataRaces + undefinedBehavior) / 3;
         
@@ -935,9 +935,9 @@ while let Some(result) = futures.next().await {
     // 辅助方法实现...
     private extractAsyncDependencies(code: string): string[] {
         const deps: string[] = [];
-        if (code.includes('tokio::')) deps.push('tokio');
-        if (code.includes('futures::')) deps.push('futures');
-        if (code.includes('async_std::')) deps.push('async-std');
+        if (code.includes('tokio::')) {deps.push('tokio');}
+        if (code.includes('futures::')) {deps.push('futures');}
+        if (code.includes('async_std::')) {deps.push('async-std');}
         return deps;
     }
 

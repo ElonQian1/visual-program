@@ -280,10 +280,10 @@ export class RealTimeCollaborationProvider {
     // 辅助方法
     private extractFunctionName(line: string): string | null {
         const functionMatch = line.match(/function\s+(\w+)/);
-        if (functionMatch) return functionMatch[1];
+        if (functionMatch) {return functionMatch[1];}
         
         const arrowMatch = line.match(/const\s+(\w+)\s*=/);
-        if (arrowMatch) return arrowMatch[1];
+        if (arrowMatch) {return arrowMatch[1];}
         
         return null;
     }

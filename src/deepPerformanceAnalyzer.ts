@@ -144,9 +144,9 @@ export class DeepPerformanceAnalyzer {
         let nestedComponents = 0;
 
         lines.forEach(line => {
-            if (line.includes('.map(')) mapOperations++;
-            if (line.includes('&&') || line.includes('?')) conditionalRendering++;
-            if (line.includes('<') && line.includes('>')) nestedComponents++;
+            if (line.includes('.map(')) {mapOperations++;}
+            if (line.includes('&&') || line.includes('?')) {conditionalRendering++;}
+            if (line.includes('<') && line.includes('>')) {nestedComponents++;}
         });
 
         renderComplexity = mapOperations * 2 + conditionalRendering + nestedComponents * 0.5;
@@ -512,10 +512,10 @@ export class DeepPerformanceAnalyzer {
         let scalability: 'excellent' | 'good' | 'fair' | 'poor';
         const complexityScore = (metrics.renderComplexity || 0) + (metrics.rerenderRisk || 0);
         
-        if (complexityScore < 30) scalability = 'excellent';
-        else if (complexityScore < 60) scalability = 'good';
-        else if (complexityScore < 90) scalability = 'fair';
-        else scalability = 'poor';
+        if (complexityScore < 30) {scalability = 'excellent';}
+        else if (complexityScore < 60) {scalability = 'good';}
+        else if (complexityScore < 90) {scalability = 'fair';}
+        else {scalability = 'poor';}
 
         const recommendations = [];
         if (renderTime > 16) { // 超过一帧时间
@@ -545,10 +545,10 @@ export class DeepPerformanceAnalyzer {
         let scalability: 'excellent' | 'good' | 'fair' | 'poor';
         const efficiencyScore = ((metrics.memoryEfficiency || 50) + (metrics.concurrencyScore || 50)) / 2;
         
-        if (efficiencyScore > 80) scalability = 'excellent';
-        else if (efficiencyScore > 60) scalability = 'good';
-        else if (efficiencyScore > 40) scalability = 'fair';
-        else scalability = 'poor';
+        if (efficiencyScore > 80) {scalability = 'excellent';}
+        else if (efficiencyScore > 60) {scalability = 'good';}
+        else if (efficiencyScore > 40) {scalability = 'fair';}
+        else {scalability = 'poor';}
 
         const recommendations = [];
         if (executionTime > 10) {
@@ -664,16 +664,16 @@ ${predictions.recommendations.map(rec => `• ${rec}`).join('\n')}
     }
 
     private getScoreEmoji(score: number): string {
-        if (score >= 80) return '🟢 优秀';
-        if (score >= 60) return '🟡 良好';
-        if (score >= 40) return '🟠 一般';
+        if (score >= 80) {return '🟢 优秀';}
+        if (score >= 60) {return '🟡 良好';}
+        if (score >= 40) {return '🟠 一般';}
         return '🔴 需优化';
     }
 
     private getMetricEmoji(value?: number): string {
-        if (!value) return '⚪';
-        if (value < 30) return '🟢';
-        if (value < 60) return '🟡';
+        if (!value) {return '⚪';}
+        if (value < 30) {return '🟢';}
+        if (value < 60) {return '🟡';}
         return '🔴';
     }
 

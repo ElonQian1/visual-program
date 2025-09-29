@@ -139,7 +139,7 @@ export class RealTimeCollaborationSystem {
     
     // 📤 同步可视化状态
     public syncVisualState(nodes: any[], connections: any[]): void {
-        if (!this.currentSession || !this.websocket) return;
+        if (!this.currentSession || !this.websocket) {return;}
         
         this.currentSession.sharedState.visualNodes = nodes;
         
@@ -154,7 +154,7 @@ export class RealTimeCollaborationSystem {
     
     // 📝 同步代码选择
     public syncSelection(selection: vscode.Range, document: vscode.TextDocument): void {
-        if (!this.currentSession || !this.websocket) return;
+        if (!this.currentSession || !this.websocket) {return;}
         
         const userId = this.getCurrentUserId();
         this.currentSession.sharedState.selections[userId] = selection;
@@ -174,7 +174,7 @@ export class RealTimeCollaborationSystem {
     
     // 💬 发送聊天消息
     public sendChatMessage(message: string): void {
-        if (!this.currentSession || !this.websocket) return;
+        if (!this.currentSession || !this.websocket) {return;}
         
         this.sendMessage({
             type: 'chat:message',
@@ -188,7 +188,7 @@ export class RealTimeCollaborationSystem {
     
     // 📍 显示参与者光标
     public showParticipantCursors(): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
         
         for (const participant of this.currentSession.participants) {
             if (participant.id !== this.getCurrentUserId() && participant.cursor) {
@@ -226,7 +226,7 @@ export class RealTimeCollaborationSystem {
     
     // 👥 处理参与者加入
     private handleParticipantJoined(message: any): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
         
         const participant = message.participant;
         this.currentSession.participants.push(participant);
@@ -241,7 +241,7 @@ export class RealTimeCollaborationSystem {
     
     // 👋 处理参与者离开
     private handleParticipantLeft(message: any): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
         
         const participantId = message.participantId;
         const participant = this.participants.get(participantId);
@@ -261,7 +261,7 @@ export class RealTimeCollaborationSystem {
     
     // 🎨 处理可视化状态更新
     private handleVisualStateUpdate(message: any): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
         
         this.currentSession.sharedState.visualNodes = message.nodes;
         
@@ -276,10 +276,10 @@ export class RealTimeCollaborationSystem {
     
     // 📍 处理选择更新
     private handleSelectionUpdate(message: any): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
         
         const participant = this.participants.get(message.userId);
-        if (!participant) return;
+        if (!participant) {return;}
         
         // 在编辑器中显示其他参与者的选择
         this.showParticipantSelection(participant, message.selection, message.file);
@@ -288,7 +288,7 @@ export class RealTimeCollaborationSystem {
     // 🖱️ 处理光标更新
     private handleCursorUpdate(message: any): void {
         const participant = this.participants.get(message.userId);
-        if (!participant) return;
+        if (!participant) {return;}
         
         participant.cursor = {
             file: message.file,
@@ -423,7 +423,7 @@ export class RealTimeCollaborationSystem {
     private renderParticipantCursor(participant: Participant): void {
         // 实现参与者光标渲染逻辑
         // 这里需要使用VS Code的装饰API
-        if (!participant.cursor) return;
+        if (!participant.cursor) {return;}
         
         const decoration = vscode.window.createTextEditorDecorationType({
             backgroundColor: participant.color,
@@ -515,7 +515,7 @@ export class RealTimeCollaborationSystem {
     }
     
     private resolveConflict(conflict: any, resolution: string | undefined): void {
-        if (!resolution) return;
+        if (!resolution) {return;}
         
         this.sendMessage({
             type: 'conflict:resolve',
@@ -527,7 +527,7 @@ export class RealTimeCollaborationSystem {
     
     // 🚪 离开会话
     public async leaveSession(): Promise<void> {
-        if (!this.currentSession || !this.websocket) return;
+        if (!this.currentSession || !this.websocket) {return;}
         
         this.sendMessage({
             type: 'session:leave',

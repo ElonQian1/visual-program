@@ -594,8 +594,8 @@ export class AdvancedCodeQualityAnalyzer {
             }
 
             // 计算认知复杂度（简化版）
-            if (trimmedLine.includes('{')) nestingLevel++;
-            if (trimmedLine.includes('}')) nestingLevel = Math.max(0, nestingLevel - 1);
+            if (trimmedLine.includes('{')) {nestingLevel++;}
+            if (trimmedLine.includes('}')) {nestingLevel = Math.max(0, nestingLevel - 1);}
 
             for (const keyword of cognitiveKeywords) {
                 if (trimmedLine.includes(keyword)) {
@@ -617,8 +617,8 @@ export class AdvancedCodeQualityAnalyzer {
         for (const line of lines) {
             const trimmedLine = line.trim();
             
-            if (trimmedLine.includes('{')) nestingLevel++;
-            if (trimmedLine.includes('}')) nestingLevel = Math.max(0, nestingLevel - 1);
+            if (trimmedLine.includes('{')) {nestingLevel++;}
+            if (trimmedLine.includes('}')) {nestingLevel = Math.max(0, nestingLevel - 1);}
 
             for (const keyword of rustKeywords) {
                 const regex = new RegExp(`\\b${keyword}\\b`, 'g');
@@ -863,7 +863,7 @@ export class AdvancedCodeQualityAnalyzer {
         const codeLines = code.split('\n').filter(line => line.trim() && 
             !line.trim().startsWith('//') && !line.trim().startsWith('/*')).length;
         
-        if (codeLines === 0) return 0;
+        if (codeLines === 0) {return 0;}
         const ratio = commentLines / codeLines;
         return Math.min(100, ratio * 200); // 目标是20%的注释率
     }

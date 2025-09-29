@@ -66,13 +66,13 @@ export class CodeGenerationEngine {
         // 生成React代码
         reactNodes.forEach(node => {
             const code = this.generateReactCode(node, connections);
-            if (code) generatedFiles.push(code);
+            if (code) {generatedFiles.push(code);}
         });
 
         // 生成Rust代码
         rustNodes.forEach(node => {
             const code = this.generateRustCode(node, connections);
-            if (code) generatedFiles.push(code);
+            if (code) {generatedFiles.push(code);}
         });
 
         return generatedFiles;

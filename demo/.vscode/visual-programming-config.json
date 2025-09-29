@@ -1,0 +1,44 @@
+{
+  "react": {
+    "enableMemoization": true,
+    "enableLazyLoading": true,
+    "enableCodeSplitting": true,
+    "deepAnalysisEnabled": true,
+    "performanceMonitoringEnabled": true,
+    "bundleAnalysisEnabled": false,
+    "hookDependencyCheck": true,
+    "renderOptimizationCheck": true,
+    "memoryLeakDetection": true,
+    "architecturePatternDetection": true,
+    "stateManagementAnalysis": true,
+    "componentDependencyAnalysis": true
+  },
+  "rust": {
+    "enableZeroCopyOptimizations": true,
+    "enableCompilerOptimizations": true,
+    "enableMemoryPooling": false,
+    "performanceProfilingEnabled": true,
+    "memoryAnalysisEnabled": true,
+    "concurrencyAnalysisEnabled": true,
+    "borrowCheckOptimization": true,
+    "lifetimeAnalysisEnabled": true,
+    "unsafeBlockDetection": true,
+    "systemArchitectureAnalysis": true,
+    "microservicePatternDetection": true,
+    "asyncPatternAnalysis": true
+  },
+  "general": {
+    "enableIntelligentCaching": true,
+    "cacheExpirationTime": 5,
+    "maxCacheSize": 100,
+    "enableLazyLoading": true,
+    "enableParallelAnalysis": false,
+    "maxWorkerThreads": 2,
+    "enableRealTimeUpdates": true,
+    "visualizationFrameRate": 30,
+    "maxVisualizationNodes": 200,
+    "enablePerformanceLogging": false,
+    "enableErrorReporting": true,
+    "logLevel": "warn"
+  }
+}

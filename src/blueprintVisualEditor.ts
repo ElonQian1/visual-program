@@ -82,7 +82,7 @@ export class BlueprintVisualEditor {
     
     // 📝 设置消息处理
     private setupMessageHandling(): void {
-        if (!this.panel) return;
+        if (!this.panel) {return;}
         
         this.panel.webview.onDidReceiveMessage(
             async (message) => {
@@ -143,7 +143,7 @@ export class BlueprintVisualEditor {
     
     // 🔧 处理节点添加
     private async handleNodeAdded(node: BlueprintNode): Promise<void> {
-        if (!this.currentGraph) return;
+        if (!this.currentGraph) {return;}
         
         this.currentGraph.nodes.push(node);
         this.currentGraph.metadata.updatedAt = Date.now();
@@ -153,7 +153,7 @@ export class BlueprintVisualEditor {
     
     // ✏️ 处理节点更新
     private async handleNodeUpdated(updatedNode: BlueprintNode): Promise<void> {
-        if (!this.currentGraph) return;
+        if (!this.currentGraph) {return;}
         
         const index = this.currentGraph.nodes.findIndex(n => n.id === updatedNode.id);
         if (index >= 0) {
@@ -164,7 +164,7 @@ export class BlueprintVisualEditor {
     
     // 🗑️ 处理节点删除
     private async handleNodeDeleted(nodeId: string): Promise<void> {
-        if (!this.currentGraph) return;
+        if (!this.currentGraph) {return;}
         
         // 删除节点
         this.currentGraph.nodes = this.currentGraph.nodes.filter(n => n.id !== nodeId);
@@ -181,7 +181,7 @@ export class BlueprintVisualEditor {
     
     // 🔗 处理连接创建
     private async handleConnectionCreated(connection: BlueprintConnection): Promise<void> {
-        if (!this.currentGraph) return;
+        if (!this.currentGraph) {return;}
         
         // 验证连接有效性
         if (this.validateConnection(connection)) {
@@ -196,7 +196,7 @@ export class BlueprintVisualEditor {
     
     // 🚫 处理连接删除
     private async handleConnectionDeleted(connectionId: string): Promise<void> {
-        if (!this.currentGraph) return;
+        if (!this.currentGraph) {return;}
         
         this.currentGraph.connections = this.currentGraph.connections.filter(
             c => c.id !== connectionId
@@ -207,17 +207,17 @@ export class BlueprintVisualEditor {
     
     // 🎯 验证连接
     private validateConnection(connection: BlueprintConnection): boolean {
-        if (!this.currentGraph) return false;
+        if (!this.currentGraph) {return false;}
         
         const fromNode = this.currentGraph.nodes.find(n => n.id === connection.from.nodeId);
         const toNode = this.currentGraph.nodes.find(n => n.id === connection.to.nodeId);
         
-        if (!fromNode || !toNode) return false;
+        if (!fromNode || !toNode) {return false;}
         
         const fromPoint = fromNode.outputs.find(p => p.id === connection.from.pointId);
         const toPoint = toNode.inputs.find(p => p.id === connection.to.pointId);
         
-        if (!fromPoint || !toPoint) return false;
+        if (!fromPoint || !toPoint) {return false;}
         
         // 检查类型兼容性
         return this.areTypesCompatible(fromPoint, toPoint);
@@ -226,14 +226,14 @@ export class BlueprintVisualEditor {
     // ✅ 检查类型兼容性
     private areTypesCompatible(from: ConnectionPoint, to: ConnectionPoint): boolean {
         // 执行流总是兼容
-        if (from.type === 'execution' && to.type === 'execution') return true;
+        if (from.type === 'execution' && to.type === 'execution') {return true;}
         
         // 事件类型检查
-        if (from.type === 'event' && to.type === 'event') return true;
+        if (from.type === 'event' && to.type === 'event') {return true;}
         
         // 数据类型检查
         if (from.type === 'data' && to.type === 'data') {
-            if (!from.dataType || !to.dataType) return true; // 任意类型
+            if (!from.dataType || !to.dataType) {return true;} // 任意类型
             return from.dataType === to.dataType;
         }
         
@@ -242,7 +242,7 @@ export class BlueprintVisualEditor {
     
     // 🔧 处理代码生成
     private async handleGenerateCode(): Promise<void> {
-        if (!this.currentGraph) return;
+        if (!this.currentGraph) {return;}
         
         try {
             const generatedCode = await this.generateCodeFromGraph(this.currentGraph);

@@ -412,14 +412,14 @@ fn process_data(data: String) { /* ... */ }`,
         
         for (let i = startIndex; i < lines.length; i++) {
             const line = lines[i];
-            if (line.includes('useEffect')) started = true;
-            if (!started) continue;
+            if (line.includes('useEffect')) {started = true;}
+            if (!started) {continue;}
             
             content += line + '\n';
             braceCount += (line.match(/{/g) || []).length;
             braceCount -= (line.match(/}/g) || []).length;
             
-            if (braceCount === 0 && started) break;
+            if (braceCount === 0 && started) {break;}
         }
         
         return content;

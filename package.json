@@ -182,7 +182,7 @@
       },
       {
         "command": "visualProgramming.analyzeRustProject",
-        "title": "🦀 深度分析Rust项目", 
+        "title": "🦀 深度分析Rust项目",
         "category": "Rust后端"
       },
       {
@@ -227,14 +227,145 @@
       ]
     },
     "menus": {
+      "explorer/context": [
+        {
+          "submenu": "visualProgramming.main",
+          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx",
+          "group": "8_visual@1"
+        },
+        {
+          "submenu": "visualProgramming.rust",
+          "when": "resourceExtname == .rs",
+          "group": "8_visual@1"
+        }
+      ],
       "editor/context": [
         {
-          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx || resourceExtname == .rs",
+          "submenu": "visualProgramming.main",
+          "when": "resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .js || resourceExtname == .jsx",
+          "group": "8_visual@1"
+        },
+        {
+          "submenu": "visualProgramming.rust",
+          "when": "resourceExtname == .rs",
+          "group": "8_visual@1"
+        }
+      ],
+      "visualProgramming.main": [
+        {
+          "submenu": "visualProgramming.react",
+          "when": "resourceExtname == .tsx || resourceExtname == .jsx",
+          "group": "1_react@1"
+        },
+        {
+          "submenu": "visualProgramming.general",
+          "group": "2_general@1"
+        },
+        {
+          "submenu": "visualProgramming.advanced",
+          "group": "3_advanced@1"
+        }
+      ],
+      "visualProgramming.react": [
+        {
+          "command": "visualProgramming.analyzeReactProject",
+          "group": "1_analysis@1"
+        },
+        {
+          "command": "visualProgramming.optimizeReactPerformance",
+          "group": "1_analysis@2"
+        },
+        {
+          "command": "visualProgramming.generateReactComponents",
+          "group": "2_generation@1"
+        },
+        {
+          "command": "visualProgramming.visualizeReactArchitecture",
+          "group": "3_visualization@1"
+        }
+      ],
+      "visualProgramming.rust": [
+        {
+          "command": "visualProgramming.analyzeRustProject",
+          "group": "1_analysis@1"
+        },
+        {
+          "command": "visualProgramming.optimizeRustPerformance",
+          "group": "1_analysis@2"
+        },
+        {
+          "command": "visualProgramming.generateRustCode",
+          "group": "2_generation@1"
+        },
+        {
+          "command": "visualProgramming.visualizeRustArchitecture",
+          "group": "3_visualization@1"
+        }
+      ],
+      "visualProgramming.general": [
+        {
           "command": "visualProgramming.analyzeCode",
-          "group": "navigation"
+          "group": "1_analysis@1"
+        },
+        {
+          "command": "visualProgramming.showCodeStructure",
+          "group": "1_analysis@2"
+        },
+        {
+          "command": "visualProgramming.generateCode",
+          "group": "2_generation@1"
+        },
+        {
+          "command": "visualProgramming.enhancedCodeGeneration",
+          "group": "2_generation@2"
+        }
+      ],
+      "visualProgramming.advanced": [
+        {
+          "command": "visualProgramming.openBlueprintEditor",
+          "group": "1_advanced@1"
+        },
+        {
+          "command": "visualProgramming.showAnalysisVisualization",
+          "group": "1_advanced@2"
+        },
+        {
+          "command": "visualProgramming.aiEnhancedAnalysis",
+          "group": "2_ai@1"
+        },
+        {
+          "command": "visualProgramming.startCollaboration",
+          "group": "3_collaboration@1"
         }
       ]
-    }
+    },
+    "submenus": [
+      {
+        "id": "visualProgramming.main",
+        "label": "🎨 可视化分析",
+        "icon": "$(graph)"
+      },
+      {
+        "id": "visualProgramming.rust",
+        "label": "🦀 Rust可视化分析",
+        "icon": "$(graph)"
+      },
+      {
+        "id": "visualProgramming.react",
+        "label": "⚛️ React分析",
+        "icon": "$(react)"
+      },
+      {
+        "id": "visualProgramming.general",
+        "label": "🔧 通用工具",
+        "icon": "$(tools)"
+      },
+      {
+        "id": "visualProgramming.advanced",
+        "label": "🚀 高级功能",
+        "icon": "$(rocket)"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -258,8 +389,10 @@
     "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.17.11",
     "eslint": "^8.28.0",
+    "mocha": "^11.7.2",
     "typescript": "^4.9.4"
   },
   "dependencies": {

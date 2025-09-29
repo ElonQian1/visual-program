@@ -568,7 +568,7 @@ const DynamicContext = createContext(dynamicValues);`
         let content = lines[index];
         for (let i = index + 1; i < lines.length && i < index + 10; i++) {
             content += lines[i];
-            if (lines[i].includes('}')) break;
+            if (lines[i].includes('}')) {break;}
         }
         return content;
     }

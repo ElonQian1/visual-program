@@ -866,7 +866,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
         const items: StructureItem[] = [];
         const analysis = this.codeAnalysis?.reactHookOptimization;
 
-        if (!analysis) return items;
+        if (!analysis) {return items;}
 
         // Hook依赖问题
         if (analysis.hookDependencyIssues.length > 0) {
@@ -923,7 +923,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
         const items: StructureItem[] = [];
         const analysis = this.codeAnalysis?.reactStateOptimization;
 
-        if (!analysis) return items;
+        if (!analysis) {return items;}
 
         // 状态设计问题
         if (analysis.stateDesignIssues.length > 0) {
@@ -980,7 +980,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
         const items: StructureItem[] = [];
         const analysis = this.codeAnalysis?.rustMemorySafetyPerformance;
 
-        if (!analysis) return items;
+        if (!analysis) {return items;}
 
         // 内存安全问题
         if (analysis.memorySafetyIssues.length > 0) {
@@ -1255,7 +1255,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
         const items: StructureItem[] = [];
         const monitoring = this.codeAnalysis?.reactRealtimePerformance;
 
-        if (!monitoring) return items;
+        if (!monitoring) {return items;}
 
         // 组件性能分析
         monitoring.componentProfiles.forEach(profile => {
@@ -1313,7 +1313,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
         const items: StructureItem[] = [];
         const monitoring = this.codeAnalysis?.rustSystemMonitoring;
 
-        if (!monitoring) return items;
+        if (!monitoring) {return items;}
 
         // 系统指标
         const metrics = monitoring.metrics;
@@ -1378,7 +1378,7 @@ export class CodeStructureProvider implements vscode.TreeDataProvider<StructureI
         const items: StructureItem[] = [];
         const quality = this.codeAnalysis?.advancedCodeQuality;
 
-        if (!quality) return items;
+        if (!quality) {return items;}
 
         // 代码指标
         const metrics = quality.metrics;

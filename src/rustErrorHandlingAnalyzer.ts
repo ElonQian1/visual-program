@@ -968,7 +968,7 @@ export class RustErrorHandlingAnalyzer {
         const resultCount = (code.match(/Result<[^>]+>/g) || []).length;
         const properHandling = (code.match(/match.*Result|if let.*Result|\?/g) || []).length;
         
-        if (resultCount === 0) return 100;
+        if (resultCount === 0) {return 100;}
         return Math.min(100, (properHandling / resultCount) * 100);
     }
 
@@ -977,7 +977,7 @@ export class RustErrorHandlingAnalyzer {
         const resultCount = (code.match(/Result<[^>]+>/g) || []).length;
         const panicCount = (code.match(/panic!\(|\.unwrap\(\)/g) || []).length;
         
-        if (resultCount + panicCount === 0) return 100;
+        if (resultCount + panicCount === 0) {return 100;}
         return Math.min(100, (resultCount / (resultCount + panicCount)) * 100);
     }
 
@@ -986,7 +986,7 @@ export class RustErrorHandlingAnalyzer {
         const errorHandlingCount = (code.match(/match.*Err|if let.*Err|\.map_err\(/g) || []).length;
         const totalOperations = (code.match(/fn\s+\w+|async\s+fn\s+\w+/g) || []).length;
         
-        if (totalOperations === 0) return 100;
+        if (totalOperations === 0) {return 100;}
         return Math.min(100, (errorHandlingCount / totalOperations) * 50);
     }
 
@@ -1003,7 +1003,7 @@ export class RustErrorHandlingAnalyzer {
         const recoveryPatterns = (code.match(/\.unwrap_or\(|\.unwrap_or_else\(|match.*Err/g) || []).length;
         const totalErrors = (code.match(/Result<|Option<|panic!\(/g) || []).length;
         
-        if (totalErrors === 0) return 100;
+        if (totalErrors === 0) {return 100;}
         return Math.min(100, (recoveryPatterns / totalErrors) * 100);
     }
 
@@ -1073,17 +1073,17 @@ export class RustErrorHandlingAnalyzer {
 
     // 日志分析方法的占位符实现
     private detectLogLevel(code: string): 'trace' | 'debug' | 'info' | 'warn' | 'error' {
-        if (code.includes('LevelFilter::Info')) return 'info';
-        if (code.includes('LevelFilter::Debug')) return 'debug';
-        if (code.includes('LevelFilter::Error')) return 'error';
-        if (code.includes('LevelFilter::Warn')) return 'warn';
-        if (code.includes('LevelFilter::Trace')) return 'trace';
+        if (code.includes('LevelFilter::Info')) {return 'info';}
+        if (code.includes('LevelFilter::Debug')) {return 'debug';}
+        if (code.includes('LevelFilter::Error')) {return 'error';}
+        if (code.includes('LevelFilter::Warn')) {return 'warn';}
+        if (code.includes('LevelFilter::Trace')) {return 'trace';}
         return 'info';
     }
 
     private detectLogFormat(code: string): 'plain' | 'json' | 'structured' | 'custom' {
-        if (code.includes('json')) return 'json';
-        if (code.includes('structured')) return 'structured';
+        if (code.includes('json')) {return 'json';}
+        if (code.includes('structured')) {return 'structured';}
         return 'plain';
     }
 

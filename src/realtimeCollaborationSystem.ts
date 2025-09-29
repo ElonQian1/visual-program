@@ -149,7 +149,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
                     prompt: '请输入协作会话ID',
                     placeholder: '例如: COLLAB-ABCD1234'
                 });
-                if (!input) return;
+                if (!input) {return;}
                 sessionId = input;
             }
 
@@ -238,7 +238,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理消息
     private handleMessage(message: CollaborationMessage, socket: ws.WebSocket): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
 
         switch (message.type) {
             case 'presence':
@@ -267,7 +267,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理在线状态消息
     private handlePresenceMessage(message: CollaborationMessage, socket: ws.WebSocket): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
 
         const { action, user } = message.data;
 
@@ -312,10 +312,10 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理光标消息
     private handleCursorMessage(message: CollaborationMessage): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
 
         const user = this.currentSession.users.get(message.userId);
-        if (!user) return;
+        if (!user) {return;}
 
         user.cursor = message.data.cursor;
         user.activeFile = message.data.activeFile;
@@ -326,7 +326,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理编辑消息
     private handleEditMessage(message: CollaborationMessage): void {
-        if (!this.currentSession?.settings.permissions.canEdit) return;
+        if (!this.currentSession?.settings.permissions.canEdit) {return;}
 
         const { filePath, changes } = message.data;
         
@@ -336,10 +336,10 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理选择消息
     private handleSelectionMessage(message: CollaborationMessage): void {
-        if (!this.currentSession) return;
+        if (!this.currentSession) {return;}
 
         const user = this.currentSession.users.get(message.userId);
-        if (!user) return;
+        if (!user) {return;}
 
         user.selection = message.data.selection;
         user.activeFile = message.data.activeFile;
@@ -350,7 +350,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理分析消息
     private handleAnalysisMessage(message: CollaborationMessage): void {
-        if (!this.currentSession?.settings.permissions.canAnalyze) return;
+        if (!this.currentSession?.settings.permissions.canAnalyze) {return;}
 
         const { type, result } = message.data;
         
@@ -366,7 +366,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 处理聊天消息
     private handleChatMessage(message: CollaborationMessage): void {
-        if (!this.currentSession?.settings.permissions.canChat) return;
+        if (!this.currentSession?.settings.permissions.canChat) {return;}
 
         const userName = this.getUserName(message.userId);
         const { text } = message.data;
@@ -376,7 +376,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 广播消息
     private broadcastMessage(message: CollaborationMessage, excludeSocket?: ws.WebSocket): void {
-        if (!this.webSocketServer) return;
+        if (!this.webSocketServer) {return;}
 
         const messageStr = JSON.stringify(message);
 
@@ -399,13 +399,13 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 更新光标装饰
     private updateCursorDecoration(user: User): void {
-        if (!user.cursor || !user.activeFile) return;
+        if (!user.cursor || !user.activeFile) {return;}
 
         const editor = vscode.window.visibleTextEditors.find(
             e => e.document.fileName === user.activeFile
         );
 
-        if (!editor) return;
+        if (!editor) {return;}
 
         // 创建或获取装饰类型
         let decorationType = this.collaborationDecorations.get(`cursor-${user.id}`);
@@ -429,13 +429,13 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 更新选择装饰
     private updateSelectionDecoration(user: User): void {
-        if (!user.selection || !user.activeFile) return;
+        if (!user.selection || !user.activeFile) {return;}
 
         const editor = vscode.window.visibleTextEditors.find(
             e => e.document.fileName === user.activeFile
         );
 
-        if (!editor) return;
+        if (!editor) {return;}
 
         // 创建或获取装饰类型
         let decorationType = this.collaborationDecorations.get(`selection-${user.id}`);
@@ -471,10 +471,10 @@ export class RealtimeCollaborationSystem extends EventEmitter {
     // 应用远程编辑
     private async applyRemoteEdits(filePath: string, changes: vscode.TextDocumentContentChangeEvent[], userId: string): Promise<void> {
         const document = vscode.workspace.textDocuments.find(doc => doc.fileName === filePath);
-        if (!document) return;
+        if (!document) {return;}
 
         const editor = vscode.window.visibleTextEditors.find(e => e.document === document);
-        if (!editor) return;
+        if (!editor) {return;}
 
         // 暂时禁用本地编辑事件，避免循环
         this.isApplyingRemoteEdit = true;
@@ -511,7 +511,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
     private setupEventListeners(): void {
         // 监听光标位置变化
         vscode.window.onDidChangeTextEditorSelection(event => {
-            if (this.isApplyingRemoteEdit || !this.currentSession || !this.currentUser) return;
+            if (this.isApplyingRemoteEdit || !this.currentSession || !this.currentUser) {return;}
 
             this.sendMessage({
                 type: 'cursor',
@@ -540,8 +540,8 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
         // 监听文档变化
         vscode.workspace.onDidChangeTextDocument(event => {
-            if (this.isApplyingRemoteEdit || !this.currentSession || !this.currentUser) return;
-            if (!this.currentSession.settings.permissions.canEdit) return;
+            if (this.isApplyingRemoteEdit || !this.currentSession || !this.currentUser) {return;}
+            if (!this.currentSession.settings.permissions.canEdit) {return;}
 
             this.sendMessage({
                 type: 'edit',
@@ -740,7 +740,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
     }
 
     private getUserName(userId: string): string {
-        if (!this.currentSession) return '未知用户';
+        if (!this.currentSession) {return '未知用户';}
         const user = this.currentSession.users.get(userId);
         return user?.name || '未知用户';
     }
@@ -750,7 +750,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
     }
 
     private getAvailableColor(): string {
-        if (!this.currentSession) return this.getRandomColor();
+        if (!this.currentSession) {return this.getRandomColor();}
         
         const usedColors = Array.from(this.currentSession.users.values()).map(u => u.color);
         const availableColors = this.userColors.filter(color => !usedColors.includes(color));
@@ -919,7 +919,7 @@ export class RealtimeCollaborationSystem extends EventEmitter {
 
     // 公共API
     public async leaveSession(): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
+        if (!this.currentSession || !this.currentUser) {return;}
 
         this.sendMessage({
             type: 'presence',
@@ -938,8 +938,8 @@ export class RealtimeCollaborationSystem extends EventEmitter {
     }
 
     public async sendChatMessage(text: string): Promise<void> {
-        if (!this.currentSession || !this.currentUser) return;
-        if (!this.currentSession.settings.permissions.canChat) return;
+        if (!this.currentSession || !this.currentUser) {return;}
+        if (!this.currentSession.settings.permissions.canChat) {return;}
 
         this.sendMessage({
             type: 'chat',

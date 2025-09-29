@@ -112,8 +112,8 @@ export class AIEnhancedAnalyzer {
         const functions = content.match(functionPattern) || [];
         functions.forEach(func => {
             const lines = func.split('\n').length;
-            if (lines > 50) score -= 2;
-            else if (lines > 30) score -= 1;
+            if (lines > 50) {score -= 2;}
+            else if (lines > 30) {score -= 1;}
         });
         
         // 注释密度奖励
@@ -123,9 +123,9 @@ export class AIEnhancedAnalyzer {
         const totalLines = content.split('\n').length;
         const commentRatio = commentLines / totalLines;
         
-        if (commentRatio > 0.15) score += 2;
-        else if (commentRatio > 0.1) score += 1;
-        else if (commentRatio < 0.05) score -= 1;
+        if (commentRatio > 0.15) {score += 2;}
+        else if (commentRatio > 0.1) {score += 1;}
+        else if (commentRatio < 0.05) {score -= 1;}
         
         // 命名质量
         const variableNames = content.match(/(?:let|const|var)\s+(\w+)/g) || [];
@@ -140,7 +140,7 @@ export class AIEnhancedAnalyzer {
     // 🧪 估算测试覆盖率
     private async estimateTestCoverage(document: vscode.TextDocument): Promise<number> {
         const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
-        if (!workspaceFolder) return 0;
+        if (!workspaceFolder) {return 0;}
         
         // 查找测试文件
         const testPatterns = [
@@ -168,7 +168,7 @@ export class AIEnhancedAnalyzer {
             !testFiles.some(testUri => testUri.toString() === uri.toString())
         );
         
-        if (testableFiles.length === 0) return 10; // 没有源文件时返回满分
+        if (testableFiles.length === 0) {return 10;} // 没有源文件时返回满分
         
         const coverageRatio = testFiles.length / testableFiles.length;
         return Math.min(10, Math.round(coverageRatio * 10));
@@ -499,20 +499,20 @@ ${this.generateSummary(result)}
     
     // 辅助方法
     private getComplexityEmoji(score: number): string {
-        if (score <= 3) return '🟢';
-        if (score <= 6) return '🟡';
+        if (score <= 3) {return '🟢';}
+        if (score <= 6) {return '🟡';}
         return '🔴';
     }
     
     private getMaintainabilityEmoji(score: number): string {
-        if (score >= 8) return '✅';
-        if (score >= 6) return '⚠️';
+        if (score >= 8) {return '✅';}
+        if (score >= 6) {return '⚠️';}
         return '❌';
     }
     
     private getCoverageEmoji(score: number): string {
-        if (score >= 8) return '🛡️';
-        if (score >= 5) return '🔍';
+        if (score >= 8) {return '🛡️';}
+        if (score >= 5) {return '🔍';}
         return '⚠️';
     }
     

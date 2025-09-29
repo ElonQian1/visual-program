@@ -754,7 +754,7 @@ let value = some_result?;`,
         categories: Record<string, number>;
     } | null {
         const insights = this.insights.get(fileName);
-        if (!insights) return null;
+        if (!insights) {return null;}
 
         const stats = {
             totalInsights: insights.length,
@@ -774,7 +774,7 @@ let value = some_result?;`,
     // 🎯 获取优先修复建议
     public getPriorityInsights(fileName: string, limit: number = 5): AICodeInsight[] {
         const insights = this.insights.get(fileName);
-        if (!insights) return [];
+        if (!insights) {return [];}
 
         return insights
             .sort((a, b) => {

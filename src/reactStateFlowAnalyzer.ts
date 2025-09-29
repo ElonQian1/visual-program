@@ -826,20 +826,20 @@ const useStore = create((set) => ({
 
     // 辅助方法
     private inferStateType(initialValue: string): 'primitive' | 'object' | 'array' | 'function' | 'complex' {
-        if (initialValue.includes('[') || initialValue.includes('Array')) return 'array';
-        if (initialValue.includes('{') || initialValue.includes('Object')) return 'object';
-        if (initialValue.includes('=>') || initialValue.includes('function')) return 'function';
+        if (initialValue.includes('[') || initialValue.includes('Array')) {return 'array';}
+        if (initialValue.includes('{') || initialValue.includes('Object')) {return 'object';}
+        if (initialValue.includes('=>') || initialValue.includes('function')) {return 'function';}
         if (initialValue.includes('null') || initialValue.includes('undefined') || 
             /^['"`]/.test(initialValue) || /^\d+$/.test(initialValue) || 
-            /^(true|false)$/.test(initialValue)) return 'primitive';
+            /^(true|false)$/.test(initialValue)) {return 'primitive';}
         return 'complex';
     }
 
     private estimateStateSize(initialValue: string): number {
         // 简化的大小估算
-        if (initialValue.includes('[') && initialValue.length > 50) return 1000;
-        if (initialValue.includes('{') && initialValue.length > 30) return 500;
-        if (initialValue.length > 100) return 2000;
+        if (initialValue.includes('[') && initialValue.length > 50) {return 1000;}
+        if (initialValue.includes('{') && initialValue.length > 30) {return 500;}
+        if (initialValue.length > 100) {return 2000;}
         return 100;
     }
 
@@ -968,12 +968,12 @@ const useStore = create((set) => ({
     }
 
     private tracePath(nodeId: string, edges: StateFlowEdge[], visited: Set<string>): string[] {
-        if (visited.has(nodeId)) return [];
+        if (visited.has(nodeId)) {return [];}
         
         visited.add(nodeId);
         const outgoing = edges.filter(edge => edge.from === nodeId);
         
-        if (outgoing.length === 0) return [nodeId];
+        if (outgoing.length === 0) {return [nodeId];}
         
         const longestPath = outgoing.reduce((longest, edge) => {
             const path = this.tracePath(edge.to, edges, new Set(visited));

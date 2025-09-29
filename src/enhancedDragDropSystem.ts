@@ -186,7 +186,7 @@ export class EnhancedDragDropSystem {
     // 📏 启用节点调整大小
     private enableResize(nodeElement: HTMLElement): void {
         const resizeHandle = nodeElement.querySelector('.node-resize-handle') as HTMLElement;
-        if (!resizeHandle) return;
+        if (!resizeHandle) {return;}
         
         resizeHandle.style.cssText = `
             position: absolute;
@@ -217,7 +217,7 @@ export class EnhancedDragDropSystem {
         });
         
         const handleMouseMove = (e: MouseEvent) => {
-            if (!isResizing) return;
+            if (!isResizing) {return;}
             
             const newWidth = startWidth + e.clientX - startX;
             const newHeight = startHeight + e.clientY - startY;
@@ -246,7 +246,7 @@ export class EnhancedDragDropSystem {
         const target = e.target as HTMLElement;
         const nodeElement = target.closest('.canvas-node') as HTMLElement;
         
-        if (!nodeElement) return;
+        if (!nodeElement) {return;}
         
         this.manager.isDragging = true;
         const nodeId = nodeElement.id;
@@ -313,7 +313,7 @@ export class EnhancedDragDropSystem {
         const nodeId = e.dataTransfer?.getData('text/plain');
         const node = nodeId ? this.nodes.get(nodeId) : null;
         
-        if (!node) return;
+        if (!node) {return;}
         
         // 计算相对于画布的位置
         const rect = this.canvas.getBoundingClientRect();
@@ -344,10 +344,10 @@ export class EnhancedDragDropSystem {
         const sourceNode = this.nodes.get(sourceId);
         const targetNode = this.nodes.get(targetId);
         
-        if (!sourceNode || !targetNode) return;
+        if (!sourceNode || !targetNode) {return;}
         
         // 避免重复连接
-        if (sourceNode.connections.includes(targetId)) return;
+        if (sourceNode.connections.includes(targetId)) {return;}
         
         // 添加连接
         sourceNode.connections.push(targetId);
@@ -368,7 +368,7 @@ export class EnhancedDragDropSystem {
         const sourceElement = document.getElementById(sourceId);
         const targetElement = document.getElementById(targetId);
         
-        if (!sourceElement || !targetElement) return;
+        if (!sourceElement || !targetElement) {return;}
         
         const svg = document.getElementById('connections-svg') || this.createConnectionsSVG();
         
@@ -453,7 +453,7 @@ export class EnhancedDragDropSystem {
     // 🔄 更新节点连接
     private updateConnections(nodeId: string): void {
         const node = this.nodes.get(nodeId);
-        if (!node) return;
+        if (!node) {return;}
         
         // 更新该节点的所有连接
         node.connections.forEach(targetId => {
@@ -508,7 +508,7 @@ export class EnhancedDragDropSystem {
     
     // ✅ 检查是否可以放置
     private canDrop(draggedNode: CanvasNode | null, dropZone: DropZone): boolean {
-        if (!draggedNode) return false;
+        if (!draggedNode) {return false;}
         return dropZone.accepts.includes(draggedNode.type) || dropZone.accepts.includes('*');
     }
     

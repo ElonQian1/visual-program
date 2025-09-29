@@ -163,7 +163,7 @@ export class IntelligentTemplateSystem {
             let score = 0;
             
             // 基于项目类型评分
-            if (context.projectType === template.category) score += 30;
+            if (context.projectType === template.category) {score += 30;}
             
             // 基于技术栈评分
             if (context.technologies.some(tech => template.tags.includes(tech))) {
@@ -176,9 +176,9 @@ export class IntelligentTemplateSystem {
             }
             
             // 基于项目规模评分
-            if (context.projectSize === 'small' && template.difficulty === 'beginner') score += 10;
-            if (context.projectSize === 'medium' && template.difficulty === 'intermediate') score += 10;
-            if (context.projectSize === 'large' && template.difficulty === 'advanced') score += 10;
+            if (context.projectSize === 'small' && template.difficulty === 'beginner') {score += 10;}
+            if (context.projectSize === 'medium' && template.difficulty === 'intermediate') {score += 10;}
+            if (context.projectSize === 'large' && template.difficulty === 'advanced') {score += 10;}
             
             if (score > 20) {
                 recommendations.push({ template, score });
@@ -236,7 +236,7 @@ export class IntelligentTemplateSystem {
         
         return template.replace(loopRegex, (match, arrayName, content) => {
             const array = variables[arrayName];
-            if (!Array.isArray(array)) return '';
+            if (!Array.isArray(array)) {return '';}
             
             return array.map((item, index) => {
                 let itemContent = content;
